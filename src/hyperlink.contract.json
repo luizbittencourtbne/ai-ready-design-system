@@ -1,0 +1,205 @@
+{
+  "component": "Hyperlink",
+  "version": "experimental",
+  "purpose": "navegação: leva a pessoa para outro destino",
+  "notAnAction": "Se o alvo executa uma ação em vez de navegar, o componente correto é o Button. Ver src/hyperlink.rules.md, 'Hyperlink vs Button'.",
+  "source": {
+    "figma": "04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1 — Hiperlink 240:1702, set 99:8725, master 99:8672",
+    "figmaRevision": "2026-09-18 — anel de foco por tema, Hit Area de 24px, altura fixa removida, ícone do Large alinhado; decisões de visited, link externo e Disabled registradas na descrição do componente",
+    "geometry": "src/hyperlink.tokens.json",
+    "themeMappings": "scripts/build-hyperlink-css.mjs",
+    "brandColors": "audit/core-brands-audit.json",
+    "rules": "src/hyperlink.rules.md"
+  },
+  "element": {
+    "required": "a",
+    "requiresHref": true,
+    "forbidden": [
+      "button",
+      "div",
+      "span"
+    ],
+    "forbiddenHref": [
+      "#",
+      "javascript:void(0)"
+    ],
+    "why": "Sem href real o elemento não é um link: não recebe foco, não aparece na lista de links do leitor de tela e não abre em nova aba. Não existe fallback genérico neste componente.",
+    "hrefExceptionWhenDisabled": "O estado desabilitado é a única situação em que o <a> fica SEM href — é justamente o que o torna não focável e não clicável. Ver states.disabled."
+  },
+  "baseClass": "bmb-hyperlink",
+  "variants": {
+    "theme": {
+      "required": true,
+      "noDefault": "sem classe de tema o link não tem cor nem anel de foco",
+      "classPrefix": "bmb-hyperlink--",
+      "values": [
+        "base",
+        "primary",
+        "secondary",
+        "tertiary",
+        "quaternary",
+        "success",
+        "warning",
+        "error",
+        "invert"
+      ]
+    },
+    "size": {
+      "required": true,
+      "noDefault": "sem classe de tamanho o link não tem font-size nem tamanho de ícone",
+      "classPrefix": "bmb-hyperlink--",
+      "values": [
+        "xs",
+        "sm",
+        "md",
+        "lg"
+      ],
+      "figmaNames": {
+        "xs": "XSmall",
+        "sm": "Small",
+        "md": "Medium",
+        "lg": "Large"
+      }
+    },
+    "content": {
+      "required": false,
+      "default": "labelAndIcon",
+      "labelAndIcon": {
+        "labelClass": "bmb-hyperlink__label",
+        "iconClass": "bmb-hyperlink__icon",
+        "iconMarkup": "<span class=\"bmb-hyperlink__icon\" aria-hidden=\"true\"><svg>…</svg></span> — a classe vai no wrapper, não no <svg>",
+        "iconPositions": [
+          "leading",
+          "trailing"
+        ],
+        "iconPositionNote": "Não há propriedade de posição no Figma: a variante Label & Icon tem os dois slots (Left Icon e Right Icon). Usar um, outro ou os dois é decisão de quem consome."
+      },
+      "iconOnly": {
+        "class": "bmb-hyperlink--icon-only",
+        "requiresAccessibleName": true
+      }
+    }
+  },
+  "states": {
+    "default": {
+      "style": "estilos base, SEM sublinhado — decisão do time, registrada no Figma em 2026-09-18",
+      "usageConstraint": {
+        "rule": "Antes de aplicar em texto corrido, meça o contraste entre a cor do link e a cor do texto ao redor. É cor-contra-cor, não texto-contra-fundo.",
+        "criterion": "WCAG 1.4.1 (Uso de Cor), mínimo 3:1",
+        "measured": "1,16:1 em Employer/Light/Primary (#24304d contra #262626) — reprova",
+        "ifBelow": "sublinhar o link nesse contexto, com o mesmo token on-surface-{tema} usado em Hover e Active, ou escolher outro Theme com contraste suficiente contra aquele texto de corpo",
+        "notApplicable": "link isolado, fora de texto corrido — não há texto ao redor para confundir",
+        "howToApply": "classe bmb-hyperlink--force-underline — ver forceUnderline neste contrato"
+      }
+    },
+    "hover": ":hover — sublinhado",
+    "active": ":active — sublinhado, igual ao Hover (corrigido no Figma em 2026-09-18)",
+    "selected": "bmb-hyperlink--selected — sublinhado",
+    "focus": {
+      "selector": ":focus-visible",
+      "ring": "outline de 2px na cor <tema>-borders-border-<tema>-focus, offset 2px, raio 4px",
+      "underline": true,
+      "figmaSource": "variante Focus do set, ajuste de 2026-09-18"
+    },
+    "disabled": {
+      "class": "bmb-hyperlink--disabled-appearance",
+      "appearanceOnly": false,
+      "figmaHasIt": true,
+      "spec": "Especificação registrada no Figma em 2026-09-18.",
+      "requiredMarkup": {
+        "removeHref": true,
+        "ariaDisabled": "true",
+        "class": "bmb-hyperlink--disabled-appearance"
+      },
+      "behavior": [
+        "não navega nem dispara ação ao clicar ou pressionar Enter/Espaço",
+        "não recebe foco por teclado: o Tab pula o elemento",
+        "cursor never pointer — o CSS aplica not-allowed"
+      ],
+      "why": "<a> não tem atributo disabled. Remover o href é o que torna o elemento não focável e não clicável pelo padrão do HTML; o aria-disabled reforça o estado para o leitor de tela.",
+      "alternativePreferred": "Na maioria dos casos, não renderizar o link é melhor do que desabilitá-lo. Ver src/hyperlink.rules.md."
+    }
+  },
+  "forceUnderline": {
+    "class": "bmb-hyperlink--force-underline",
+    "figmaProperty": "Force Underline",
+    "figmaType": "BOOLEAN",
+    "figmaDefault": false,
+    "figmaDrawsNothing": true,
+    "whyCodeOnly": "No Figma a propriedade é só sinalização. A tentativa de desenhar o sublinhado lá dentro (retângulo atrás do texto) foi testada e descartada em 2026-09-18: o retângulo fica fora da instância aninhada .Master Hiperlink e não enxerga se Show Left Icon / Show Right Icon estão ligados, então a margem calibrada para uma configuração desalinha nas outras. O sublinhado nativo do CSS acompanha a largura real do texto e não tem esse problema.",
+    "color": "currentColor, que já é o token on-surface-{tema} — o mesmo de Hover e Active. Nenhuma cor nova.",
+    "whenToUse": "quando o contraste entre a cor do link e a cor do texto ao redor ficar abaixo de 3:1 — ver states.default.usageConstraint",
+    "figmaFullFixOutOfScope": "resolver dentro do Figma exigiria desaninhar o .Master Hiperlink dos 78 nós; registrado como fora de escopo"
+  },
+  "externalLink": {
+    "isVariant": false,
+    "pattern": "Não é variante nova de State nem de Theme: usa o slot Right Icon já existente, com o ícone arrow-up-right-01-round (categoria Arrows, em 03. CORE-Media).",
+    "figmaSource": "descrição do componente, 2026-09-18",
+    "accessibility": "Se abrir em nova aba, use target=\"_blank\" com rel=\"noopener noreferrer\" e avise no texto ou no nome acessível. O ícone sozinho, sendo decorativo (aria-hidden), não anuncia nada."
+  },
+  "globalTheme": {
+    "brandAttribute": "data-brand",
+    "brands": [
+      "employer",
+      "epays",
+      "bne-cia"
+    ],
+    "modeAttribute": "data-theme",
+    "modes": [
+      "light",
+      "dark"
+    ]
+  },
+  "invalidCombinations": [
+    {
+      "combination": "bmb-hyperlink--icon-only sem nome acessível",
+      "why": "link sem texto e sem aria-label não é anunciável"
+    },
+    {
+      "combination": "bmb-hyperlink em <button>",
+      "why": "Hyperlink é navegação; ação é Button"
+    },
+    {
+      "combination": "bmb-hyperlink--disabled-appearance mantendo o href",
+      "why": "a aparência prometeria indisponibilidade enquanto o link continua navegável e focável"
+    },
+    {
+      "combination": "<a> sem href fora do estado desabilitado, ou com href=\"#\"",
+      "why": "não é um link para o navegador nem para a tecnologia assistiva"
+    }
+  ],
+  "notSupported": {
+    "visited": {
+      "status": "decisão registrada, não é lacuna",
+      "date": "2026-09-18",
+      "why": "Navegadores restringem :visited a poucas propriedades desde que a pseudo-classe virou vetor de detecção de histórico. O DS optou por não diferenciar, por privacidade.",
+      "ifRevisited": "exigiria uma variante nova de State (Visited) e uma cor a calibrar por tema"
+    },
+    "inlineVsStandalone": {
+      "status": "decisão registrada, não é lacuna",
+      "date": "2026-09-18",
+      "why": "inline-flex é intencional: resolve inline (participa do fluxo de texto) e flex (organiza ícone e label) ao mesmo tempo, como o elemento de link nativo do HTML."
+    },
+    "radius": "O Figma reporta border-radius-null = 0 no estado normal. O raio de 4px existe apenas no anel de foco."
+  },
+  "accessibility": {
+    "iconOnlyRequiresAccessibleName": true,
+    "decorativeIconsAriaHidden": true,
+    "focusRing": "outline de 2px na cor do tema, com offset. Vem do Figma.",
+    "neverRemoveOutline": "Não há outline:none no CSS gerado, e a validação reprova se alguém acrescentar.",
+    "forcedColors": "@media (forced-colors: active) aplica outline: 2px solid Highlight",
+    "minimumTargetSize": {
+      "px": 24,
+      "criterion": "WCAG 2.5.8",
+      "how": "pseudo-elemento ::after invisível amplia o alvo sem ocupar espaço no fluxo do texto",
+      "figmaSource": "camada 'Hit Area (invisível, min 24x24 WCAG 2.5.8)' presente nas 8 variantes de tamanho"
+    },
+    "ariaDisabled": "Usado APENAS no estado desabilitado, junto com a remoção do href — ver states.disabled. Não aplicar aria-disabled a um link que continua navegável.",
+    "newTab": "target=\"_blank\" exige rel=\"noopener noreferrer\" e aviso no nome acessível."
+  },
+  "generatedFiles": [
+    "dist/hyperlink.css",
+    "dist/hyperlink.preview.css",
+    "dist/hyperlink.tokens.js"
+  ]
+}

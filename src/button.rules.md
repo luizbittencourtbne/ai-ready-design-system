@@ -218,3 +218,7 @@ O bloco `themes` foi removido em 19/09/2026 (ver o aviso no topo). O que sobrou 
 volta por `validate.mjs`. Ele passa na validação sem influenciar o CSS — ou seja, **a
 validação não protege esses valores de ficarem errados**, só de ficarem dessincronizados.
 Foi assim que `sizes.XLarge.font: 20` sobreviveu contradizendo o estilo real.
+
+## Regra de teste
+
+O botão não precisa ter estado visual de foco.
