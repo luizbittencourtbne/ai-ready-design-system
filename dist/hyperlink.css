@@ -1,0 +1,157 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+ * Hyperlink — 9 temas × 6 estados × 4 tamanhos × 2 conteúdos
+ * Fonte: Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1: Hiperlink 240:1702 — component set 99:8725 (Theme × State, 9×6) e .Master Hiperlink 99:8672 (Size × Content, 4×2). Lido ao vivo via MCP.
+ * COR: só tokens semânticos --bmb-color-*. Precisa de brands.css carregado antes.
+ * GEOMETRIA: literais do Figma (hyperlink.tokens.json) — não são tokens.
+ * GERADO por build-hyperlink-css.mjs — não edite à mão.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+    .bmb-hyperlink {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--_bmb-link-fg);
+        font-family: var(--bmb-font-family-body);
+        font-weight: var(--bmb-font-weight-semibold);
+        line-height: var(--bmb-line-height-130);
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 120ms ease, text-decoration-color 120ms ease;
+    }
+
+    .bmb-hyperlink__label { display: inline; }
+
+    .bmb-hyperlink__icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+    }
+    .bmb-hyperlink__icon svg { width: 100%; height: 100%; }
+
+    /* Hit Area invisível: alvo de no mínimo 24px (WCAG 2.5.8). Não afeta o layout. */
+    .bmb-hyperlink::after {
+        content: '';
+        position: absolute;
+        inset-inline: 0;
+        top: 50%;
+        translate: 0 -50%;
+        block-size: max(100%, 24px);
+    }
+
+    /* Icon Only é quadrado e pequeno: o alvo precisa crescer nos dois eixos. */
+    .bmb-hyperlink--icon-only::after {
+        inset-inline: auto;
+        left: 50%;
+        translate: -50% -50%;
+        inline-size: max(100%, 24px);
+    }
+
+    /* Sublinhado: presente em Hover, Active, Selected e Focus. Ausente só no Default e no
+     * Disabled. O Active ganhou sublinhado no ajuste de 2026-09-18 — antes era idêntico ao
+     * Default e quem apertava o link não recebia retorno visual. */
+    .bmb-hyperlink:hover,
+    .bmb-hyperlink:active,
+    .bmb-hyperlink--selected,
+    .bmb-hyperlink--force-underline,
+    .bmb-hyperlink:focus-visible {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+    }
+
+    /* Contraparte da prop Force Underline do Figma, que lá é só sinalização.
+     * A cor vem de currentColor = o token on-surface-{tema}, igual ao Hover. */
+
+    .bmb-hyperlink:hover { color: var(--_bmb-link-fg-hover, var(--_bmb-link-fg)); }
+    .bmb-hyperlink:active { color: var(--_bmb-link-fg-active, var(--_bmb-link-fg)); }
+    .bmb-hyperlink--selected { color: var(--_bmb-link-fg-selected, var(--_bmb-link-fg)); }
+    .bmb-hyperlink:focus-visible { color: var(--_bmb-link-fg-focus, var(--_bmb-link-fg)); }
+
+    /* Anel de foco por tema, vindo do Figma. `outline` em vez de `border` para não
+     * empurrar o texto ao redor a cada Tab. Nunca use outline: none aqui. */
+    .bmb-hyperlink:focus-visible {
+        outline: 2px solid var(--_bmb-link-ring);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* Aparência apenas. NÃO desabilita nada: <a> não tem disabled nativo.
+     * Ver "Disabled" em src/hyperlink.rules.md antes de usar. */
+    .bmb-hyperlink--disabled-appearance {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    /* ----- temas ----- */
+    .bmb-hyperlink--base {
+        --_bmb-link-fg: var(--bmb-color-base-on-on-base);
+        --_bmb-link-ring: var(--bmb-color-base-borders-border-base-focus);
+        --_bmb-link-fg-hover: var(--bmb-color-base-backgrounds-base-hover-alt);
+        --_bmb-link-fg-active: var(--bmb-color-base-backgrounds-base-active-alt);
+        --_bmb-link-fg-selected: var(--bmb-color-base-backgrounds-base-selected-alt);
+        --_bmb-link-fg-focus: var(--bmb-color-base-borders-border-base-focus-alt);
+    }
+    .bmb-hyperlink--primary {
+        --_bmb-link-fg: var(--bmb-color-primary-on-on-surface-primary);
+        --_bmb-link-ring: var(--bmb-color-primary-borders-border-primary-focus);
+    }
+    .bmb-hyperlink--secondary {
+        --_bmb-link-fg: var(--bmb-color-secondary-on-on-surface-secondary);
+        --_bmb-link-ring: var(--bmb-color-secondary-borders-border-secondary-focus);
+    }
+    .bmb-hyperlink--tertiary {
+        --_bmb-link-fg: var(--bmb-color-tertiary-on-on-surface-tertiary);
+        --_bmb-link-ring: var(--bmb-color-tertiary-borders-border-tertiary-focus);
+    }
+    .bmb-hyperlink--quaternary {
+        --_bmb-link-fg: var(--bmb-color-quaternary-on-on-surface-quaternary);
+        --_bmb-link-ring: var(--bmb-color-quaternary-borders-border-quaternary-focus);
+    }
+    .bmb-hyperlink--success {
+        --_bmb-link-fg: var(--bmb-color-success-on-on-surface-success);
+        --_bmb-link-ring: var(--bmb-color-success-borders-border-success-focus);
+    }
+    .bmb-hyperlink--warning {
+        --_bmb-link-fg: var(--bmb-color-warning-on-on-surface-warning);
+        --_bmb-link-ring: var(--bmb-color-warning-borders-border-warning-focus);
+    }
+    .bmb-hyperlink--error {
+        --_bmb-link-fg: var(--bmb-color-error-on-on-surface-error);
+        --_bmb-link-ring: var(--bmb-color-error-borders-border-error-focus);
+    }
+    .bmb-hyperlink--invert {
+        --_bmb-link-fg: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+        --_bmb-link-ring: var(--bmb-color-surface-brand-borders-border-brand);
+    }
+
+    /* ----- tamanhos: literais do Figma; font-size via token ----- */
+    .bmb-hyperlink--xs {
+        font-size: var(--bmb-font-size-paragraph-xsmall);
+    }
+    .bmb-hyperlink--xs .bmb-hyperlink__icon { inline-size: 8.981px; block-size: 8.981px; }
+    .bmb-hyperlink--icon-only.bmb-hyperlink--xs { inline-size: 8.981px; block-size: 8.981px; justify-content: center; }
+    .bmb-hyperlink--sm {
+        font-size: var(--bmb-font-size-paragraph-small);
+    }
+    .bmb-hyperlink--sm .bmb-hyperlink__icon { inline-size: 12px; block-size: 12px; }
+    .bmb-hyperlink--icon-only.bmb-hyperlink--sm { inline-size: 12px; block-size: 12px; justify-content: center; }
+    .bmb-hyperlink--md {
+        font-size: var(--bmb-font-size-paragraph-medium);
+    }
+    .bmb-hyperlink--md .bmb-hyperlink__icon { inline-size: 16px; block-size: 16px; }
+    .bmb-hyperlink--icon-only.bmb-hyperlink--md { inline-size: 16px; block-size: 16px; justify-content: center; }
+    .bmb-hyperlink--lg {
+        font-size: var(--bmb-font-size-paragraph-large);
+    }
+    .bmb-hyperlink--lg .bmb-hyperlink__icon { inline-size: 18.917px; block-size: 18.917px; }
+    .bmb-hyperlink--icon-only.bmb-hyperlink--lg { inline-size: 18.917px; block-size: 18.917px; justify-content: center; }
+
+    /* Alto contraste do Windows: garante indicador de foco pintado. */
+    @media (forced-colors: active) {
+        .bmb-hyperlink:focus-visible { outline: 2px solid Highlight; }
+    }
+}
