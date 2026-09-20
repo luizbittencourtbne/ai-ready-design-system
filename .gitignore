@@ -15,6 +15,10 @@ desktop.ini
 *.tmp
 *~
 
+# Contexto de revisão gerado pelo detector (scripts/detect-changed-components.mjs).
+# No CI ele vira artefato; localmente é descartável e pode ficar grande.
+.ai-review/
+
 # NÃO ignorar:
 #   dist/  — é gerado, mas faz parte do pacote. As demos carregam dist/ por caminho
 #            relativo e `npm run validate` roda sozinho, sem build. Clone sem dist/

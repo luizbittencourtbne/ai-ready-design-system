@@ -1,0 +1,209 @@
+# Fase 2 da automação do BambooDS: revisão de componentes em Pull Request.
+#
+# Detecta quais componentes o PR toca, monta um contexto só com os arquivos relevantes,
+# manda para a Anthropic Messages API e publica o parecer como um comentário único no PR.
+#
+# Este workflow NÃO: altera arquivos, cria commit, faz merge, abre PR, nem executa nada que
+# o modelo produza. A resposta do modelo vira texto de comentário e só.
+#
+# Não substitui o validate-ds.yml: aquele é o gate objetivo (build + validação). Este é
+# parecer, e de propósito não reprova o PR — nem quando a própria chamada falha.
+
+name: Revisão de componentes
+
+on:
+  pull_request:
+    branches: [main]
+
+# Menor privilégio possível:
+#   contents: read        — ler o código do PR
+#   pull-requests: write  — publicar/atualizar UM comentário
+# Nada de `contents: write`: este workflow não commita.
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+# Trocar modelo ou effort é mudar estas duas linhas, não o código do revisor.
+env:
+  AI_REVIEW_MODEL: claude-sonnet-5
+  AI_REVIEW_EFFORT: medium
+
+jobs:
+  review:
+    name: Detectar componentes e revisar
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      # fetch-depth: 0 é obrigatório. Com o clone raso padrão, o merge-base entre a base e a
+      # head não existe localmente e `git diff base...head` falha.
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Mapeia git diff -> components.json -> componentes afetados, e escreve o contexto de
+      # cada componente em .ai-review/contexto/<id>/. `base...head` compara a partir do
+      # merge-base: só o que o PR introduziu.
+      - name: Detectar componentes afetados
+        id: detectar
+        run: |
+          node scripts/detect-changed-components.mjs \
+            --base "$BASE_SHA" --head "$HEAD_SHA" \
+            --context .ai-review/contexto --github-output
+          node scripts/detect-changed-components.mjs \
+            --base "$BASE_SHA" --head "$HEAD_SHA" --json > .ai-review/deteccao.json
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+      - name: Resumo na aba do job
+        run: |
+          {
+            echo "### Componentes afetados: ${{ steps.detectar.outputs.count }}"
+            echo ""
+            echo '```'
+            node scripts/detect-changed-components.mjs --base "$BASE_SHA" --head "$HEAD_SHA"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+      # Só checa presença. Imprime "true"/"false" no output do step — nunca o valor.
+      # É o padrão confiável: o contexto `secrets` não está disponível em `if:` de job.
+      - name: Verificar credencial
+        id: credencial
+        env:
+          CHAVE: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          if [ -n "$CHAVE" ]; then
+            echo "tem=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tem=false" >> "$GITHUB_OUTPUT"
+            echo "ANTHROPIC_API_KEY ausente: a revisão por modelo será pulada."
+          fi
+
+      # ÚNICO passo que recebe a credencial, e ela entra por `env:` aqui, não no nível do
+      # job nem do workflow. `continue-on-error` porque isto é parecer, não gate: uma falha
+      # de API não deve reprovar o PR — mas aparece no comentário e no resumo do job.
+      - name: Revisão por modelo
+        id: revisar
+        if: steps.detectar.outputs.has-changes == 'true' && steps.credencial.outputs.tem == 'true'
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COMPONENTES: ${{ steps.detectar.outputs.components }}
+        run: |
+          set -e
+          for id in $(node -e 'JSON.parse(process.env.COMPONENTES).forEach(i => console.log(i))'); do
+            echo "Revisando $id com $AI_REVIEW_MODEL (effort $AI_REVIEW_EFFORT)..."
+            node scripts/ai-review.mjs \
+              --component "$id" \
+              --context .ai-review/contexto \
+              --out ".ai-review/revisao-$id.md"
+          done
+
+      # O contexto fica disponível para download: é assim que se confere o que foi enviado.
+      # Sobe depois da revisão para carregar também o parecer gerado.
+      - name: Publicar contexto e revisão como artefato
+        if: steps.detectar.outputs.has-changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: revisao-pr-${{ github.event.pull_request.number }}
+          path: .ai-review/
+          retention-days: 7
+
+      # Comentário único e atualizável: procura o marcador e edita o existente, em vez de
+      # empilhar um novo a cada push.
+      # A condição de fork existe porque em PR vindo de fork o GITHUB_TOKEN é somente leitura
+      # e a publicação falharia. Resolver isso exigiria `pull_request_target`, que roda com o
+      # token privilegiado sobre código de terceiro — não usamos.
+      - name: Publicar comentário no PR
+        if: >
+          steps.detectar.outputs.has-changes == 'true' &&
+          github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/github-script@v7
+        env:
+          TEM_CREDENCIAL: ${{ steps.credencial.outputs.tem }}
+          RESULTADO_REVISAO: ${{ steps.revisar.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const MARCADOR = '<!-- bamboods-revisao-componentes -->';
+            const dados = JSON.parse(fs.readFileSync('.ai-review/deteccao.json', 'utf8'));
+            const temCredencial = process.env.TEM_CREDENCIAL === 'true';
+            const resultado = process.env.RESULTADO_REVISAO;
+            const prNumero = context.payload.pull_request.number;
+
+            const linhas = [MARCADOR, '## Revisão de componentes — BambooDS', ''];
+
+            for (const c of dados.afetados) {
+              linhas.push(`### ${c.name} (\`${c.id}\`) — status \`${c.status}\``, '');
+              linhas.push('<details><summary>Por que entrou na revisão</summary>', '');
+              linhas.push('| Arquivo | Camada | Motivo |', '| --- | --- | --- |');
+              for (const m of c.motivos) {
+                linhas.push(`| \`${m.caminho}\` | ${m.camada} | ${m.porque} |`);
+              }
+              linhas.push('', '</details>', '');
+
+              const revisao = `.ai-review/revisao-${c.id}.md`;
+              if (fs.existsSync(revisao)) {
+                linhas.push(fs.readFileSync(revisao, 'utf8'), '');
+              } else if (!temCredencial) {
+                linhas.push(
+                  '> **Revisão por modelo pulada: `ANTHROPIC_API_KEY` não está configurada.**',
+                  '> A detecção e o contexto funcionaram — baixe o artefato',
+                  `> \`revisao-pr-${prNumero}\` para ver o que seria enviado.`,
+                  '> Para ligar: Settings › Secrets and variables › Actions › New repository secret.',
+                  '',
+                );
+              } else {
+                linhas.push(
+                  `> **A revisão por modelo falhou** (resultado do passo: \`${resultado}\`).`,
+                  '> Veja o log do job para o motivo. Isto não reprova o PR: o gate objetivo',
+                  '> é o workflow **Validar Design System**.',
+                  '',
+                );
+              }
+            }
+
+            if (dados.naoAtribuidos.length) {
+              linhas.push('<details><summary>Arquivos alterados que não foram atribuídos a nenhum componente</summary>', '');
+              for (const f of dados.naoAtribuidos) linhas.push(`- \`${f.caminho}\``);
+              linhas.push('', 'Se algum destes deveria disparar revisão, declare em `components.json`',
+                          'ou acrescente em `COMPARTILHADOS` no detector, citando a fonte.', '', '</details>', '');
+            }
+
+            linhas.push('---',
+              '_Parecer automático, não é gate. O gate objetivo é o workflow **Validar Design System** (`npm run check`)._');
+
+            let corpo = linhas.join('\n');
+            if (corpo.length > 65000) corpo = corpo.slice(0, 65000) + '\n\n_(comentário truncado)_';
+
+            const { owner, repo } = context.repo;
+            const existentes = await github.rest.issues.listComments({
+              owner, repo, issue_number: prNumero, per_page: 100,
+            });
+            const meu = existentes.data.find((c) => c.body && c.body.includes(MARCADOR));
+
+            if (meu) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: meu.id, body: corpo });
+              core.info(`Comentário ${meu.id} atualizado.`);
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: prNumero, body: corpo });
+              core.info('Comentário criado.');
+            }
