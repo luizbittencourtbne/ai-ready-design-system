@@ -1,0 +1,57 @@
+# Fase 1 da automação do BambooDS: Continuous Integration.
+#
+# Reconstrói os artefatos gerados a partir das fontes e roda a validação do
+# Design System. Qualquer falha de build ou de validação reprova o job.
+#
+# Não faz review de código nem publica nada — isso fica para fases seguintes.
+
+name: Validar Design System
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Só leitura: este workflow não comenta em PR, não faz commit e não publica.
+permissions:
+  contents: read
+
+# Um push logo em cima de outro cancela a execução anterior do mesmo ref,
+# em vez de manter as duas na fila.
+concurrency:
+  group: validate-ds-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Build e validação
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node 24: é a versão em que o pacote é desenvolvido hoje (v24.18.0) e a
+      # LTS ativa. O piso técnico real dos scripts é bem mais baixo — só usam
+      # built-ins (fs, path, url), e o recurso mais recente é o prefixo `node:`,
+      # de Node 16 — mas CI deve espelhar o ambiente de desenvolvimento.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      # O pacote não tem dependências, mas `npm ci` é o que garante instalação
+      # reproduzível: falha se package.json e package-lock.json divergirem, em
+      # vez de resolver as versões de novo como o `npm install` faria.
+      - name: Instalar dependências
+        run: npm ci
+
+      # `check` = `build` + `validate`. O build regenera dist/ e o audit
+      # derivado a partir das fontes; a validação confere contrato, temas,
+      # tamanhos, tokens e links das demos. Qualquer etapa que sair com código
+      # diferente de zero reprova o job.
+      - name: Build e validação do Design System
+        run: npm run check
