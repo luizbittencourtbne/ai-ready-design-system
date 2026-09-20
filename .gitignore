@@ -1,0 +1,24 @@
+# Dependências (o pacote não tem nenhuma hoje; aqui por precaução)
+node_modules/
+
+# Lixo de sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores
+.idea/
+.vscode/
+
+# Backups e temporários
+*.bak
+*.tmp
+*~
+
+# NÃO ignorar:
+#   dist/  — é gerado, mas faz parte do pacote. As demos carregam dist/ por caminho
+#            relativo e `npm run validate` roda sozinho, sem build. Clone sem dist/
+#            teria demo quebrada e validação impossível.
+#   audit/core-brands-audit.json — mesmo caso: gerado, mas lido pela validação.
+#   .claude/ — contém as definições dos subagentes do projeto, que são código-fonte
+#            aqui (ver CLAUDE-CODE-AGENTES.md).

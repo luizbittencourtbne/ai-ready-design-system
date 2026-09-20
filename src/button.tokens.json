@@ -1,0 +1,82 @@
+{
+  "_source": "Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1: set Button 9:872 (Theme x State) + .Master Button 9:170 (Size x Content). Geometria derivada das posicoes dos filhos via MCP.",
+  "_generated": "2026-09-19",
+  "themeOrder": [
+    "Base",
+    "Primary",
+    "Secondary",
+    "Tertiary",
+    "Quaternary",
+    "Success",
+    "Warning",
+    "Error",
+    "Invert",
+    "Plain",
+    "Plain Invert",
+    "CTA",
+    "Plain Error"
+  ],
+  "stateOrder": [
+    "Default",
+    "Hover",
+    "Active",
+    "Selected",
+    "Focus",
+    "Disabled"
+  ],
+  "sizeOrder": [
+    "Small",
+    "Medium",
+    "Large",
+    "XLarge"
+  ],
+  "radius": {
+    "round": 8,
+    "straight": 0,
+    "pill": 100
+  },
+  "disabledOpacity": 0.4,
+  "fontWeight": 600,
+  "sizes": {
+    "Small": {
+      "h": 32,
+      "padY": 8,
+      "padX": 8,
+      "gap": 4,
+      "font": 14,
+      "icon": 13.167,
+      "iconOnlyPad": 8,
+      "iconOnlyIcon": 13.167
+    },
+    "Medium": {
+      "h": 40,
+      "padY": 8,
+      "padX": 16,
+      "gap": 8,
+      "font": 16,
+      "icon": 18.167,
+      "iconOnlyPad": 8,
+      "iconOnlyIcon": 18.167
+    },
+    "Large": {
+      "h": 48,
+      "padY": 8,
+      "padX": 16,
+      "gap": 8,
+      "font": 18,
+      "icon": 21.5,
+      "iconOnlyPad": 8,
+      "iconOnlyIcon": 21.5
+    },
+    "XLarge": {
+      "h": 64,
+      "padY": 12,
+      "padX": 24,
+      "gap": 16,
+      "font": 20,
+      "icon": 28.167,
+      "iconOnlyPad": 12,
+      "iconOnlyIcon": 28.167
+    }
+  }
+}

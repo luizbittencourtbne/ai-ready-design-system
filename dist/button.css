@@ -1,0 +1,348 @@
+/* ---------------------------------------------------------------------------
+ * Button — 13 temas × 6 estados × 4 tamanhos
+ * Fonte: Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1: set Button 9:872 (Theme x State) + .Master Button 9:170 (Size x Content). Geometria derivada das posicoes dos filhos via MCP.
+ * COR: só tokens semânticos --bmb-color-*, espelhando
+ *      TESTES/src/components/button/_button.scss (verificado: 234 checks · 0 falhas).
+ *      Precisa de brands.css carregado antes, que define os tokens por marca/tema.
+ * GEOMETRIA: literais do Figma (button.tokens.json) — não são tokens.
+ * GERADO por build-css.mjs — não edite à mão.
+ * ------------------------------------------------------------------------ */
+
+@import 'tailwindcss';
+
+@layer components {
+    .bmb-button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        border: 1px solid var(--_bmb-btn-bd, transparent);
+        border-radius: var(--bmb-radius-button-round);
+        background-color: var(--_bmb-btn-bg, transparent);
+        color: var(--_bmb-btn-fg);
+        font-family: var(--bmb-font-family-body);
+        font-weight: var(--bmb-font-weight-semibold);
+        line-height: var(--bmb-line-height-130);
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        transition:
+            background-color 120ms ease,
+            border-color 120ms ease,
+            color 120ms ease;
+    }
+
+    .bmb-button__label { display: inline-block; }
+
+    .bmb-button__icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+    }
+    .bmb-button__icon svg { width: 100%; height: 100%; }
+
+    /* Show Dot — 8×8, raio full, cor do componente 09. Dot. Posição top-right. */
+    .bmb-button__dot {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        inline-size: 8px;
+        block-size: 8px;
+        border-radius: var(--bmb-radius-full);
+        background-color: var(--bmb-color-error-backgrounds-error-hover);
+    }
+
+    .bmb-button:hover:not(:disabled, .bmb-button--selected) {
+        background-color: var(--_bmb-btn-bg-hover, var(--_bmb-btn-bg, transparent));
+        color: var(--_bmb-btn-fg-hover, var(--_bmb-btn-fg));
+        border-color: var(--_bmb-btn-bd-hover, var(--_bmb-btn-bd, transparent));
+    }
+
+    .bmb-button:active:not(:disabled) {
+        background-color: var(--_bmb-btn-bg-active, var(--_bmb-btn-bg, transparent));
+        color: var(--_bmb-btn-fg-active, var(--_bmb-btn-fg));
+        border-color: var(--_bmb-btn-bd-active, var(--_bmb-btn-bd, transparent));
+    }
+
+    .bmb-button--selected {
+        background-color: var(--_bmb-btn-bg-selected, var(--_bmb-btn-bg, transparent));
+        color: var(--_bmb-btn-fg-selected, var(--_bmb-btn-fg));
+        border-color: var(--_bmb-btn-bd-selected, var(--_bmb-btn-bd, transparent));
+    }
+
+    /* Focus = stroke interno de 3px, sem alterar a geometria. O anel vale para
+     * qualquer estado; o bg/fg de foco fica fora de Selected, que mantém o próprio
+     * fundo — mesmo critério já aplicado no :hover acima. */
+    .bmb-button:focus-visible {
+        box-shadow: inset 0 0 0 3px var(--_bmb-btn-focus, transparent);
+        outline: none;
+    }
+
+    .bmb-button:focus-visible:not(.bmb-button--selected) {
+        background-color: var(--_bmb-btn-bg-focus, var(--_bmb-btn-bg, transparent));
+        color: var(--_bmb-btn-fg-focus, var(--_bmb-btn-fg));
+    }
+
+    /* Cores forcadas (alto contraste do Windows / forced-colors). Nesse modo o navegador
+     * descarta box-shadow, entao o anel de foco acima simplesmente nao e pintado e o
+     * `outline: none` deixaria o botao sem nenhuma indicacao de foco. `outline` com cor
+     * de sistema continua sendo pintado, entao devolvemos o indicador por ali. Usa as
+     * mesmas medidas do anel (3px, para dentro) para nao mudar a geometria. */
+    @media (forced-colors: active) {
+        .bmb-button:focus-visible {
+            outline: 3px solid Highlight;
+            outline-offset: -3px;
+        }
+    }
+
+    .bmb-button:disabled,
+    .bmb-button[disabled] {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .bmb-button--straight { border-radius: var(--bmb-radius-button-straight); }
+    .bmb-button--pill { border-radius: var(--bmb-radius-button-pill); }
+
+    /* ----- temas filled ----- */
+    .bmb-button--primary {
+        --_bmb-btn-bg: var(--bmb-color-primary-backgrounds-primary-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-primary-backgrounds-primary-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-primary-backgrounds-primary-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-primary-backgrounds-primary-selected);
+        --_bmb-btn-fg: var(--bmb-color-primary-on-on-primary);
+        --_bmb-btn-fg-hover: var(--bmb-color-primary-on-on-hover-primary);
+        --_bmb-btn-fg-selected: var(--bmb-color-primary-on-on-selected-primary);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-primary-borders-border-primary-focus);
+    }
+
+    .bmb-button--secondary {
+        --_bmb-btn-bg: var(--bmb-color-secondary-backgrounds-secondary-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-secondary-backgrounds-secondary-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-secondary-backgrounds-secondary-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-secondary-backgrounds-secondary-selected);
+        --_bmb-btn-fg: var(--bmb-color-secondary-on-on-secondary);
+        --_bmb-btn-fg-hover: var(--bmb-color-secondary-on-on-hover-secondary);
+        --_bmb-btn-fg-selected: var(--bmb-color-secondary-on-on-selected-secondary);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-secondary-borders-border-secondary-focus);
+    }
+
+    .bmb-button--tertiary {
+        --_bmb-btn-bg: var(--bmb-color-tertiary-backgrounds-tertiary-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-tertiary-backgrounds-tertiary-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-tertiary-backgrounds-tertiary-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-tertiary-backgrounds-tertiary-selected);
+        --_bmb-btn-fg: var(--bmb-color-tertiary-on-on-tertiary);
+        --_bmb-btn-fg-hover: var(--bmb-color-tertiary-on-on-hover-tertiary);
+        --_bmb-btn-fg-selected: var(--bmb-color-tertiary-on-on-selected-tertiary);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-tertiary-borders-border-tertiary-focus);
+    }
+
+    .bmb-button--quaternary {
+        --_bmb-btn-bg: var(--bmb-color-quaternary-backgrounds-quaternary-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-quaternary-backgrounds-quaternary-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-quaternary-backgrounds-quaternary-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-quaternary-backgrounds-quaternary-selected);
+        --_bmb-btn-fg: var(--bmb-color-quaternary-on-on-quaternary);
+        --_bmb-btn-fg-hover: var(--bmb-color-quaternary-on-on-hover-quaternary);
+        --_bmb-btn-fg-selected: var(--bmb-color-quaternary-on-on-selected-quaternary);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-quaternary-borders-border-quaternary-focus);
+    }
+
+    .bmb-button--success {
+        --_bmb-btn-bg: var(--bmb-color-success-backgrounds-success-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-success-backgrounds-success-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-success-backgrounds-success-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-success-backgrounds-success-selected);
+        --_bmb-btn-fg: var(--bmb-color-success-on-on-success);
+        --_bmb-btn-fg-hover: var(--bmb-color-success-on-on-hover-success);
+        --_bmb-btn-fg-selected: var(--bmb-color-success-on-on-selected-success);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-success-borders-border-success-focus);
+    }
+
+    .bmb-button--warning {
+        --_bmb-btn-bg: var(--bmb-color-warning-backgrounds-warning-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-warning-backgrounds-warning-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-warning-backgrounds-warning-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-warning-backgrounds-warning-selected);
+        --_bmb-btn-fg: var(--bmb-color-warning-on-on-warning);
+        --_bmb-btn-fg-hover: var(--bmb-color-warning-on-on-hover-warning);
+        --_bmb-btn-fg-selected: var(--bmb-color-warning-on-on-selected-warning);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-warning-borders-border-warning-focus);
+    }
+
+    .bmb-button--error {
+        --_bmb-btn-bg: var(--bmb-color-error-backgrounds-error-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-error-backgrounds-error-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-error-backgrounds-error-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-error-backgrounds-error-selected);
+        --_bmb-btn-fg: var(--bmb-color-error-on-on-error);
+        --_bmb-btn-fg-hover: var(--bmb-color-error-on-on-hover-error);
+        --_bmb-btn-fg-selected: var(--bmb-color-error-on-on-selected-error);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-error-borders-border-error-focus);
+    }
+
+    .bmb-button--cta {
+        --_bmb-btn-bg: var(--bmb-color-cta-backgrounds-cta-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-cta-backgrounds-cta-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-cta-backgrounds-cta-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-cta-backgrounds-cta-selected);
+        --_bmb-btn-fg: var(--bmb-color-cta-on-on-cta);
+        --_bmb-btn-fg-hover: var(--bmb-color-cta-on-on-hover-cta);
+        --_bmb-btn-fg-selected: var(--bmb-color-cta-on-on-selected-cta);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-focus: var(--bmb-color-cta-borders-border-cta-focus);
+    }
+
+    /* ----- temas irregulares ----- */
+    .bmb-button--base {
+        --_bmb-btn-bg: var(--bmb-color-base-backgrounds-base-default);
+        --_bmb-btn-bg-hover: var(--bmb-color-base-backgrounds-base-hover);
+        --_bmb-btn-bg-active: var(--bmb-color-base-backgrounds-base-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-base-backgrounds-base-selected);
+        --_bmb-btn-fg: var(--bmb-color-base-on-on-base);
+        --_bmb-btn-bd: var(--bmb-color-base-borders-border-base);
+        --_bmb-btn-focus: var(--bmb-color-base-borders-border-base-focus);
+    }
+
+    .bmb-button--plain {
+        --_bmb-btn-bg: transparent;
+        --_bmb-btn-fg: var(--bmb-color-base-on-on-base);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-bg-hover: var(--bmb-color-base-backgrounds-base-hover-alt);
+        --_bmb-btn-fg-hover: var(--bmb-color-base-backgrounds-base-default);
+        --_bmb-btn-bd-hover: var(--bmb-color-base-backgrounds-base-default);
+        --_bmb-btn-bg-active: var(--bmb-color-base-backgrounds-base-active);
+        --_bmb-btn-bd-active: var(--bmb-color-base-borders-border-base-subtle);
+        --_bmb-btn-bg-selected: var(--bmb-color-base-backgrounds-base-selected);
+        --_bmb-btn-bd-selected: var(--bmb-color-base-borders-border-base-subtle);
+        --_bmb-btn-focus: var(--bmb-color-base-borders-border-base-focus);
+        --_bmb-btn-bg-focus: var(--bmb-color-base-backgrounds-base-default);
+    }
+
+    .bmb-button--plain-invert {
+        --_bmb-btn-bg: transparent;
+        --_bmb-btn-fg: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-bg-hover: var(--bmb-color-primary-backgrounds-primary-default);
+        --_bmb-btn-bg-active: var(--bmb-color-primary-backgrounds-primary-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-primary-backgrounds-primary-selected);
+        --_bmb-btn-focus: var(--bmb-color-surface-brand-borders-border-brand);
+        --_bmb-btn-bg-focus: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+    }
+
+    .bmb-button--invert {
+        --_bmb-btn-bg: transparent;
+        --_bmb-btn-fg: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+        --_bmb-btn-bd: var(--bmb-color-surface-brand-borders-border-brand);
+        --_bmb-btn-bg-hover: var(--bmb-color-primary-backgrounds-primary-default);
+        --_bmb-btn-bd-hover: var(--bmb-color-surface-brand-on-on-surface-subtle-brand);
+        --_bmb-btn-bg-active: var(--bmb-color-primary-backgrounds-primary-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-primary-backgrounds-primary-selected);
+        --_bmb-btn-focus: var(--bmb-color-surface-brand-borders-border-brand);
+        --_bmb-btn-bg-focus: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+    }
+
+    .bmb-button--plain-error {
+        --_bmb-btn-bg: transparent;
+        --_bmb-btn-fg: var(--bmb-color-error-on-on-surface-error);
+        --_bmb-btn-bd: transparent;
+        --_bmb-btn-bg-hover: var(--bmb-color-error-backgrounds-error-hover);
+        --_bmb-btn-fg-hover: var(--bmb-color-error-on-on-error);
+        --_bmb-btn-bd-hover: var(--bmb-color-error-on-on-error);
+        --_bmb-btn-bg-active: var(--bmb-color-error-backgrounds-error-active);
+        --_bmb-btn-fg-active: var(--bmb-color-error-on-on-error);
+        --_bmb-btn-bd-active: var(--bmb-color-error-backgrounds-error-active);
+        --_bmb-btn-bg-selected: var(--bmb-color-error-backgrounds-error-selected);
+        --_bmb-btn-fg-selected: var(--bmb-color-error-on-on-error);
+        --_bmb-btn-bd-selected: var(--bmb-color-error-backgrounds-error-selected);
+        --_bmb-btn-focus: var(--bmb-color-error-borders-border-error-focus);
+        --_bmb-btn-bg-focus: var(--bmb-color-error-backgrounds-error-default);
+        --_bmb-btn-fg-focus: var(--bmb-color-error-on-on-error);
+    }
+
+    /* ----- disabled com fills próprios no Figma (além do opacity) ----- */
+    .bmb-button--warning:disabled,
+    .bmb-button--warning[disabled] {
+        border-color: var(--bmb-color-warning-backgrounds-warning-default);
+    }
+
+    .bmb-button--error:disabled,
+    .bmb-button--error[disabled] {
+        border-color: var(--bmb-color-error-backgrounds-error-default);
+    }
+
+    .bmb-button--plain:disabled,
+    .bmb-button--plain[disabled] {
+        border-color: var(--bmb-color-base-borders-border-base-subtle);
+        background-color: var(--bmb-color-base-backgrounds-base-default);
+    }
+
+    /* ----- tamanhos: literais do Figma; font-size via token ----- */
+    .bmb-button--sm {
+        height: 32px;
+        gap: 4px;
+        padding: 8px 8px;
+        font-size: var(--bmb-font-size-paragraph-small);
+    }
+    .bmb-button--sm .bmb-button__icon { inline-size: 13.167px; block-size: 13.167px; }
+
+    .bmb-button--icon-only.bmb-button--sm {
+        inline-size: 32px;
+        padding-inline: 0;
+    }
+    .bmb-button--icon-only.bmb-button--sm .bmb-button__icon { inline-size: 13.167px; block-size: 13.167px; }
+
+    .bmb-button--md {
+        height: 40px;
+        gap: 8px;
+        padding: 8px 16px;
+        font-size: var(--bmb-font-size-paragraph-medium);
+    }
+    .bmb-button--md .bmb-button__icon { inline-size: 18.167px; block-size: 18.167px; }
+
+    .bmb-button--icon-only.bmb-button--md {
+        inline-size: 40px;
+        padding-inline: 0;
+    }
+    .bmb-button--icon-only.bmb-button--md .bmb-button__icon { inline-size: 18.167px; block-size: 18.167px; }
+
+    .bmb-button--lg {
+        height: 48px;
+        gap: 8px;
+        padding: 8px 16px;
+        font-size: var(--bmb-font-size-paragraph-large);
+    }
+    .bmb-button--lg .bmb-button__icon { inline-size: 21.5px; block-size: 21.5px; }
+
+    .bmb-button--icon-only.bmb-button--lg {
+        inline-size: 48px;
+        padding-inline: 0;
+    }
+    .bmb-button--icon-only.bmb-button--lg .bmb-button__icon { inline-size: 21.5px; block-size: 21.5px; }
+
+    .bmb-button--xl {
+        height: 64px;
+        gap: 16px;
+        padding: 12px 24px;
+        font-size: var(--bmb-font-size-paragraph-xlarge);
+    }
+    .bmb-button--xl .bmb-button__icon { inline-size: 28.167px; block-size: 28.167px; }
+
+    .bmb-button--icon-only.bmb-button--xl {
+        inline-size: 64px;
+        padding-inline: 0;
+    }
+    .bmb-button--icon-only.bmb-button--xl .bmb-button__icon { inline-size: 28.167px; block-size: 28.167px; }
+
+}

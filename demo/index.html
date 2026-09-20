@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Button — Primary</title>
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/button.preview.css" />
+        <style>
+            /* apenas a pagina de demo — os estilos do componente vem de button.preview.css */
+            body {
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                margin: 0;
+                padding: 40px;
+                color: #1b2439;
+                background: #fff;
+            }
+            h1 { font-size: 20px; margin: 0 0 4px; }
+            p.sub { margin: 0 0 32px; color: #5b6478; font-size: 14px; }
+            h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #5b6478;
+                margin: 32px 0 12px;
+                font-weight: 600;
+            }
+            .row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+            .cell { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+            .cap { font-size: 11px; color: #8890a0; }
+        </style>
+    </head>
+    <body>
+        <svg style="display: none" aria-hidden="true">
+            <symbol id="ico-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round">
+                <path d="M12 5v14M5 12h14" />
+            </symbol>
+        </svg>
+
+        <h1>Button — Primary</h1>
+        <p class="sub">Figma CORE-Basics · set 9:872 + .Master Button 9:170</p>
+
+        <h2>Estados</h2>
+        <div class="row">
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md">Button</button>
+                <span class="cap">Default</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md bmb-button--selected">
+                    Button
+                </button>
+                <span class="cap">Selected</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md" disabled>
+                    Button
+                </button>
+                <span class="cap">Disabled</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md">Tab ate aqui</button>
+                <span class="cap">Focus (Tab)</span>
+            </div>
+        </div>
+
+        <h2>Tamanhos · Label &amp; Icon</h2>
+        <div class="row">
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--sm">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                    Button
+                </button>
+                <span class="cap">Small · 32</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                    Button
+                </button>
+                <span class="cap">Medium · 40</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--lg">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                    Button
+                </button>
+                <span class="cap">Large · 48</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--xl">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                    Button
+                </button>
+                <span class="cap">XLarge · 64</span>
+            </div>
+        </div>
+
+        <h2>Tamanhos · Icon Only</h2>
+        <div class="row">
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--sm bmb-button--icon-only"
+                        aria-label="Adicionar">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                </button>
+                <span class="cap">Small</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md bmb-button--icon-only"
+                        aria-label="Adicionar">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                </button>
+                <span class="cap">Medium</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--lg bmb-button--icon-only"
+                        aria-label="Adicionar">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                </button>
+                <span class="cap">Large</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--xl bmb-button--icon-only"
+                        aria-label="Adicionar">
+                    <span class="bmb-button__icon" aria-hidden="true"><svg><use href="#ico-plus" /></svg></span>
+                </button>
+                <span class="cap">XLarge</span>
+            </div>
+        </div>
+
+        <h2>Radius</h2>
+        <div class="row">
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md">Button</button>
+                <span class="cap">round · 8</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md bmb-button--straight">
+                    Button
+                </button>
+                <span class="cap">straight · 0</span>
+            </div>
+            <div class="cell">
+                <button type="button" class="bmb-button bmb-button--primary bmb-button--md bmb-button--pill">
+                    Button
+                </button>
+                <span class="cap">pill · 100</span>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,635 @@
+<!doctype html>
+<html lang="pt-BR" data-brand="employer" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Button — Playground</title>
+        <!-- As fontes das marcas precisam ser CARREGADAS, senão `font-family: Roboto` cai no
+             sans-serif genérico e as três marcas ficam tipograficamente idênticas — foi o que
+             acontecia. Roboto (employer), Nunito (epays) e Montserrat (bne-cia) estão no Google
+             Fonts; peso 600 porque o botão é semibold.
+             `Frederik`, o title da BNE CIA, é fonte comercial e não está aqui — mas o botão usa
+             o body, então não afeta o que se vê no playground.
+             Sem internet, tudo volta a cair no fallback: a cadeia `, sans-serif` segura. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Nunito:wght@400;600&family=Roboto:wght@400;600&display=swap"
+        />
+
+        <!-- brands.css PRIMEIRO: define os tokens --bmb-* por marca/tema.
+             button.preview.css consome esses tokens; sozinha ela não pinta nada. -->
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/button.preview.css" />
+        <style>
+            /* A UI do playground usa paleta própria (--ui-*), independente dos tokens do
+               DS, para continuar legível quando o modo do componente muda. */
+            :root {
+                --ui-bg: #ffffff;
+                --ui-panel: #fafafa;
+                --ui-line: #e5e5e5;
+                --ui-line-strong: #d4d4d4;
+                --ui-ink: #1b2439;
+                --ui-muted: #6b7280;
+                --ui-faint: #9ca3af;
+                --ui-accent: #1b2439;
+            }
+
+            * { box-sizing: border-box; }
+
+            body {
+                margin: 0;
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                color: var(--ui-ink);
+                background: var(--ui-bg);
+                font-size: 14px;
+            }
+
+            header {
+                padding: 22px 28px;
+                border-bottom: 1px solid var(--ui-line);
+            }
+            header h1 { margin: 0; font-size: 17px; letter-spacing: -0.01em; }
+            header p { margin: 3px 0 0; font-size: 12px; color: var(--ui-faint); }
+
+            .layout {
+                display: grid;
+                grid-template-columns: 296px minmax(0, 1fr);
+                align-items: start;
+                min-height: calc(100vh - 68px);
+            }
+            @media (max-width: 860px) {
+                .layout { grid-template-columns: 1fr; }
+                .controls { border-right: 0; border-bottom: 1px solid var(--ui-line); }
+            }
+
+            .controls {
+                border-right: 1px solid var(--ui-line);
+                background: var(--ui-panel);
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                position: sticky;
+                top: 0;
+            }
+
+            .field > .lbl {
+                display: block;
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.07em;
+                color: var(--ui-muted);
+                margin-bottom: 8px;
+            }
+            .field > .lbl small {
+                font-weight: 400;
+                text-transform: none;
+                letter-spacing: 0;
+                color: var(--ui-faint);
+            }
+
+            .rule {
+                border: 0;
+                border-top: 1px solid var(--ui-line-strong);
+                margin: 0;
+            }
+
+            .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+            .seg button {
+                flex: 1 1 auto;
+                min-width: fit-content;
+                padding: 7px 10px;
+                font: inherit;
+                font-size: 12px;
+                border: 1px solid var(--ui-line-strong);
+                background: #fff;
+                color: var(--ui-ink);
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 100ms ease;
+            }
+            .seg button:hover { border-color: var(--ui-faint); }
+            .seg button[aria-pressed='true'] {
+                background: var(--ui-accent);
+                border-color: var(--ui-accent);
+                color: #fff;
+            }
+
+            .themes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+            .themes button {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                padding: 6px 8px;
+                font: inherit;
+                font-size: 12px;
+                text-align: left;
+                border: 1px solid var(--ui-line-strong);
+                background: #fff;
+                color: var(--ui-ink);
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 100ms ease;
+            }
+            .themes button:hover { border-color: var(--ui-faint); }
+            .themes button[aria-pressed='true'] {
+                border-color: var(--ui-accent);
+                box-shadow: inset 0 0 0 1px var(--ui-accent);
+                font-weight: 600;
+            }
+            /* o swatch mostra a cor REAL do tema na marca/modo ativos — fundo xadrez
+               aparece nos temas transparentes */
+            .sw {
+                width: 14px;
+                height: 14px;
+                border-radius: 4px;
+                flex: none;
+                border: 1px solid rgba(0, 0, 0, 0.16);
+                background-image: linear-gradient(45deg, #eee 25%, transparent 25%),
+                    linear-gradient(-45deg, #eee 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #eee 75%),
+                    linear-gradient(-45deg, transparent 75%, #eee 75%);
+                background-size: 8px 8px;
+                background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+            }
+            .sw i { display: block; width: 100%; height: 100%; border-radius: 3px; }
+
+            .checks { display: flex; flex-direction: column; gap: 7px; }
+            .checks label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+            .checks input { accent-color: var(--ui-accent); width: 15px; height: 15px; cursor: pointer; }
+
+            input[type='text'] {
+                width: 100%;
+                padding: 8px 10px;
+                font: inherit;
+                font-size: 13px;
+                border: 1px solid var(--ui-line-strong);
+                border-radius: 6px;
+                background: #fff;
+                color: var(--ui-ink);
+            }
+            input[type='text']:focus { outline: 2px solid var(--ui-accent); outline-offset: -1px; }
+
+            .main {
+                padding: 24px 28px 48px;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+                min-width: 0;
+            }
+
+            .stage {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 230px;
+                border: 1px solid var(--ui-line);
+                border-radius: 10px;
+                padding: 32px;
+                transition: background-color 150ms ease;
+            }
+            .stage[data-canvas='light'] {
+                background: #ffffff;
+                background-image: radial-gradient(var(--ui-line) 1px, transparent 1px);
+                background-size: 16px 16px;
+            }
+            .stage[data-canvas='dark'] {
+                background: #0a0c18;
+                background-image: radial-gradient(#242a3d 1px, transparent 1px);
+                background-size: 16px 16px;
+                border-color: #0a0c18;
+            }
+
+            .hint { font-size: 12px; color: var(--ui-faint); margin: 0; }
+
+            .panel { border: 1px solid var(--ui-line); border-radius: 10px; overflow: hidden; }
+            .panel-hd {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 10px 14px;
+                background: var(--ui-panel);
+                border-bottom: 1px solid var(--ui-line);
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.07em;
+                color: var(--ui-muted);
+            }
+            .panel-hd button {
+                font: inherit;
+                font-size: 11px;
+                letter-spacing: 0.04em;
+                padding: 4px 10px;
+                border: 1px solid var(--ui-line-strong);
+                background: #fff;
+                border-radius: 5px;
+                cursor: pointer;
+                color: var(--ui-ink);
+                text-transform: none;
+            }
+            .panel-hd button:hover { border-color: var(--ui-faint); }
+
+            table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+            td { padding: 8px 14px; border-bottom: 1px solid var(--ui-line); vertical-align: middle; }
+            tr:last-child td { border-bottom: 0; }
+            td.k { width: 84px; color: var(--ui-muted); }
+            td.v {
+                width: 108px;
+                font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+                white-space: nowrap;
+            }
+            td.t {
+                color: var(--ui-muted);
+                font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+                font-size: 11.5px;
+                word-break: break-all;
+            }
+            .chip {
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                border-radius: 3px;
+                border: 1px solid rgba(0, 0, 0, 0.18);
+                margin-right: 7px;
+                vertical-align: -2px;
+            }
+
+            pre {
+                margin: 0;
+                padding: 14px;
+                font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+                font-size: 12.5px;
+                line-height: 1.6;
+                white-space: pre-wrap;
+                word-break: break-word;
+                color: #1b2439;
+                background: #fff;
+            }
+            .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+            @media (max-width: 1100px) { .cols { grid-template-columns: 1fr; } }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Button — Playground</h1>
+            <p id="src"></p>
+        </header>
+
+        <div class="layout">
+            <aside class="controls">
+                <div class="field">
+                    <span class="lbl">Marca <small>data-brand</small></span>
+                    <div class="seg" id="c-brand" role="group" aria-label="Marca"></div>
+                </div>
+
+                <div class="field">
+                    <span class="lbl">Modo <small>data-theme</small></span>
+                    <div class="seg" id="c-mode" role="group" aria-label="Modo"></div>
+                </div>
+
+                <hr class="rule" />
+
+                <div class="field">
+                    <span class="lbl">Theme <small>props do Figma</small></span>
+                    <div class="themes" id="c-theme" role="group" aria-label="Theme"></div>
+                </div>
+
+                <div class="field">
+                    <span class="lbl">State</span>
+                    <div class="seg" id="c-state" role="group" aria-label="State"></div>
+                </div>
+
+                <div class="field">
+                    <span class="lbl">Size</span>
+                    <div class="seg" id="c-size" role="group" aria-label="Size"></div>
+                </div>
+
+                <div class="field">
+                    <span class="lbl">Content</span>
+                    <div class="seg" id="c-content" role="group" aria-label="Content"></div>
+                </div>
+
+                <div class="field">
+                    <span class="lbl">Radius</span>
+                    <div class="seg" id="c-radius" role="group" aria-label="Radius"></div>
+                </div>
+
+                <div class="field">
+                    <span class="lbl">Label</span>
+                    <input type="text" id="c-label" value="Button" />
+                </div>
+
+                <div class="field">
+                    <span class="lbl">Booleans</span>
+                    <div class="checks" role="group" aria-label="Booleans">
+                        <label><input type="checkbox" id="c-left" checked /> Show Left Icon</label>
+                        <label><input type="checkbox" id="c-right" /> Show Right Icon</label>
+                        <label><input type="checkbox" id="c-dot" /> Show Dot</label>
+                    </div>
+                </div>
+
+                <hr class="rule" />
+
+                <div class="field">
+                    <span class="lbl">Canvas <small>só o palco</small></span>
+                    <div class="seg" id="c-canvas" role="group" aria-label="Canvas"></div>
+                </div>
+            </aside>
+
+            <main class="main">
+                <div class="stage" id="stage" data-canvas="light"></div>
+                <p class="hint" id="hint"></p>
+
+                <div class="cols">
+                    <div class="panel">
+                        <div class="panel-hd"><span>Tokens ativos</span></div>
+                        <table>
+                            <tbody id="tokens"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-hd">
+                            <span>Markup</span>
+                            <button id="copy" type="button">Copiar</button>
+                        </div>
+                        <pre id="code"></pre>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <script src="../dist/button.tokens.js"></script>
+        <script>
+            const T = window.BMB_TOKENS;
+            const SZ = { Small: 'sm', Medium: 'md', Large: 'lg', XLarge: 'xl' };
+            const slug = (s) => s.toLowerCase().replace(/\s+/g, '-');
+            const $ = (id) => document.getElementById(id);
+            const ROOT = document.documentElement;
+
+            // Hover/Active/Focus são pseudo-estados: não existem como classe. No palco eles
+            // são forçados via style inline que aponta para as MESMAS custom properties do
+            // tema — então continuam corretos ao trocar de marca. O markup não os inclui.
+            const FORCED = ['Hover', 'Active', 'Focus'];
+
+            // Estado inicial da DEMO, escolhido para abrir numa combinacao vistosa.
+            // Nao e o default do componente: no CSS, tema e tamanho sao obrigatorios e so o
+            // raio tem default real (round). Ver a tabela de props em ../src/button.rules.md.
+            const S = {
+                brand: 'employer',
+                mode: 'light',
+                theme: 'Primary',
+                state: 'Interativo',
+                size: 'Medium',
+                content: 'Label & Icon',
+                radius: 'round',
+                label: 'Button',
+                left: true,
+                right: false,
+                dot: false,
+                canvas: 'light',
+            };
+
+            $('src').textContent = T._source + ' · gerado em ' + T._generated;
+
+            function seg(host, values, key, labels) {
+                host.innerHTML = '';
+                values.forEach((v, i) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.textContent = labels ? labels[i] : v;
+                    b.dataset.val = v;
+                    b.onclick = () => { S[key] = v; render(); };
+                    host.appendChild(b);
+                });
+            }
+
+            function themeSwatches() {
+                const host = $('c-theme');
+                host.innerHTML = '';
+                for (const name of T.themeOrder) {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.dataset.val = name;
+                    b.innerHTML = '<span class="sw"><i></i></span><span>' + name + '</span>';
+                    b.onclick = () => { S.theme = name; render(); };
+                    host.appendChild(b);
+                }
+            }
+
+            themeSwatches();
+            seg(
+                $('c-brand'),
+                T.brands.map((b) => b.id),
+                'brand',
+                T.brands.map((b) => b.label),
+            );
+            seg($('c-mode'), ['light', 'dark'], 'mode', ['Light', 'Dark']);
+            seg($('c-state'), ['Interativo', ...T.stateOrder], 'state');
+            seg($('c-size'), T.sizeOrder, 'size');
+            seg($('c-content'), ['Label & Icon', 'Icon Only'], 'content');
+            seg($('c-radius'), ['round', 'straight', 'pill'], 'radius');
+            seg($('c-canvas'), ['light', 'dark'], 'canvas', ['Claro', 'Escuro']);
+
+            $('c-label').oninput = (e) => { S.label = e.target.value; render(); };
+            for (const [id, key] of [['c-left', 'left'], ['c-right', 'right'], ['c-dot', 'dot']]) {
+                $(id).onchange = (e) => { S[key] = e.target.checked; render(); };
+            }
+
+            const ICON_SVG =
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+            const ICON = '<span class="bmb-button__icon" aria-hidden="true">' + ICON_SVG + '</span>';
+            const DOT = '<span class="bmb-button__dot"></span>';
+
+            function classList() {
+                return [
+                    'bmb-button',
+                    'bmb-button--' + slug(S.theme),
+                    'bmb-button--' + SZ[S.size],
+                    S.content === 'Icon Only' ? 'bmb-button--icon-only' : '',
+                    S.state === 'Selected' ? 'bmb-button--selected' : '',
+                    S.radius !== 'round' ? 'bmb-button--' + S.radius : '',
+                ].filter(Boolean);
+            }
+
+            function innerHTML() {
+                const label = '<span class="bmb-button__label">' + (S.label || '') + '</span>';
+                const core =
+                    S.content === 'Icon Only'
+                        ? ICON
+                        : (S.left ? ICON : '') + label + (S.right ? ICON : '');
+                return core + (S.dot ? DOT : '');
+            }
+
+            function markup() {
+                const attrs = ['class="' + classList().join(' ') + '"', 'type="button"'];
+                if (S.state === 'Disabled') attrs.push('disabled');
+                if (S.content === 'Icon Only') attrs.push('aria-label="Ação"');
+                const icon = '    <span class="bmb-button__icon" aria-hidden="true"><!-- svg --></span>';
+                const parts =
+                    S.content === 'Icon Only'
+                        ? [icon]
+                        : [
+                              S.left ? icon : null,
+                              '    <span class="bmb-button__label">' + (S.label || '') + '</span>',
+                              S.right ? icon : null,
+                          ].filter(Boolean);
+                if (S.dot) parts.push('    <span class="bmb-button__dot"></span>');
+                return '<button ' + attrs.join(' ') + '>\n' + parts.join('\n') + '\n</button>';
+            }
+
+            /* `document.fonts.check()` devolve true mesmo quando o browser vai cair no
+               fallback, então não serve. Comparamos a largura do mesmo texto na família pedida
+               e no genérico: se for idêntica, a fonte não está instalada. */
+            const _medir = (fam) => {
+                const ctx = document.createElement('canvas').getContext('2d');
+                ctx.font = '40px ' + fam;
+                return ctx.measureText('Button Wg').width;
+            };
+            const _cacheFonte = new Map();
+            function fonteCarregada(fontFamily) {
+                const nome = fontFamily.split(',')[0].trim();
+                if (_cacheFonte.has(nome)) return _cacheFonte.get(nome);
+                const r = Math.abs(_medir(nome + ', sans-serif') - _medir('sans-serif')) > 0.5;
+                _cacheFonte.set(nome, r);
+                return r;
+            }
+
+            const hex = (rgb) => {
+                const m = (rgb || '').match(/\d+(\.\d+)?/g);
+                if (!m || m.length < 3) return rgb || '—';
+                if (m.length > 3 && parseFloat(m[3]) === 0) return 'transparente';
+                return '#' + m.slice(0, 3).map((n) => (+n).toString(16).padStart(2, '0')).join('');
+            };
+
+            function render() {
+                ROOT.setAttribute('data-brand', S.brand);
+                ROOT.setAttribute('data-theme', S.mode);
+
+                const groups = {
+                    'c-brand': S.brand, 'c-mode': S.mode, 'c-theme': S.theme,
+                    'c-state': S.state, 'c-size': S.size, 'c-content': S.content,
+                    'c-radius': S.radius, 'c-canvas': S.canvas,
+                };
+                for (const [id, val] of Object.entries(groups)) {
+                    for (const b of $(id).querySelectorAll('button')) {
+                        b.setAttribute('aria-pressed', String(b.dataset.val === val));
+                    }
+                }
+
+                $('stage').dataset.canvas = S.canvas;
+
+                const btn = document.createElement('button');
+                btn.className = classList().join(' ');
+                btn.type = 'button';
+                btn.innerHTML = innerHTML();
+                if (S.state === 'Disabled') btn.disabled = true;
+                if (S.content === 'Icon Only') btn.setAttribute('aria-label', 'Ação');
+
+                // estado forçado: aponta para as custom properties do tema, não para hex —
+                // assim continua certo em qualquer marca/modo
+                if (FORCED.includes(S.state)) {
+                    if (S.state === 'Focus') {
+                        btn.style.boxShadow = 'inset 0 0 0 3px var(--_bmb-btn-focus, transparent)';
+                        btn.style.backgroundColor = 'var(--_bmb-btn-bg-focus, var(--_bmb-btn-bg, transparent))';
+                        btn.style.color = 'var(--_bmb-btn-fg-focus, var(--_bmb-btn-fg))';
+                    } else {
+                        const k = S.state.toLowerCase();
+                        btn.style.backgroundColor = `var(--_bmb-btn-bg-${k}, var(--_bmb-btn-bg, transparent))`;
+                        btn.style.color = `var(--_bmb-btn-fg-${k}, var(--_bmb-btn-fg))`;
+                        btn.style.borderColor = `var(--_bmb-btn-bd-${k}, var(--_bmb-btn-bd, transparent))`;
+                    }
+                }
+
+                // Recriar o botao apagava o foco: quem estava testando por teclado era jogado
+                // de volta no <body> a cada troca de controle, justamente na pagina que existe
+                // para testar teclado. Guardamos e devolvemos.
+                const tinhaFoco = $('stage').contains(document.activeElement);
+                $('stage').innerHTML = '';
+                $('stage').appendChild(btn);
+                if (tinhaFoco) btn.focus();
+
+                // swatches refletem a marca/modo atuais
+                for (const b of $('c-theme').querySelectorAll('button')) {
+                    const probe = document.createElement('span');
+                    probe.className = 'bmb-button bmb-button--' + slug(b.dataset.val);
+                    probe.style.display = 'none';
+                    document.body.appendChild(probe);
+                    const bg = getComputedStyle(probe).backgroundColor;
+                    probe.remove();
+                    b.querySelector('i').style.background = bg;
+                }
+
+                $('hint').textContent = FORCED.includes(S.state)
+                    ? S.state + ' é pseudo-estado — forçado aqui só para inspeção; no markup vem de :' +
+                      S.state.toLowerCase() + (S.state === 'Focus' ? '-visible' : '') + '.'
+                    : S.state === 'Disabled'
+                      ? 'Disabled = opacity ' + T.disabledOpacity + ' sobre a Default.'
+                      : 'Estado real — passe o mouse, clique e dê Tab no botão.';
+
+                // tokens: nome do token + hex REALMENTE resolvido nesta marca/modo
+                const cs = getComputedStyle(btn);
+                const map = T.themeTokens[slug(S.theme)] || {};
+                const st = S.state === 'Interativo' ? 'Default' : S.state;
+                const sfx = { Hover: '-hover', Active: '-active', Selected: '-selected' }[st] || '';
+                const rows = [
+                    ['background', cs.backgroundColor, map['bg' + sfx] || map.bg],
+                    ['texto', cs.color, map['fg' + sfx] || map.fg],
+                    ['borda', cs.borderColor, map['bd' + sfx] || map.bd],
+                ];
+                if (st === 'Focus') rows[2] = ['anel interno 3px', cs.boxShadow, map.focus];
+
+                const z = T.sizes[S.size];
+                $('tokens').innerHTML =
+                    rows.map((r) =>
+                        '<tr><td class="k">' + r[0] + '</td><td class="v">' +
+                        '<span class="chip" style="background:' + r[1] + '"></span>' + hex(r[1]) +
+                        '</td><td class="t">' + (r[2] ? '--bmb-color-' + r[2] : '—') + '</td></tr>',
+                    ).join('') +
+                    '<tr><td class="k">fonte</td><td class="v">' + cs.fontSize + '</td>' +
+                    '<td class="t">--bmb-font-size-paragraph-' +
+                    ({ sm: 'small', md: 'medium', lg: 'large', xl: 'xlarge' })[SZ[S.size]] +
+                    ' · peso ' + cs.fontWeight + '</td></tr>' +
+                    '<tr><td class="k">família</td><td class="v">' +
+                    cs.fontFamily.split(',')[0].replace(/["']/g, '') +
+                    (fonteCarregada(cs.fontFamily) ? '' : ' <span title="não instalada; caiu no fallback">⚠</span>') +
+                    '</td><td class="t">--bmb-font-family-body · muda com a marca</td></tr>' +
+                    '<tr><td class="k">geometria</td><td class="v">' + z.h + 'px</td>' +
+                    '<td class="t">padding ' + z.padY + '·' +
+                    (S.content === 'Icon Only' ? 0 : z.padX) + ' · gap ' + z.gap +
+                    ' · ícone ' + (S.content === 'Icon Only' ? z.iconOnlyIcon : z.icon) +
+                    ' <em>(literais do Figma)</em></td></tr>' +
+                    '<tr><td class="k">radius</td><td class="v">' + cs.borderRadius + '</td>' +
+                    '<td class="t">--bmb-radius-button-' + S.radius + '</td></tr>';
+
+                $('code').textContent = markup();
+            }
+
+            $('copy').onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(markup());
+                    $('copy').textContent = 'Copiado';
+                } catch {
+                    $('copy').textContent = 'Falhou';
+                }
+                setTimeout(() => ($('copy').textContent = 'Copiar'), 1200);
+            };
+
+            render();
+
+            /* As fontes do Google chegam depois do primeiro render: sem isto o painel mostraria
+               o aviso de fallback para sempre, e o cache guardaria a medição errada. */
+            if (document.fonts?.ready) {
+                document.fonts.ready.then(() => {
+                    _cacheFonte.clear();
+                    render();
+                });
+            }
+        </script>
+    </body>
+</html>

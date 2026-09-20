@@ -1,0 +1,107 @@
+{
+  "component": "Button",
+  "version": "experimental",
+  "source": {
+    "geometry": "src/button.tokens.json",
+    "themeMappings": "scripts/build-css.mjs",
+    "brandColors": "audit/core-brands-audit.json",
+    "rules": "src/button.rules.md"
+  },
+  "element": {
+    "action": "button",
+    "navigation": "a"
+  },
+  "baseClass": "bmb-button",
+  "variants": {
+    "theme": {
+      "required": true,
+      "noDefault": "sem classe de tema o botao nao tem fundo nem cor de texto; nenhuma das 13 e implicita",
+      "classPrefix": "bmb-button--",
+      "values": [
+        "base",
+        "primary",
+        "secondary",
+        "tertiary",
+        "quaternary",
+        "success",
+        "warning",
+        "error",
+        "invert",
+        "plain",
+        "plain-invert",
+        "cta",
+        "plain-error"
+      ]
+    },
+    "size": {
+      "required": true,
+      "noDefault": "sem classe de tamanho o botao nao tem font-size, height nem padding",
+      "classPrefix": "bmb-button--",
+      "values": [
+        "sm",
+        "md",
+        "lg",
+        "xl"
+      ]
+    },
+    "radius": {
+      "required": false,
+      "default": "round",
+      "classes": {
+        "round": null,
+        "straight": "bmb-button--straight",
+        "pill": "bmb-button--pill"
+      }
+    },
+    "content": {
+      "default": "labelAndIcon",
+      "required": false,
+      "labelAndIcon": {
+        "iconClass": "bmb-button__icon",
+        "iconMarkup": "<span class=\"bmb-button__icon\" aria-hidden=\"true\"><svg>…</svg></span> — a classe vai no wrapper, nao no <svg>; a regra .bmb-button__icon svg depende disso",
+        "labelClass": "bmb-button__label",
+        "dotClass": "bmb-button__dot"
+      },
+      "iconOnly": {
+        "class": "bmb-button--icon-only",
+        "requiresAccessibleName": true
+      }
+    }
+  },
+  "states": {
+    "default": "base styles",
+    "hover": ":hover",
+    "active": ":active",
+    "selected": "bmb-button--selected",
+    "focus": ":focus-visible",
+    "disabled": "disabled attribute"
+  },
+  "globalTheme": {
+    "brandAttribute": "data-brand",
+    "brands": [
+      "employer",
+      "epays",
+      "bne-cia"
+    ],
+    "modeAttribute": "data-theme",
+    "modes": [
+      "light",
+      "dark"
+    ]
+  },
+  "accessibility": {
+    "iconOnlyRequiresAccessibleName": true,
+    "decorativeIconsAriaHidden": true,
+    "useNativeDisabled": true,
+    "disabledClassRemoved": "there is no .bmb-button--disabled; only the native disabled attribute disables the button (removed 2026-09-19)",
+    "focusVisible": "inset box-shadow 3px; bg/fg do foco nao se aplicam a .bmb-button--selected",
+    "forcedColors": "@media (forced-colors: active) restores outline: 3px solid Highlight, because box-shadow is not painted in that mode",
+    "resolvedException": "warning theme used to ship a transparent focus ring copied from the Figma source; restored to its own token on 2026-09-19 — see src/button.rules.md, 'Desvios do Figma (autorizados)' item 5"
+  },
+  "generatedFiles": [
+    "dist/brands.css",
+    "dist/button.css",
+    "dist/button.preview.css",
+    "dist/button.tokens.js"
+  ]
+}

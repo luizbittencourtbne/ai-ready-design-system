@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "id": "button",
+      "name": "Button",
+      "status": "experimental",
+      "contract": "src/button.contract.json",
+      "rules": "src/button.rules.md",
+      "tokens": "src/button.tokens.json",
+      "css": "dist/button.css",
+      "browserCss": "dist/button.preview.css",
+      "demo": "demo/playground.html"
+    }
+  ]
+}

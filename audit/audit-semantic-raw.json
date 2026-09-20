@@ -1,0 +1,550 @@
+{
+ "02-Color Surface/Backgrounds/background": {
+  "Light": "02-Neutral/Light/100",
+  "Dark": "02-Neutral/Dark/100"
+ },
+ "02-Color Surface/Backgrounds/surface": {
+  "Light": "02-Neutral/Light/50",
+  "Dark": "02-Neutral/Dark/50"
+ },
+ "02-Color Surface/Backgrounds/surface-alt": {
+  "Light": "02-Neutral/Light/200",
+  "Dark": "02-Neutral/Dark/200"
+ },
+ "02-Color Surface/On/on-surface-neutral": {
+  "Light": "02-Neutral/Light/800",
+  "Dark": "02-Neutral/Dark/800"
+ },
+ "02-Color Surface/On/on-surface-neutral-alt": {
+  "Light": "02-Neutral/Light/600",
+  "Dark": "02-Neutral/Dark/600"
+ },
+ "02-Color Surface/Borders/border": {
+  "Light": "02-Neutral/Light/200",
+  "Dark": "02-Neutral/Dark/200"
+ },
+ "03-Color Surface Brand/Backgrounds/background-brand": {
+  "Light": "03-Primary/Light/Deeper",
+  "Dark": "03-Primary/Dark/Shallower"
+ },
+ "03-Color Surface Brand/Backgrounds/surface-brand": {
+  "Light": "03-Primary/Light/Deep",
+  "Dark": "03-Primary/Dark/Shallow"
+ },
+ "03-Color Surface Brand/Backgrounds/surface-alt-brand": {
+  "Light": "03-Primary/Light/Default",
+  "Dark": "03-Primary/Dark/Default"
+ },
+ "04-Color Support/Backgrounds/background": {
+  "Light": "07-Support/Light/Deep",
+  "Dark": "07-Support/Dark/Deep"
+ },
+ "04-Color Support/Backgrounds/surface": {
+  "Light": "07-Support/Light/Default",
+  "Dark": "07-Support/Dark/Default"
+ },
+ "04-Color Support/Backgrounds/surface-alt": {
+  "Light": "07-Support/Light/Shallow",
+  "Dark": "07-Support/Dark/Shallow"
+ },
+ "04-Color Support/On/on-surface-support": {
+  "Light": "07-Support/Light/OnColor",
+  "Dark": "07-Support/Dark/OnColor"
+ },
+ "04-Color Support/On/on-surface-support-alt": {
+  "Light": "07-Support/Light/OnColor",
+  "Dark": "07-Support/Dark/OnColor"
+ },
+ "04-Color Support/Borders/border": {
+  "Light": "07-Support/Light/Deep",
+  "Dark": "07-Support/Dark/Deep"
+ },
+ "03-Color Surface Brand/On/on-surface-neutral-brand": {
+  "Light": "02-Neutral/Light/50",
+  "Dark": "02-Neutral/Dark/900"
+ },
+ "03-Color Surface Brand/On/on-surface-subtle-brand": {
+  "Light": "03-Primary/Light/Shallower",
+  "Dark": "03-Primary/Dark/Deeper"
+ },
+ "03-Color Surface Brand/Borders/border-brand": {
+  "Light": "03-Primary/Light/Shallow",
+  "Dark": "03-Primary/Dark/Deep"
+ },
+ "05-Color Base/Backgrounds/base-default": {
+  "Light": "02-Neutral/Light/0",
+  "Dark": "02-Neutral/Dark/0"
+ },
+ "05-Color Base/Backgrounds/base-hover": {
+  "Light": "02-Neutral/Light/200",
+  "Dark": "02-Neutral/Dark/200"
+ },
+ "05-Color Base/Backgrounds/base-active": {
+  "Light": "02-Neutral/Light/300",
+  "Dark": "02-Neutral/Dark/300"
+ },
+ "05-Color Base/Backgrounds/base-selected": {
+  "Light": "02-Neutral/Light/300",
+  "Dark": "02-Neutral/Dark/300"
+ },
+ "05-Color Base/Backgrounds/base-subtle": {
+  "Light": "02-Neutral/Light/200",
+  "Dark": "02-Neutral/Dark/200"
+ },
+ "05-Color Base/Backgrounds/base-default-alt": {
+  "Light": "02-Neutral/Light/900",
+  "Dark": "02-Neutral/Dark/900"
+ },
+ "05-Color Base/Backgrounds/base-hover-alt": {
+  "Light": "02-Neutral/Light/800",
+  "Dark": "02-Neutral/Dark/800"
+ },
+ "05-Color Base/Backgrounds/base-active-alt": {
+  "Light": "02-Neutral/Light/700",
+  "Dark": "02-Neutral/Dark/700"
+ },
+ "05-Color Base/Backgrounds/base-selected-alt": {
+  "Light": "02-Neutral/Light/1000",
+  "Dark": "02-Neutral/Dark/1000"
+ },
+ "05-Color Base/Backgrounds/base-subtle-alt": {
+  "Light": "02-Neutral/Light/800",
+  "Dark": "02-Neutral/Dark/800"
+ },
+ "05-Color Base/On/on-base": {
+  "Light": "02-Neutral/Light/800",
+  "Dark": "02-Neutral/Dark/800"
+ },
+ "05-Color Base/On/on-surface-base": {
+  "Light": "02-Neutral/Light/900",
+  "Dark": "02-Neutral/Dark/900"
+ },
+ "05-Color Base/On/on-base-alt": {
+  "Light": "02-Neutral/Light/400",
+  "Dark": "02-Neutral/Dark/400"
+ },
+ "05-Color Base/On/on-surface-base-alt": {
+  "Light": "02-Neutral/Light/200",
+  "Dark": "02-Neutral/Dark/200"
+ },
+ "05-Color Base/On/on-selected-base": {
+  "Light": "05-Color Base/On/on-base",
+  "Dark": "05-Color Base/On/on-base"
+ },
+ "05-Color Base/On/on-hover-base": {
+  "Light": "05-Color Base/On/on-base",
+  "Dark": "05-Color Base/On/on-base"
+ },
+ "05-Color Base/Borders/border-base": {
+  "Light": "02-Neutral/Light/400",
+  "Dark": "02-Neutral/Dark/400"
+ },
+ "05-Color Base/Borders/border-base-alt": {
+  "Light": "02-Neutral/Light/200",
+  "Dark": "02-Neutral/Dark/200"
+ },
+ "05-Color Base/Borders/border-base-subtle": {
+  "Light": "02-Neutral/Light/50",
+  "Dark": "02-Neutral/Dark/50"
+ },
+ "05-Color Base/Borders/border-base-subtle-alt": {
+  "Light": "02-Neutral/Light/600",
+  "Dark": "02-Neutral/Dark/600"
+ },
+ "05-Color Base/Borders/border-base-focus": {
+  "Light": "02-Neutral/Light/400",
+  "Dark": "02-Neutral/Dark/400"
+ },
+ "05-Color Base/Borders/border-base-focus-alt": {
+  "Light": "02-Neutral/Light/600",
+  "Dark": "02-Neutral/Dark/600"
+ },
+ "05-Color Base/Borders/border-base-input": {
+  "Light": "02-Neutral/Light/400",
+  "Dark": "02-Neutral/Dark/400"
+ },
+ "06-Color Primary/Backgrounds/primary-default": {
+  "Light": "03-Primary/Light/Deep",
+  "Dark": "03-Primary/Dark/Deep"
+ },
+ "06-Color Primary/Backgrounds/primary-hover": {
+  "Light": "03-Primary/Light/Deep-Hover",
+  "Dark": "03-Primary/Dark/Deep-Hover"
+ },
+ "06-Color Primary/Backgrounds/primary-active": {
+  "Light": "03-Primary/Light/Deep-Active",
+  "Dark": "03-Primary/Dark/Deep-Active"
+ },
+ "06-Color Primary/Backgrounds/primary-selected": {
+  "Light": "03-Primary/Light/Deep-Selected",
+  "Dark": "03-Primary/Dark/Deep-Selected"
+ },
+ "06-Color Primary/Backgrounds/primary-subtle": {
+  "Light": "03-Primary/Light/Transparency",
+  "Dark": "03-Primary/Dark/Transparency"
+ },
+ "06-Color Primary/On/on-primary": {
+  "Light": "03-Primary/Light/OnColor",
+  "Dark": "03-Primary/Dark/OnColor"
+ },
+ "06-Color Primary/On/on-surface-primary": {
+  "Light": "03-Primary/Light/Default",
+  "Dark": "03-Primary/Dark/Deeper"
+ },
+ "06-Color Primary/On/on-selected-primary": {
+  "Light": "06-Color Primary/On/on-primary",
+  "Dark": "06-Color Primary/On/on-primary"
+ },
+ "06-Color Primary/On/on-hover-primary": {
+  "Light": "06-Color Primary/On/on-primary",
+  "Dark": "06-Color Primary/On/on-primary"
+ },
+ "06-Color Primary/Borders/border-primary": {
+  "Light": "03-Primary/Light/Deep",
+  "Dark": "03-Primary/Dark/Deep"
+ },
+ "06-Color Primary/Borders/border-primary-subtle": {
+  "Light": "03-Primary/Light/Shallower",
+  "Dark": "03-Primary/Dark/Shallower"
+ },
+ "06-Color Primary/Borders/border-primary-focus": {
+  "Light": "03-Primary/Light/Shallow",
+  "Dark": "03-Primary/Dark/Shallow"
+ },
+ "07-Color Secondary/Backgrounds/secondary-default": {
+  "Light": "04-Secondary/Light/Deep",
+  "Dark": "04-Secondary/Dark/Deep"
+ },
+ "07-Color Secondary/Backgrounds/secondary-hover": {
+  "Light": "04-Secondary/Light/Deep-Hover",
+  "Dark": "04-Secondary/Dark/Deep-Hover"
+ },
+ "07-Color Secondary/Backgrounds/secondary-active": {
+  "Light": "04-Secondary/Light/Deep-Active",
+  "Dark": "04-Secondary/Dark/Deep-Active"
+ },
+ "07-Color Secondary/Backgrounds/secondary-selected": {
+  "Light": "04-Secondary/Light/Deep-Selected",
+  "Dark": "04-Secondary/Dark/Deep-Selected"
+ },
+ "07-Color Secondary/Backgrounds/secondary-subtle": {
+  "Light": "04-Secondary/Light/Transparency",
+  "Dark": "04-Secondary/Dark/Transparency"
+ },
+ "07-Color Secondary/On/on-secondary": {
+  "Light": "04-Secondary/Light/OnColor",
+  "Dark": "04-Secondary/Dark/OnColor"
+ },
+ "07-Color Secondary/On/on-surface-secondary": {
+  "Light": "04-Secondary/Light/Default",
+  "Dark": "04-Secondary/Dark/Default"
+ },
+ "07-Color Secondary/On/on-selected-secondary": {
+  "Light": "07-Color Secondary/On/on-secondary",
+  "Dark": "07-Color Secondary/On/on-secondary"
+ },
+ "07-Color Secondary/On/on-hover-secondary": {
+  "Light": "07-Color Secondary/On/on-secondary",
+  "Dark": "07-Color Secondary/On/on-secondary"
+ },
+ "07-Color Secondary/Borders/border-secondary": {
+  "Light": "04-Secondary/Light/Deep",
+  "Dark": "04-Secondary/Dark/Deep"
+ },
+ "07-Color Secondary/Borders/border-secondary-subtle": {
+  "Light": "04-Secondary/Light/Shallower",
+  "Dark": "04-Secondary/Dark/Shallower"
+ },
+ "07-Color Secondary/Borders/border-secondary-focus": {
+  "Light": "04-Secondary/Light/Shallow",
+  "Dark": "04-Secondary/Dark/Shallow"
+ },
+ "08-Color Tertiary/Backgrounds/tertiary-default": {
+  "Light": "05-Tertiary/Light/Deep",
+  "Dark": "05-Tertiary/Dark/Deep"
+ },
+ "08-Color Tertiary/Backgrounds/tertiary-hover": {
+  "Light": "05-Tertiary/Light/Deep-Hover",
+  "Dark": "05-Tertiary/Dark/Deep-Hover"
+ },
+ "08-Color Tertiary/Backgrounds/tertiary-active": {
+  "Light": "05-Tertiary/Light/Deep-Active",
+  "Dark": "05-Tertiary/Dark/Deep-Active"
+ },
+ "08-Color Tertiary/Backgrounds/tertiary-selected": {
+  "Light": "05-Tertiary/Light/Deep-Selected",
+  "Dark": "05-Tertiary/Dark/Deep-Selected"
+ },
+ "08-Color Tertiary/Backgrounds/tertiary-subtle": {
+  "Light": "05-Tertiary/Light/Transparency",
+  "Dark": "05-Tertiary/Dark/Transparency"
+ },
+ "09-Color Quaternary/Backgrounds/quaternary-default": {
+  "Light": "06-Quaternary/Light/Deep",
+  "Dark": "06-Quaternary/Dark/Deep"
+ },
+ "09-Color Quaternary/Backgrounds/quaternary-hover": {
+  "Light": "06-Quaternary/Light/Deep-Hover",
+  "Dark": "06-Quaternary/Dark/Deep-Hover"
+ },
+ "09-Color Quaternary/Backgrounds/quaternary-active": {
+  "Light": "06-Quaternary/Light/Deep-Active",
+  "Dark": "06-Quaternary/Dark/Deep-Active"
+ },
+ "09-Color Quaternary/Backgrounds/quaternary-selected": {
+  "Light": "06-Quaternary/Light/Deep-Selected",
+  "Dark": "06-Quaternary/Dark/Deep-Selected"
+ },
+ "09-Color Quaternary/Backgrounds/quaternary-subtle": {
+  "Light": "06-Quaternary/Light/Transparency",
+  "Dark": "06-Quaternary/Dark/Transparency"
+ },
+ "09-Color Quaternary/On/on-quaternary": {
+  "Light": "06-Quaternary/Light/OnColor",
+  "Dark": "06-Quaternary/Dark/OnColor"
+ },
+ "09-Color Quaternary/On/on-surface-quaternary": {
+  "Light": "06-Quaternary/Light/Deep",
+  "Dark": "06-Quaternary/Dark/Deep"
+ },
+ "09-Color Quaternary/On/on-selected-quaternary": {
+  "Light": "09-Color Quaternary/On/on-quaternary",
+  "Dark": "09-Color Quaternary/On/on-quaternary"
+ },
+ "09-Color Quaternary/On/on-hover-quaternary": {
+  "Light": "09-Color Quaternary/On/on-quaternary",
+  "Dark": "09-Color Quaternary/On/on-quaternary"
+ },
+ "09-Color Quaternary/Borders/border-quaternary": {
+  "Light": "06-Quaternary/Light/Deep",
+  "Dark": "06-Quaternary/Dark/Deep"
+ },
+ "09-Color Quaternary/Borders/border-quaternary-subtle": {
+  "Light": "06-Quaternary/Light/Shallower",
+  "Dark": "06-Quaternary/Dark/Shallower"
+ },
+ "09-Color Quaternary/Borders/border-quaternary-focus": {
+  "Light": "06-Quaternary/Light/Shallow",
+  "Dark": "06-Quaternary/Dark/Shallow"
+ },
+ "08-Color Tertiary/On/on-tertiary": {
+  "Light": "05-Tertiary/Light/OnColor",
+  "Dark": "05-Tertiary/Dark/OnColor"
+ },
+ "08-Color Tertiary/On/on-surface-tertiary": {
+  "Light": "05-Tertiary/Light/Default",
+  "Dark": "05-Tertiary/Dark/Deeper"
+ },
+ "08-Color Tertiary/On/on-selected-tertiary": {
+  "Light": "08-Color Tertiary/On/on-tertiary",
+  "Dark": "08-Color Tertiary/On/on-tertiary"
+ },
+ "08-Color Tertiary/On/on-hover-tertiary": {
+  "Light": "08-Color Tertiary/On/on-tertiary",
+  "Dark": "08-Color Tertiary/On/on-tertiary"
+ },
+ "08-Color Tertiary/Borders/border-tertiary": {
+  "Light": "05-Tertiary/Light/Deep",
+  "Dark": "05-Tertiary/Dark/Deep"
+ },
+ "08-Color Tertiary/Borders/border-tertiary-subtle": {
+  "Light": "05-Tertiary/Light/Shallower",
+  "Dark": "05-Tertiary/Dark/Shallower"
+ },
+ "08-Color Tertiary/Borders/border-tertiary-focus": {
+  "Light": "05-Tertiary/Light/Shallow",
+  "Dark": "05-Tertiary/Dark/Shallow"
+ },
+ "10-Color Success/Backgrounds/success-default": {
+  "Light": "09-Success/Light/Deep",
+  "Dark": "09-Success/Dark/Deep"
+ },
+ "10-Color Success/Backgrounds/success-hover": {
+  "Light": "09-Success/Light/Deep-Hover",
+  "Dark": "09-Success/Dark/Deep-Hover"
+ },
+ "10-Color Success/Backgrounds/success-active": {
+  "Light": "09-Success/Light/Deep-Active",
+  "Dark": "09-Success/Dark/Deep-Active"
+ },
+ "10-Color Success/Backgrounds/success-selected": {
+  "Light": "09-Success/Light/Deep-Selected",
+  "Dark": "09-Success/Dark/Deep-Selected"
+ },
+ "10-Color Success/Backgrounds/success-subtle": {
+  "Light": "09-Success/Light/Transparency",
+  "Dark": "09-Success/Dark/Transparency"
+ },
+ "10-Color Success/On/on-success": {
+  "Light": "09-Success/Light/OnColor",
+  "Dark": "09-Success/Dark/OnColor"
+ },
+ "10-Color Success/On/on-surface-success": {
+  "Light": "09-Success/Light/Deep",
+  "Dark": "09-Success/Dark/Deep"
+ },
+ "10-Color Success/On/on-selected-success": {
+  "Light": "10-Color Success/On/on-success",
+  "Dark": "10-Color Success/On/on-success"
+ },
+ "10-Color Success/On/on-hover-success": {
+  "Light": "10-Color Success/On/on-success",
+  "Dark": "10-Color Success/On/on-success"
+ },
+ "10-Color Success/Borders/border-success": {
+  "Light": "09-Success/Light/Deep",
+  "Dark": "09-Success/Dark/Deep"
+ },
+ "10-Color Success/Borders/border-success-subtle": {
+  "Light": "09-Success/Light/Shallower",
+  "Dark": "09-Success/Dark/Shallower"
+ },
+ "10-Color Success/Borders/border-success-focus": {
+  "Light": "09-Success/Light/Shallow",
+  "Dark": "09-Success/Dark/Shallow"
+ },
+ "11-Color Warning/Backgrounds/warning-default": {
+  "Light": "10-Warning/Light/Deep",
+  "Dark": "10-Warning/Dark/Deep"
+ },
+ "11-Color Warning/Backgrounds/warning-hover": {
+  "Light": "10-Warning/Light/Deep-Hover",
+  "Dark": "10-Warning/Dark/Deep-Hover"
+ },
+ "11-Color Warning/Backgrounds/warning-active": {
+  "Light": "10-Warning/Light/Deep-Active",
+  "Dark": "10-Warning/Dark/Deep-Active"
+ },
+ "11-Color Warning/Backgrounds/warning-selected": {
+  "Light": "10-Warning/Light/Deep-Selected",
+  "Dark": "10-Warning/Dark/Deep-Selected"
+ },
+ "11-Color Warning/Backgrounds/warning-subtle": {
+  "Light": "10-Warning/Light/Transparency",
+  "Dark": "10-Warning/Dark/Transparency"
+ },
+ "11-Color Warning/On/on-warning": {
+  "Light": "10-Warning/Light/OnColor",
+  "Dark": "10-Warning/Dark/OnColor"
+ },
+ "11-Color Warning/On/on-surface-warning": {
+  "Light": "10-Warning/Light/Deep",
+  "Dark": "10-Warning/Dark/Deep"
+ },
+ "11-Color Warning/On/on-selected-warning": {
+  "Light": "11-Color Warning/On/on-warning",
+  "Dark": "11-Color Warning/On/on-warning"
+ },
+ "11-Color Warning/On/on-hover-warning": {
+  "Light": "11-Color Warning/On/on-warning",
+  "Dark": "11-Color Warning/On/on-warning"
+ },
+ "11-Color Warning/Borders/border-warning": {
+  "Light": "10-Warning/Light/Deep",
+  "Dark": "10-Warning/Dark/Deep"
+ },
+ "11-Color Warning/Borders/border-warning-subtle": {
+  "Light": "10-Warning/Light/Shallower",
+  "Dark": "10-Warning/Dark/Shallower"
+ },
+ "11-Color Warning/Borders/border-warning-focus": {
+  "Light": "10-Warning/Light/Shallow",
+  "Dark": "10-Warning/Dark/Shallow"
+ },
+ "12-Color Error/Backgrounds/error-default": {
+  "Light": "11-Error/Light/Deep",
+  "Dark": "11-Error/Dark/Deep"
+ },
+ "12-Color Error/Backgrounds/error-hover": {
+  "Light": "11-Error/Light/Deep-Hover",
+  "Dark": "11-Error/Dark/Deep-Hover"
+ },
+ "12-Color Error/Backgrounds/error-active": {
+  "Light": "11-Error/Light/Deep-Active",
+  "Dark": "11-Error/Dark/Deep-Active"
+ },
+ "12-Color Error/Backgrounds/error-selected": {
+  "Light": "11-Error/Light/Deep-Selected",
+  "Dark": "11-Error/Dark/Deep-Selected"
+ },
+ "12-Color Error/Backgrounds/error-subtle": {
+  "Light": "11-Error/Light/Transparency",
+  "Dark": "11-Error/Dark/Transparency"
+ },
+ "12-Color Error/On/on-error": {
+  "Light": "11-Error/Light/OnColor",
+  "Dark": "11-Error/Dark/OnColor"
+ },
+ "12-Color Error/On/on-surface-error": {
+  "Light": "11-Error/Light/Deep",
+  "Dark": "11-Error/Dark/Deep"
+ },
+ "12-Color Error/On/on-selected-error": {
+  "Light": "12-Color Error/On/on-error",
+  "Dark": "12-Color Error/On/on-error"
+ },
+ "12-Color Error/On/on-hover-error": {
+  "Light": "12-Color Error/On/on-error",
+  "Dark": "12-Color Error/On/on-error"
+ },
+ "12-Color Error/Borders/border-error": {
+  "Light": "11-Error/Light/Deep",
+  "Dark": "11-Error/Dark/Deep"
+ },
+ "12-Color Error/Borders/border-error-subtle": {
+  "Light": "11-Error/Light/Shallower",
+  "Dark": "11-Error/Dark/Shallower"
+ },
+ "12-Color Error/Borders/border-error-focus": {
+  "Light": "11-Error/Light/Shallow",
+  "Dark": "11-Error/Dark/Shallow"
+ },
+ "13-Color CTA/Backgrounds/CTA-default": {
+  "Light": "17-CTA/Light/Deep",
+  "Dark": "17-CTA/Dark/Deep"
+ },
+ "13-Color CTA/Backgrounds/CTA-hover": {
+  "Light": "17-CTA/Light/Deep-Hover",
+  "Dark": "17-CTA/Dark/Deep-Hover"
+ },
+ "13-Color CTA/Backgrounds/CTA-active": {
+  "Light": "17-CTA/Light/Deep-Active",
+  "Dark": "17-CTA/Dark/Deep-Active"
+ },
+ "13-Color CTA/Backgrounds/CTA-selected": {
+  "Light": "17-CTA/Light/Deep-Selected",
+  "Dark": "17-CTA/Dark/Deep-Selected"
+ },
+ "13-Color CTA/Backgrounds/CTA-subtle": {
+  "Light": "17-CTA/Light/Transparency",
+  "Dark": "17-CTA/Dark/Transparency"
+ },
+ "13-Color CTA/On/on-CTA": {
+  "Light": "17-CTA/Light/OnColor",
+  "Dark": "17-CTA/Dark/OnColor"
+ },
+ "13-Color CTA/On/on-surface-CTA": {
+  "Light": "17-CTA/Light/Deep",
+  "Dark": "17-CTA/Dark/Deep"
+ },
+ "13-Color CTA/On/on-selected-CTA": {
+  "Light": "13-Color CTA/On/on-CTA",
+  "Dark": "13-Color CTA/On/on-CTA"
+ },
+ "13-Color CTA/On/on-hover-CTA": {
+  "Light": "13-Color CTA/On/on-CTA",
+  "Dark": "13-Color CTA/On/on-CTA"
+ },
+ "13-Color CTA/Borders/border-CTA": {
+  "Light": "17-CTA/Light/Deep",
+  "Dark": "17-CTA/Dark/Deep"
+ },
+ "13-Color CTA/Borders/border-CTA-subtle": {
+  "Light": "17-CTA/Light/Shallower",
+  "Dark": "17-CTA/Dark/Shallower"
+ },
+ "13-Color CTA/Borders/border-CTA-focus": {
+  "Light": "17-CTA/Light/Shallow",
+  "Dark": "17-CTA/Dark/Shallow"
+ }
+}
