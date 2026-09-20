@@ -42,7 +42,6 @@ const rel = (p) => path.relative(ROOT, p).split(path.sep).join('/');
  * Mudança em qualquer uma afeta TODOS os componentes. O campo `porque` vai para o relatório,
  * para o revisor humano entender por que o componente foi puxado para a revisão. */
 const COMPARTILHADOS = [
-    ['scripts/build-css.mjs', 'mapeamento tema -> token e geometria do CSS (AGENTS.md: "o mapeamento de temas continua em scripts/build-css.mjs")'],
     ['scripts/build-core-brands.mjs', 'resolve os primitivos e deriva os estados de cor (AGENTS.md, "Fontes e fluxo")'],
     ['scripts/build-brands.mjs', 'gera dist/brands.css a partir do audit (AGENTS.md, "Fontes e fluxo")'],
     ['scripts/validate.mjs', 'define o que a validação considera válido; mudar aqui muda o critério de aprovação'],
@@ -55,6 +54,28 @@ const COMPARTILHADOS = [
     ['AGENTS.md', 'as regras contra as quais a revisão julga'],
 ];
 const MAPA_COMPARTILHADO = new Map(COMPARTILHADOS);
+
+/* ---- caminhos de um componente só, que o índice não declara -----------------------------
+ * `scripts/build-css.mjs` é o gerador do BUTTON — o AGENTS.md diz que "o mapeamento de temas
+ * continua" ali, mas isso vale para o Button, não para todo componente. O Hyperlink tem
+ * gerador próprio. Tratar os dois como compartilhados faria um PR que mexe só no gerador do
+ * Button acusar o Hyperlink, e vice-versa.
+ *
+ * Ao acrescentar um componente com gerador próprio, registre-o aqui. Sem isso o arquivo cai
+ * em "não atribuídos" — visível, não silencioso. */
+const POR_COMPONENTE = {
+    button: [
+        ['scripts/build-css.mjs', 'gerador do Button: mapeamento tema -> token e geometria (AGENTS.md)'],
+    ],
+    hyperlink: [
+        ['scripts/build-hyperlink-css.mjs', 'gerador do Hyperlink: mapeamento tema -> token e geometria'],
+    ],
+};
+
+/* Demo preferida no contexto, quando a declarada no índice não é a melhor para revisão. */
+const DEMO_PREFERIDA = {
+    button: ['demo/index.html', 'demo estática do Button: o markup real que as pessoas copiam'],
+};
 
 /* Diretórios compartilhados: qualquer arquivo abaixo conta. */
 const DIRS_COMPARTILHADOS = [
@@ -139,7 +160,19 @@ function atribuir(arquivos, componentes) {
         }
         if (casou) continue;
 
-        // camada 2: o caminho carrega o id do componente
+        // camada 2a: caminho que pertence a um componente específico
+        for (const c of componentes) {
+            const dono = (POR_COMPONENTE[c.id] ?? []).find(([caminhoDono]) => caminhoDono === caminho);
+            if (dono) {
+                porComponente.get(c.id).motivos.push({
+                    caminho, status, camada: 'do componente', porque: dono[1],
+                });
+                casou = true;
+            }
+        }
+        if (casou) continue;
+
+        // camada 2b: o caminho carrega o id do componente
         for (const c of componentes) {
             if (new RegExp(`(^|[/._-])${c.id}([/._-]|$)`, 'i').test(caminho)) {
                 porComponente.get(c.id).motivos.push({
@@ -197,19 +230,23 @@ function arquivosDeContexto(c) {
         add(c.browserCss, 'CSS gerado para navegador');
     }
 
-    /* Demo: o índice aponta para `demo/playground.html` (28 KB), que monta o markup em
-     * JavaScript — os `aria-label` que ele carrega são do painel de controle dele, não do
-     * componente. A demo estática tem o markup real que as pessoas copiam (9 `aria-hidden`,
-     * 4 `aria-label`, `disabled`, `type="button"`) em 6,8 KB. Para revisar acessibilidade ela
-     * é melhor E mais barata, então é a preferida. Sem ela, cai para a declarada no índice. */
-    const DEMO_ESTATICA = 'demo/index.html';
-    if (existe(DEMO_ESTATICA)) {
-        add(DEMO_ESTATICA, 'demo estática: o markup real que as pessoas copiam');
+    /* Demo: por padrão vai a declarada no índice. O Button é exceção: o índice aponta para
+     * `demo/playground.html` (28 KB), que monta o markup em JavaScript — os `aria-label` que
+     * ele carrega são do painel de controle dele, não do componente. A demo estática do Button
+     * tem o markup real que as pessoas copiam (9 `aria-hidden`, 4 `aria-label`, `disabled`,
+     * `type="button"`) em 6,8 KB: melhor para revisar acessibilidade E mais barata.
+     *
+     * A exceção é POR COMPONENTE. Antes disso a troca era fixa em `demo/index.html`, e o
+     * Hyperlink recebia a demo do Button no próprio contexto — arquivo irrelevante ocupando
+     * espaço e convidando o revisor a comentar o componente errado. */
+    const [demoPreferida, papelDemo] = DEMO_PREFERIDA[c.id] ?? [];
+    if (demoPreferida && existe(demoPreferida)) {
+        add(demoPreferida, papelDemo);
     } else {
         add(c.demo, 'demo');
     }
 
-    add('scripts/build-css.mjs', 'gerador: mapeamento tema -> token (AGENTS.md)');
+    for (const [caminho, papel] of POR_COMPONENTE[c.id] ?? []) add(caminho, papel);
     return lista;
 }
 

@@ -3,485 +3,310 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Button — Playground</title>
+        <title>BambooDS</title>
         <!-- As fontes das marcas precisam ser CARREGADAS, senão `font-family: Roboto` cai no
-             sans-serif genérico e as três marcas ficam tipograficamente idênticas — foi o que
-             acontecia. Roboto (employer), Nunito (epays) e Montserrat (bne-cia) estão no Google
-             Fonts; peso 600 porque o botão é semibold.
-             `Frederik`, o title da BNE CIA, é fonte comercial e não está aqui — mas o botão usa
-             o body, então não afeta o que se vê no playground.
-             Sem internet, tudo volta a cair no fallback: a cadeia `, sans-serif` segura. -->
+             fallback do sistema e o palco mostra uma tipografia que não é a do Design System.
+             O painel de tokens avisa com ⚠ quando isso acontece. -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Nunito:wght@400;600&family=Roboto:wght@400;600&display=swap"
         />
-
         <!-- brands.css PRIMEIRO: define os tokens --bmb-* por marca/tema.
-             button.preview.css consome esses tokens; sozinha ela não pinta nada. -->
+             Depois o CSS de cada componente, que só os consome. -->
         <link rel="stylesheet" href="../dist/brands.css" />
         <link rel="stylesheet" href="../dist/button.preview.css" />
+        <link rel="stylesheet" href="../dist/hyperlink.preview.css" />
         <style>
-            /* A UI do playground usa paleta própria (--ui-*), independente dos tokens do
-               DS, para continuar legível quando o modo do componente muda. */
             :root {
-                --ui-bg: #ffffff;
-                --ui-panel: #fafafa;
-                --ui-line: #e5e5e5;
-                --ui-line-strong: #d4d4d4;
-                --ui-ink: #1b2439;
-                --ui-muted: #6b7280;
-                --ui-faint: #9ca3af;
-                --ui-accent: #1b2439;
+                --doc-bg: #ffffff;
+                --doc-soft: #f7f8fa;
+                --doc-line: #e5e8ee;
+                --doc-text: #14161a;
+                --doc-dim: #5b6478;
+                --doc-accent: #1b2439;
+                --doc-ok: #1a7f37;
+                --doc-warn: #b45309;
+                --doc-radius: 12px;
             }
-
             * { box-sizing: border-box; }
-
+            html { scroll-behavior: smooth; }
             body {
                 margin: 0;
-                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-                color: var(--ui-ink);
-                background: var(--ui-bg);
-                font-size: 14px;
+                font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+                color: var(--doc-text);
+                background: var(--doc-bg);
+                font-size: 15px;
+                line-height: 1.55;
             }
 
-            header {
-                padding: 22px 28px;
-                border-bottom: 1px solid var(--ui-line);
-            }
-            header h1 { margin: 0; font-size: 17px; letter-spacing: -0.01em; }
-            header p { margin: 3px 0 0; font-size: 12px; color: var(--ui-faint); }
-
-            .layout {
-                display: grid;
-                grid-template-columns: 296px minmax(0, 1fr);
-                align-items: start;
-                min-height: calc(100vh - 68px);
-            }
-            @media (max-width: 860px) {
-                .layout { grid-template-columns: 1fr; }
-                .controls { border-right: 0; border-bottom: 1px solid var(--ui-line); }
-            }
-
-            .controls {
-                border-right: 1px solid var(--ui-line);
-                background: var(--ui-panel);
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
+            /* ---------- barra do topo ---------- */
+            .topbar {
                 position: sticky;
                 top: 0;
-            }
-
-            .field > .lbl {
-                display: block;
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.07em;
-                color: var(--ui-muted);
-                margin-bottom: 8px;
-            }
-            .field > .lbl small {
-                font-weight: 400;
-                text-transform: none;
-                letter-spacing: 0;
-                color: var(--ui-faint);
-            }
-
-            .rule {
-                border: 0;
-                border-top: 1px solid var(--ui-line-strong);
-                margin: 0;
-            }
-
-            .seg { display: flex; flex-wrap: wrap; gap: 4px; }
-            .seg button {
-                flex: 1 1 auto;
-                min-width: fit-content;
-                padding: 7px 10px;
-                font: inherit;
-                font-size: 12px;
-                border: 1px solid var(--ui-line-strong);
-                background: #fff;
-                color: var(--ui-ink);
-                border-radius: 6px;
-                cursor: pointer;
-                transition: all 100ms ease;
-            }
-            .seg button:hover { border-color: var(--ui-faint); }
-            .seg button[aria-pressed='true'] {
-                background: var(--ui-accent);
-                border-color: var(--ui-accent);
-                color: #fff;
-            }
-
-            .themes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
-            .themes button {
+                z-index: 20;
                 display: flex;
                 align-items: center;
-                gap: 7px;
-                padding: 6px 8px;
-                font: inherit;
-                font-size: 12px;
-                text-align: left;
-                border: 1px solid var(--ui-line-strong);
-                background: #fff;
-                color: var(--ui-ink);
+                gap: 16px;
+                padding: 12px 24px;
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(8px);
+                border-bottom: 1px solid var(--doc-line);
+            }
+            .marca {
+                display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px;
+                border: 0; background: none; padding: 0; cursor: pointer;
+                font-family: inherit; color: inherit;
                 border-radius: 6px;
-                cursor: pointer;
-                transition: all 100ms ease;
             }
-            .themes button:hover { border-color: var(--ui-faint); }
-            .themes button[aria-pressed='true'] {
-                border-color: var(--ui-accent);
-                box-shadow: inset 0 0 0 1px var(--ui-accent);
+            .marca:hover { text-decoration: underline; }
+            .marca:focus-visible { outline: 2px solid var(--doc-accent); outline-offset: 3px; }
+            .marca .pontos {
+                display: grid;
+                grid-template-columns: repeat(3, 3px);
+                gap: 2px;
+            }
+            .marca .pontos i { width: 3px; height: 3px; border-radius: 50%; background: var(--doc-accent); display: block; }
+            .selo {
+                font-size: 11px;
                 font-weight: 600;
+                padding: 2px 8px;
+                border-radius: 999px;
+                background: #eef0f4;
+                color: var(--doc-dim);
+                border: 1px solid var(--doc-line);
             }
-            /* o swatch mostra a cor REAL do tema na marca/modo ativos — fundo xadrez
-               aparece nos temas transparentes */
-            .sw {
-                width: 14px;
-                height: 14px;
-                border-radius: 4px;
-                flex: none;
-                border: 1px solid rgba(0, 0, 0, 0.16);
-                background-image: linear-gradient(45deg, #eee 25%, transparent 25%),
-                    linear-gradient(-45deg, #eee 25%, transparent 25%),
-                    linear-gradient(45deg, transparent 75%, #eee 75%),
-                    linear-gradient(-45deg, transparent 75%, #eee 75%);
-                background-size: 8px 8px;
-                background-position: 0 0, 0 4px, 4px -4px, -4px 0;
-            }
-            .sw i { display: block; width: 100%; height: 100%; border-radius: 3px; }
-
-            .checks { display: flex; flex-direction: column; gap: 7px; }
-            .checks label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
-            .checks input { accent-color: var(--ui-accent); width: 15px; height: 15px; cursor: pointer; }
-
-            input[type='text'] {
-                width: 100%;
-                padding: 8px 10px;
+            .topbar .espaco { flex: 1; }
+            .topbar-ctrl { display: flex; align-items: center; gap: 6px; }
+            .topbar-ctrl label { font-size: 11px; color: var(--doc-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+            select {
                 font: inherit;
                 font-size: 13px;
-                border: 1px solid var(--ui-line-strong);
-                border-radius: 6px;
+                padding: 4px 8px;
+                border: 1px solid var(--doc-line);
+                border-radius: 8px;
                 background: #fff;
-                color: var(--ui-ink);
-            }
-            input[type='text']:focus { outline: 2px solid var(--ui-accent); outline-offset: -1px; }
-
-            .main {
-                padding: 24px 28px 48px;
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-                min-width: 0;
+                color: inherit;
             }
 
-            .stage {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 230px;
-                border: 1px solid var(--ui-line);
+            /* ---------- página ---------- */
+            .pagina { max-width: 900px; margin: 0 auto; padding: 28px 24px 80px; }
+            .crumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--doc-dim); margin-bottom: 14px; }
+            .crumb button {
+                border: 0; background: none; font: inherit; font-size: 13px;
+                color: var(--doc-dim); cursor: pointer; padding: 0;
+            }
+            .crumb button:hover { color: var(--doc-text); text-decoration: underline; }
+            .crumb .atual { color: var(--doc-text); font-weight: 600; }
+            h1 { font-size: 36px; line-height: 1.15; margin: 0 0 6px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+            .descricao { margin: 0 0 22px; color: var(--doc-dim); font-size: 15px; }
+
+            /* ---------- abas ---------- */
+            .abas {
+                display: inline-flex;
+                gap: 2px;
+                padding: 3px;
+                background: var(--doc-soft);
+                border: 1px solid var(--doc-line);
                 border-radius: 10px;
-                padding: 32px;
-                transition: background-color 150ms ease;
+                margin-bottom: 28px;
+                flex-wrap: wrap;
             }
-            .stage[data-canvas='light'] {
-                background: #ffffff;
-                background-image: radial-gradient(var(--ui-line) 1px, transparent 1px);
-                background-size: 16px 16px;
+            .abas button {
+                border: 0; background: none; font: inherit; font-size: 13px;
+                padding: 6px 14px; border-radius: 7px; cursor: pointer; color: var(--doc-dim);
             }
-            .stage[data-canvas='dark'] {
-                background: #0a0c18;
-                background-image: radial-gradient(#242a3d 1px, transparent 1px);
-                background-size: 16px 16px;
-                border-color: #0a0c18;
+            .abas button[aria-selected='true'] {
+                background: #fff; color: var(--doc-text); font-weight: 600;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
             }
+            .painel[hidden] { display: none; }
+            h2 { font-size: 22px; margin: 32px 0 14px; }
+            h2:first-child { margin-top: 0; }
+            h3 { font-size: 15px; margin: 22px 0 10px; }
 
-            .hint { font-size: 12px; color: var(--ui-faint); margin: 0; }
-
-            .panel { border: 1px solid var(--ui-line); border-radius: 10px; overflow: hidden; }
-            .panel-hd {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 12px;
-                padding: 10px 14px;
-                background: var(--ui-panel);
-                border-bottom: 1px solid var(--ui-line);
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.07em;
-                color: var(--ui-muted);
-            }
-            .panel-hd button {
-                font: inherit;
-                font-size: 11px;
-                letter-spacing: 0.04em;
-                padding: 4px 10px;
-                border: 1px solid var(--ui-line-strong);
+            /* ---------- cards ---------- */
+            .card {
+                border: 1px solid var(--doc-line);
+                border-radius: var(--doc-radius);
+                padding: 20px;
+                margin-bottom: 16px;
                 background: #fff;
-                border-radius: 5px;
-                cursor: pointer;
-                color: var(--ui-ink);
-                text-transform: none;
             }
-            .panel-hd button:hover { border-color: var(--ui-faint); }
+            .card > .titulo {
+                font-size: 13px; font-weight: 600; color: var(--doc-dim);
+                margin: 0 0 16px;
+            }
+            .card .nota-spec { font: 12px ui-monospace, monospace; color: var(--doc-dim); margin: 14px 0 0; }
+            .palco {
+                display: flex; flex-wrap: wrap; align-items: center; gap: 18px 24px;
+                padding: 24px; border-radius: 8px; background: var(--doc-soft);
+            }
+            .palco[data-canvas='dark'] { background: #14161a; }
+            .amostra { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+            .amostra .rot { font: 11px ui-monospace, monospace; color: var(--doc-dim); }
+            .palco[data-canvas='dark'] .rot { color: #9aa0aa; }
+            .linha-estado { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px 16px; width: 100%; }
+            .linha-estado .rot { justify-self: end; }
 
-            table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-            td { padding: 8px 14px; border-bottom: 1px solid var(--ui-line); vertical-align: middle; }
-            tr:last-child td { border-bottom: 0; }
-            td.k { width: 84px; color: var(--ui-muted); }
-            td.v {
-                width: 108px;
-                font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
-                white-space: nowrap;
+            /* ---------- controles do playground ---------- */
+            .controles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 20px; margin-top: 18px; }
+            .campo { display: flex; flex-direction: column; gap: 6px; }
+            .campo .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--doc-dim); font-weight: 600; }
+            .seg { display: flex; flex-wrap: wrap; gap: 4px; }
+            .seg button, .temas button {
+                border: 1px solid var(--doc-line); background: #fff; border-radius: 7px;
+                padding: 4px 9px; font: inherit; font-size: 12px; cursor: pointer; color: inherit;
             }
-            td.t {
-                color: var(--ui-muted);
-                font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
-                font-size: 11.5px;
-                word-break: break-all;
+            .seg button[aria-pressed='true'], .temas button[aria-pressed='true'] {
+                background: var(--doc-accent); border-color: var(--doc-accent); color: #fff;
             }
-            .chip {
-                display: inline-block;
-                width: 12px;
-                height: 12px;
-                border-radius: 3px;
-                border: 1px solid rgba(0, 0, 0, 0.18);
-                margin-right: 7px;
-                vertical-align: -2px;
-            }
+            .temas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+            .temas button { display: flex; align-items: center; gap: 6px; text-align: left; }
+            .sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,.25); overflow: hidden; flex: 0 0 auto; }
+            .sw i { display: block; width: 100%; height: 100%; }
+            .checks { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+            .checks label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+            input[type='text'] { border: 1px solid var(--doc-line); border-radius: 7px; padding: 5px 8px; font: inherit; font-size: 13px; }
+            .dica { font-size: 12px; color: var(--doc-dim); margin: 14px 0 0; }
 
+            /* ---------- tabelas ---------- */
+            table { width: 100%; border-collapse: collapse; font-size: 13px; }
+            th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--doc-dim); padding: 0 10px 8px; border-bottom: 1px solid var(--doc-line); }
+            td { padding: 8px 10px; border-bottom: 1px solid var(--doc-line); vertical-align: top; }
+            td code, th code { font: 12px ui-monospace, monospace; }
+            .chip { display: inline-block; width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(0,0,0,.2); vertical-align: -2px; margin-right: 6px; }
+            .mono { font: 12px ui-monospace, monospace; color: var(--doc-dim); }
+
+            /* ---------- listas de guideline ---------- */
+            .lista { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+            .lista li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+            .lista li::before { flex: 0 0 auto; font-size: 13px; line-height: 1.5; }
+            .lista.sim li::before { content: '✓'; color: var(--doc-ok); font-weight: 700; }
+            .lista.nao li::before { content: '⚠'; color: var(--doc-warn); }
+            .lista.neutra li::before { content: '•'; color: var(--doc-dim); }
+            .card ol { padding-left: 20px; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+            .card ol li::marker { color: var(--doc-dim); font-size: 13px; }
+
+            /* ---------- código ---------- */
             pre {
-                margin: 0;
-                padding: 14px;
-                font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
-                font-size: 12.5px;
-                line-height: 1.6;
-                white-space: pre-wrap;
-                word-break: break-word;
-                color: #1b2439;
-                background: #fff;
+                margin: 0; background: #14161a; color: #e9e9e9; padding: 14px 16px;
+                border-radius: 8px; font: 12.5px/1.6 ui-monospace, monospace;
+                overflow-x: auto; white-space: pre-wrap;
             }
-            .cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
-            @media (max-width: 1100px) { .cols { grid-template-columns: 1fr; } }
+            .codehead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+            .codehead button { border: 1px solid var(--doc-line); background: #fff; border-radius: 7px; padding: 3px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+            .aviso {
+                background: #fffbe6; border: 1px solid #e8d48b; border-radius: 8px;
+                padding: 12px 16px; font-size: 13px; margin: 0 0 18px;
+            }
+            .vazio { color: var(--doc-dim); font-size: 13px; }
+            .indice { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+            .card-indice {
+                border: 1px solid var(--doc-line); border-radius: var(--doc-radius);
+                padding: 20px; background: #fff; cursor: pointer;
+            }
+            .card-indice:hover { border-color: var(--doc-dim); }
+            .card-indice:focus-within { border-color: var(--doc-accent); }
+            .indice .nome {
+                font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px;
+                margin: 0 0 6px; border: 0; background: none; padding: 0; cursor: pointer;
+                font-family: inherit; color: inherit; text-align: left;
+            }
+            .indice .nome:hover { text-decoration: underline; }
+            .indice .amostras { pointer-events: none; }
+            .indice .desc { font-size: 13px; color: var(--doc-dim); margin: 0 0 14px; }
+            .indice .amostras { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 14px; border-radius: 8px; background: var(--doc-soft); }
+            .fonte-doc { font-size: 12px; color: var(--doc-dim); margin-top: 24px; }
+            .fonte-doc code { font-size: 11px; }
         </style>
     </head>
     <body>
-        <header>
-            <h1>Button — Playground</h1>
-            <p id="src"></p>
-        </header>
+        <div class="topbar">
+            <button class="marca" id="ir-indice" type="button" title="Ver todos os componentes">
+                <span class="pontos" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                BambooDS
+            </button>
+            <span class="selo" id="selo-versao">experimental</span>
+            <span class="espaco"></span>
+            <span class="topbar-ctrl">
+                <label for="sel-comp">Componente</label>
+                <select id="sel-comp"></select>
+            </span>
+            <span class="topbar-ctrl">
+                <label for="sel-marca">Marca</label>
+                <select id="sel-marca"></select>
+            </span>
+            <span class="topbar-ctrl">
+                <label for="sel-modo">Modo</label>
+                <select id="sel-modo">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+            </span>
+        </div>
 
-        <div class="layout">
-            <aside class="controls">
-                <div class="field">
-                    <span class="lbl">Marca <small>data-brand</small></span>
-                    <div class="seg" id="c-brand" role="group" aria-label="Marca"></div>
-                </div>
+        <div class="pagina">
+            <nav class="crumb" aria-label="Trilha">
+                <button type="button" id="crumb-home">Componentes</button>
+                <span aria-hidden="true" id="crumb-sep">›</span>
+                <span class="atual" id="crumb-atual"></span>
+            </nav>
 
-                <div class="field">
-                    <span class="lbl">Modo <small>data-theme</small></span>
-                    <div class="seg" id="c-mode" role="group" aria-label="Modo"></div>
-                </div>
+            <section id="vista-indice" hidden>
+                <h1>Componentes</h1>
+                <p class="descricao">Dois componentes documentados. Cada um traz exemplos, contrato, guidelines e acessibilidade, lidos direto dos arquivos do pacote.</p>
+                <div class="indice" id="indice-cards"></div>
+            </section>
 
-                <hr class="rule" />
+            <div id="vista-componente">
+            <h1><span id="titulo"></span> <span class="selo" id="selo-status"></span></h1>
+            <p class="descricao" id="descricao"></p>
 
-                <div class="field">
-                    <span class="lbl">Theme <small>props do Figma</small></span>
-                    <div class="themes" id="c-theme" role="group" aria-label="Theme"></div>
-                </div>
+            <div class="abas" role="tablist">
+                <button type="button" role="tab" data-aba="overview" aria-selected="true">Overview</button>
+                <button type="button" role="tab" data-aba="specs" aria-selected="false">Specs</button>
+                <button type="button" role="tab" data-aba="guidelines" aria-selected="false">Guidelines</button>
+                <button type="button" role="tab" data-aba="a11y" aria-selected="false">Acessibilidade</button>
+            </div>
 
-                <div class="field">
-                    <span class="lbl">State</span>
-                    <div class="seg" id="c-state" role="group" aria-label="State"></div>
-                </div>
+            <section class="painel" id="p-overview"></section>
+            <section class="painel" id="p-specs" hidden></section>
+            <section class="painel" id="p-guidelines" hidden></section>
+            <section class="painel" id="p-a11y" hidden></section>
 
-                <div class="field">
-                    <span class="lbl">Size</span>
-                    <div class="seg" id="c-size" role="group" aria-label="Size"></div>
-                </div>
-
-                <div class="field">
-                    <span class="lbl">Content</span>
-                    <div class="seg" id="c-content" role="group" aria-label="Content"></div>
-                </div>
-
-                <div class="field">
-                    <span class="lbl">Radius</span>
-                    <div class="seg" id="c-radius" role="group" aria-label="Radius"></div>
-                </div>
-
-                <div class="field">
-                    <span class="lbl">Label</span>
-                    <input type="text" id="c-label" value="Button" />
-                </div>
-
-                <div class="field">
-                    <span class="lbl">Booleans</span>
-                    <div class="checks" role="group" aria-label="Booleans">
-                        <label><input type="checkbox" id="c-left" checked /> Show Left Icon</label>
-                        <label><input type="checkbox" id="c-right" /> Show Right Icon</label>
-                        <label><input type="checkbox" id="c-dot" /> Show Dot</label>
-                    </div>
-                </div>
-
-                <hr class="rule" />
-
-                <div class="field">
-                    <span class="lbl">Canvas <small>só o palco</small></span>
-                    <div class="seg" id="c-canvas" role="group" aria-label="Canvas"></div>
-                </div>
-            </aside>
-
-            <main class="main">
-                <div class="stage" id="stage" data-canvas="light"></div>
-                <p class="hint" id="hint"></p>
-
-                <div class="cols">
-                    <div class="panel">
-                        <div class="panel-hd"><span>Tokens ativos</span></div>
-                        <table>
-                            <tbody id="tokens"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="panel">
-                        <div class="panel-hd">
-                            <span>Markup</span>
-                            <button id="copy" type="button">Copiar</button>
-                        </div>
-                        <pre id="code"></pre>
-                    </div>
-                </div>
-            </main>
+            <p class="fonte-doc" id="fonte-doc"></p>
+            </div>
         </div>
 
         <script src="../dist/button.tokens.js"></script>
+        <script src="../dist/hyperlink.tokens.js"></script>
         <script>
-            const T = window.BMB_TOKENS;
-            const SZ = { Small: 'sm', Medium: 'md', Large: 'lg', XLarge: 'xl' };
-            const slug = (s) => s.toLowerCase().replace(/\s+/g, '-');
             const $ = (id) => document.getElementById(id);
             const ROOT = document.documentElement;
-
-            // Hover/Active/Focus são pseudo-estados: não existem como classe. No palco eles
-            // são forçados via style inline que aponta para as MESMAS custom properties do
-            // tema — então continuam corretos ao trocar de marca. O markup não os inclui.
-            const FORCED = ['Hover', 'Active', 'Focus'];
-
-            // Estado inicial da DEMO, escolhido para abrir numa combinacao vistosa.
-            // Nao e o default do componente: no CSS, tema e tamanho sao obrigatorios e so o
-            // raio tem default real (round). Ver a tabela de props em ../src/button.rules.md.
-            const S = {
-                brand: 'employer',
-                mode: 'light',
-                theme: 'Primary',
-                state: 'Interativo',
-                size: 'Medium',
-                content: 'Label & Icon',
-                radius: 'round',
-                label: 'Button',
-                left: true,
-                right: false,
-                dot: false,
-                canvas: 'light',
+            const slug = (s) => s.toLowerCase().replace(/\s+/g, '-');
+            const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+            const el = (tag, cls, html) => {
+                const n = document.createElement(tag);
+                if (cls) n.className = cls;
+                if (html != null) n.innerHTML = html;
+                return n;
             };
 
-            $('src').textContent = T._source + ' · gerado em ' + T._generated;
-
-            function seg(host, values, key, labels) {
-                host.innerHTML = '';
-                values.forEach((v, i) => {
-                    const b = document.createElement('button');
-                    b.type = 'button';
-                    b.textContent = labels ? labels[i] : v;
-                    b.dataset.val = v;
-                    b.onclick = () => { S[key] = v; render(); };
-                    host.appendChild(b);
-                });
-            }
-
-            function themeSwatches() {
-                const host = $('c-theme');
-                host.innerHTML = '';
-                for (const name of T.themeOrder) {
-                    const b = document.createElement('button');
-                    b.type = 'button';
-                    b.dataset.val = name;
-                    b.innerHTML = '<span class="sw"><i></i></span><span>' + name + '</span>';
-                    b.onclick = () => { S.theme = name; render(); };
-                    host.appendChild(b);
-                }
-            }
-
-            themeSwatches();
-            seg(
-                $('c-brand'),
-                T.brands.map((b) => b.id),
-                'brand',
-                T.brands.map((b) => b.label),
-            );
-            seg($('c-mode'), ['light', 'dark'], 'mode', ['Light', 'Dark']);
-            seg($('c-state'), ['Interativo', ...T.stateOrder], 'state');
-            seg($('c-size'), T.sizeOrder, 'size');
-            seg($('c-content'), ['Label & Icon', 'Icon Only'], 'content');
-            seg($('c-radius'), ['round', 'straight', 'pill'], 'radius');
-            seg($('c-canvas'), ['light', 'dark'], 'canvas', ['Claro', 'Escuro']);
-
-            $('c-label').oninput = (e) => { S.label = e.target.value; render(); };
-            for (const [id, key] of [['c-left', 'left'], ['c-right', 'right'], ['c-dot', 'dot']]) {
-                $(id).onchange = (e) => { S[key] = e.target.checked; render(); };
-            }
-
+            /* Hover, Active e Focus são pseudo-estados: não existem como classe. Nos exemplos
+               eles são forçados por style inline que aponta para as MESMAS custom properties
+               do tema — então continuam corretos ao trocar de marca. O markup não os inclui. */
+            const FORCADOS = ['Hover', 'Active', 'Focus'];
             const ICON_SVG =
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
-            const ICON = '<span class="bmb-button__icon" aria-hidden="true">' + ICON_SVG + '</span>';
-            const DOT = '<span class="bmb-button__dot"></span>';
 
-            function classList() {
-                return [
-                    'bmb-button',
-                    'bmb-button--' + slug(S.theme),
-                    'bmb-button--' + SZ[S.size],
-                    S.content === 'Icon Only' ? 'bmb-button--icon-only' : '',
-                    S.state === 'Selected' ? 'bmb-button--selected' : '',
-                    S.radius !== 'round' ? 'bmb-button--' + S.radius : '',
-                ].filter(Boolean);
-            }
-
-            function innerHTML() {
-                const label = '<span class="bmb-button__label">' + (S.label || '') + '</span>';
-                const core =
-                    S.content === 'Icon Only'
-                        ? ICON
-                        : (S.left ? ICON : '') + label + (S.right ? ICON : '');
-                return core + (S.dot ? DOT : '');
-            }
-
-            function markup() {
-                const attrs = ['class="' + classList().join(' ') + '"', 'type="button"'];
-                if (S.state === 'Disabled') attrs.push('disabled');
-                if (S.content === 'Icon Only') attrs.push('aria-label="Ação"');
-                const icon = '    <span class="bmb-button__icon" aria-hidden="true"><!-- svg --></span>';
-                const parts =
-                    S.content === 'Icon Only'
-                        ? [icon]
-                        : [
-                              S.left ? icon : null,
-                              '    <span class="bmb-button__label">' + (S.label || '') + '</span>',
-                              S.right ? icon : null,
-                          ].filter(Boolean);
-                if (S.dot) parts.push('    <span class="bmb-button__dot"></span>');
-                return '<button ' + attrs.join(' ') + '>\n' + parts.join('\n') + '\n</button>';
-            }
+            const hex = (rgb) => {
+                const m = (rgb || '').match(/\d+(\.\d+)?/g);
+                if (!m || m.length < 3) return rgb || '—';
+                if (m.length > 3 && parseFloat(m[3]) === 0) return 'transparente';
+                return '#' + m.slice(0, 3).map((n) => (+n).toString(16).padStart(2, '0')).join('');
+            };
 
             /* `document.fonts.check()` devolve true mesmo quando o browser vai cair no
                fallback, então não serve. Comparamos a largura do mesmo texto na família pedida
@@ -492,144 +317,743 @@
                 return ctx.measureText('Button Wg').width;
             };
             const _cacheFonte = new Map();
-            function fonteCarregada(fontFamily) {
-                const nome = fontFamily.split(',')[0].trim();
+            function fonteCarregada(ff) {
+                const nome = ff.split(',')[0].trim();
                 if (_cacheFonte.has(nome)) return _cacheFonte.get(nome);
                 const r = Math.abs(_medir(nome + ', sans-serif') - _medir('sans-serif')) > 0.5;
                 _cacheFonte.set(nome, r);
                 return r;
             }
 
-            const hex = (rgb) => {
-                const m = (rgb || '').match(/\d+(\.\d+)?/g);
-                if (!m || m.length < 3) return rgb || '—';
-                if (m.length > 3 && parseFloat(m[3]) === 0) return 'transparente';
-                return '#' + m.slice(0, 3).map((n) => (+n).toString(16).padStart(2, '0')).join('');
-            };
-
-            function render() {
-                ROOT.setAttribute('data-brand', S.brand);
-                ROOT.setAttribute('data-theme', S.mode);
-
-                const groups = {
-                    'c-brand': S.brand, 'c-mode': S.mode, 'c-theme': S.theme,
-                    'c-state': S.state, 'c-size': S.size, 'c-content': S.content,
-                    'c-radius': S.radius, 'c-canvas': S.canvas,
-                };
-                for (const [id, val] of Object.entries(groups)) {
-                    for (const b of $(id).querySelectorAll('button')) {
-                        b.setAttribute('aria-pressed', String(b.dataset.val === val));
-                    }
-                }
-
-                $('stage').dataset.canvas = S.canvas;
-
-                const btn = document.createElement('button');
-                btn.className = classList().join(' ');
-                btn.type = 'button';
-                btn.innerHTML = innerHTML();
-                if (S.state === 'Disabled') btn.disabled = true;
-                if (S.content === 'Icon Only') btn.setAttribute('aria-label', 'Ação');
-
-                // estado forçado: aponta para as custom properties do tema, não para hex —
-                // assim continua certo em qualquer marca/modo
-                if (FORCED.includes(S.state)) {
-                    if (S.state === 'Focus') {
-                        btn.style.boxShadow = 'inset 0 0 0 3px var(--_bmb-btn-focus, transparent)';
-                        btn.style.backgroundColor = 'var(--_bmb-btn-bg-focus, var(--_bmb-btn-bg, transparent))';
-                        btn.style.color = 'var(--_bmb-btn-fg-focus, var(--_bmb-btn-fg))';
-                    } else {
-                        const k = S.state.toLowerCase();
-                        btn.style.backgroundColor = `var(--_bmb-btn-bg-${k}, var(--_bmb-btn-bg, transparent))`;
-                        btn.style.color = `var(--_bmb-btn-fg-${k}, var(--_bmb-btn-fg))`;
-                        btn.style.borderColor = `var(--_bmb-btn-bd-${k}, var(--_bmb-btn-bd, transparent))`;
-                    }
-                }
-
-                // Recriar o botao apagava o foco: quem estava testando por teclado era jogado
-                // de volta no <body> a cada troca de controle, justamente na pagina que existe
-                // para testar teclado. Guardamos e devolvemos.
-                const tinhaFoco = $('stage').contains(document.activeElement);
-                $('stage').innerHTML = '';
-                $('stage').appendChild(btn);
-                if (tinhaFoco) btn.focus();
-
-                // swatches refletem a marca/modo atuais
-                for (const b of $('c-theme').querySelectorAll('button')) {
-                    const probe = document.createElement('span');
-                    probe.className = 'bmb-button bmb-button--' + slug(b.dataset.val);
-                    probe.style.display = 'none';
-                    document.body.appendChild(probe);
-                    const bg = getComputedStyle(probe).backgroundColor;
-                    probe.remove();
-                    b.querySelector('i').style.background = bg;
-                }
-
-                $('hint').textContent = FORCED.includes(S.state)
-                    ? S.state + ' é pseudo-estado — forçado aqui só para inspeção; no markup vem de :' +
-                      S.state.toLowerCase() + (S.state === 'Focus' ? '-visible' : '') + '.'
-                    : S.state === 'Disabled'
-                      ? 'Disabled = opacity ' + T.disabledOpacity + ' sobre a Default.'
-                      : 'Estado real — passe o mouse, clique e dê Tab no botão.';
-
-                // tokens: nome do token + hex REALMENTE resolvido nesta marca/modo
-                const cs = getComputedStyle(btn);
-                const map = T.themeTokens[slug(S.theme)] || {};
-                const st = S.state === 'Interativo' ? 'Default' : S.state;
-                const sfx = { Hover: '-hover', Active: '-active', Selected: '-selected' }[st] || '';
-                const rows = [
-                    ['background', cs.backgroundColor, map['bg' + sfx] || map.bg],
-                    ['texto', cs.color, map['fg' + sfx] || map.fg],
-                    ['borda', cs.borderColor, map['bd' + sfx] || map.bd],
-                ];
-                if (st === 'Focus') rows[2] = ['anel interno 3px', cs.boxShadow, map.focus];
-
-                const z = T.sizes[S.size];
-                $('tokens').innerHTML =
-                    rows.map((r) =>
-                        '<tr><td class="k">' + r[0] + '</td><td class="v">' +
-                        '<span class="chip" style="background:' + r[1] + '"></span>' + hex(r[1]) +
-                        '</td><td class="t">' + (r[2] ? '--bmb-color-' + r[2] : '—') + '</td></tr>',
-                    ).join('') +
-                    '<tr><td class="k">fonte</td><td class="v">' + cs.fontSize + '</td>' +
-                    '<td class="t">--bmb-font-size-paragraph-' +
-                    ({ sm: 'small', md: 'medium', lg: 'large', xl: 'xlarge' })[SZ[S.size]] +
-                    ' · peso ' + cs.fontWeight + '</td></tr>' +
-                    '<tr><td class="k">família</td><td class="v">' +
-                    cs.fontFamily.split(',')[0].replace(/["']/g, '') +
-                    (fonteCarregada(cs.fontFamily) ? '' : ' <span title="não instalada; caiu no fallback">⚠</span>') +
-                    '</td><td class="t">--bmb-font-family-body · muda com a marca</td></tr>' +
-                    '<tr><td class="k">geometria</td><td class="v">' + z.h + 'px</td>' +
-                    '<td class="t">padding ' + z.padY + '·' +
-                    (S.content === 'Icon Only' ? 0 : z.padX) + ' · gap ' + z.gap +
-                    ' · ícone ' + (S.content === 'Icon Only' ? z.iconOnlyIcon : z.icon) +
-                    ' <em>(literais do Figma)</em></td></tr>' +
-                    '<tr><td class="k">radius</td><td class="v">' + cs.borderRadius + '</td>' +
-                    '<td class="t">--bmb-radius-button-' + S.radius + '</td></tr>';
-
-                $('code').textContent = markup();
+            function resolver(classe, prop) {
+                const p = document.createElement('span');
+                p.className = classe;
+                p.style.display = 'none';
+                document.body.appendChild(p);
+                const v = getComputedStyle(p)[prop];
+                p.remove();
+                return v;
             }
 
-            $('copy').onclick = async () => {
-                try {
-                    await navigator.clipboard.writeText(markup());
-                    $('copy').textContent = 'Copiado';
-                } catch {
-                    $('copy').textContent = 'Falhou';
-                }
-                setTimeout(() => ($('copy').textContent = 'Copiar'), 1200);
+            const BTN = window.BMB_TOKENS;
+            const LNK = window.BMB_HYPERLINK_TOKENS;
+
+            /* Sem os tokens a página não tem o que mostrar. Falhar com uma frase é melhor do
+               que morrer com "cannot read properties of undefined" e uma tela em branco. */
+            const FALTANDO = [!BTN && 'dist/button.tokens.js', !LNK && 'dist/hyperlink.tokens.js'].filter(Boolean);
+            if (FALTANDO.length) {
+                document.body.innerHTML =
+                    '<div style="padding:40px;max-width:60ch;font:15px/1.6 ui-sans-serif,system-ui,sans-serif">' +
+                    '<h1 style="font-size:18px">A documentação não carregou</h1><p>Não encontrei:</p><ul><li><code>' +
+                    FALTANDO.join('</code></li><li><code>') + '</code></li></ul>' +
+                    '<p>Rode <code>npm run build</code> na raiz. Se já rodou, o problema é o caminho: esta ' +
+                    'página carrega <code>../dist/</code> de forma relativa e precisa ser servida a partir ' +
+                    'da raiz do pacote.</p></div>';
+                throw new Error('tokens ausentes: ' + FALTANDO.join(', '));
+            }
+
+            // =================================================================
+            // Registro de componentes
+            // =================================================================
+            const REG = {
+                button: {
+                    nome: 'Button',
+                    descricao: 'Ação: executa alguma coisa na página. Para navegar, use o Hyperlink.',
+                    base: 'bmb-button',
+                    T: BTN,
+                    contrato: '../src/button.contract.json',
+                    regras: '../src/button.rules.md',
+                    SZ: { Small: 'sm', Medium: 'md', Large: 'lg', XLarge: 'xl' },
+                    FONTE: { sm: 'small', md: 'medium', lg: 'large', xl: 'xlarge' },
+                    controles: ['theme', 'state', 'size', 'content', 'radius', 'label', 'icones', 'dot'],
+                    inicial: { theme: 'Primary', state: 'Interativo', size: 'Medium', content: 'Label & Icon', radius: 'round', label: 'Button', left: true, right: false, dot: false },
+                    /* Títulos que existem em button.rules.md. Os dois componentes têm seções
+                       diferentes, então a lista é por componente — pedir seção inexistente faz
+                       a aba avisar em vez de mostrar vazio. */
+                    secoesGuidelines: ['Desvios do Figma (autorizados)', 'Achados conhecidos — mantidos por decisão'],
+                    secoesA11y: ['Acessibilidade'],
+                    notaTamanhos: () => BTN.sizeOrder.map((s) => `${s} ${BTN.sizes[s].h}px`).join(' · '),
+                    classes(S) {
+                        return ['bmb-button', 'bmb-button--' + slug(S.theme), 'bmb-button--' + this.SZ[S.size],
+                            S.content === 'Icon Only' ? 'bmb-button--icon-only' : '',
+                            S.state === 'Selected' ? 'bmb-button--selected' : '',
+                            S.radius !== 'round' ? 'bmb-button--' + S.radius : ''].filter(Boolean);
+                    },
+                    no(S) {
+                        const n = document.createElement('button');
+                        n.type = 'button';
+                        n.className = this.classes(S).join(' ');
+                        const ic = '<span class="bmb-button__icon" aria-hidden="true">' + ICON_SVG + '</span>';
+                        const lb = '<span class="bmb-button__label">' + esc(S.label || '') + '</span>';
+                        n.innerHTML = (S.content === 'Icon Only' ? ic : (S.left ? ic : '') + lb + (S.right ? ic : '')) +
+                            (S.dot ? '<span class="bmb-button__dot"></span>' : '');
+                        if (S.state === 'Disabled') n.disabled = true;
+                        if (S.content === 'Icon Only') n.setAttribute('aria-label', 'Ação');
+                        return n;
+                    },
+                    forcar(n, S) {
+                        if (S.state === 'Focus') {
+                            n.style.boxShadow = 'inset 0 0 0 3px var(--_bmb-btn-focus, transparent)';
+                            n.style.backgroundColor = 'var(--_bmb-btn-bg-focus, var(--_bmb-btn-bg, transparent))';
+                            n.style.color = 'var(--_bmb-btn-fg-focus, var(--_bmb-btn-fg))';
+                        } else {
+                            const k = S.state.toLowerCase();
+                            n.style.backgroundColor = `var(--_bmb-btn-bg-${k}, var(--_bmb-btn-bg, transparent))`;
+                            n.style.color = `var(--_bmb-btn-fg-${k}, var(--_bmb-btn-fg))`;
+                            n.style.borderColor = `var(--_bmb-btn-bd-${k}, var(--_bmb-btn-bd, transparent))`;
+                        }
+                    },
+                    corSwatch(t) { return resolver('bmb-button bmb-button--' + slug(t), 'backgroundColor'); },
+                    markup(S) {
+                        const a = ['class="' + this.classes(S).join(' ') + '"', 'type="button"'];
+                        if (S.state === 'Disabled') a.push('disabled');
+                        if (S.content === 'Icon Only') a.push('aria-label="Ação"');
+                        const ic = '    <span class="bmb-button__icon" aria-hidden="true"><!-- svg --></span>';
+                        const p = S.content === 'Icon Only' ? [ic] : [S.left ? ic : null,
+                            '    <span class="bmb-button__label">' + (S.label || '') + '</span>',
+                            S.right ? ic : null].filter(Boolean);
+                        if (S.dot) p.push('    <span class="bmb-button__dot"></span>');
+                        return '<button ' + a.join(' ') + '>\n' + p.join('\n') + '\n</button>';
+                    },
+                    tokens(S, cs) {
+                        const map = this.T.themeTokens[slug(S.theme)] || {};
+                        const st = S.state === 'Interativo' ? 'Default' : S.state;
+                        const sfx = { Hover: '-hover', Active: '-active', Selected: '-selected' }[st] || '';
+                        const r = [['background', cs.backgroundColor, map['bg' + sfx] || map.bg],
+                            ['texto', cs.color, map['fg' + sfx] || map.fg],
+                            ['borda', cs.borderColor, map['bd' + sfx] || map.bd]];
+                        if (st === 'Focus') r[2] = ['anel interno 3px', cs.boxShadow, map.focus];
+                        const z = this.T.sizes[S.size];
+                        return { cores: r, fonte: '--bmb-font-size-paragraph-' + this.FONTE[this.SZ[S.size]],
+                            geo: `altura ${z.h}px · padding ${z.padY}·${S.content === 'Icon Only' ? 0 : z.padX} · gap ${z.gap} · ícone ${S.content === 'Icon Only' ? z.iconOnlyIcon : z.icon}`,
+                            extra: [['radius', cs.borderRadius, '--bmb-radius-button-' + S.radius]] };
+                    },
+                    dica(S) {
+                        return FORCADOS.includes(S.state)
+                            ? `${S.state} é pseudo-estado — forçado aqui só para inspeção; no markup vem de :${S.state.toLowerCase()}${S.state === 'Focus' ? '-visible' : ''}.`
+                            : S.state === 'Disabled' ? `Disabled = opacity ${this.T.disabledOpacity} sobre a Default, com o atributo nativo.`
+                            : 'Estado real — passe o mouse, clique e dê Tab.';
+                    },
+                    comoUsar: `<!-- Tema e tamanho são OBRIGATÓRIOS: sem eles o botão não tem cor nem altura. -->
+<button type="button" class="bmb-button bmb-button--primary bmb-button--md">
+    <span class="bmb-button__label">Continuar</span>
+</button>
+
+<!-- Com ícone. A classe vai no wrapper, não no <svg>. -->
+<button type="button" class="bmb-button bmb-button--primary bmb-button--md">
+    <span class="bmb-button__icon" aria-hidden="true"><svg>…</svg></span>
+    <span class="bmb-button__label">Adicionar</span>
+</button>
+
+<!-- Só ícone: exige nome acessível. -->
+<button type="button" class="bmb-button bmb-button--primary bmb-button--md bmb-button--icon-only"
+        aria-label="Adicionar">
+    <span class="bmb-button__icon" aria-hidden="true"><svg>…</svg></span>
+</button>
+
+<!-- Desabilitado: atributo nativo, não só a classe. -->
+<button type="button" class="bmb-button bmb-button--primary bmb-button--md" disabled>
+    <span class="bmb-button__label">Indisponível</span>
+</button>`,
+                },
+
+                hyperlink: {
+                    nome: 'Hyperlink',
+                    descricao: 'Navegação: leva a pessoa para outro destino. Para executar uma ação, use o Button.',
+                    base: 'bmb-hyperlink',
+                    T: LNK,
+                    contrato: '../src/hyperlink.contract.json',
+                    regras: '../src/hyperlink.rules.md',
+                    SZ: { XSmall: 'xs', Small: 'sm', Medium: 'md', Large: 'lg' },
+                    FONTE: { xs: 'xsmall', sm: 'small', md: 'medium', lg: 'large' },
+                    controles: ['theme', 'state', 'size', 'content', 'label', 'icones', 'forceUnderline'],
+                    inicial: { theme: 'Primary', state: 'Interativo', size: 'Medium', content: 'Label & Icon', label: 'Hiperlink', left: true, right: true, forceUnderline: false },
+                    secoesGuidelines: ['Hyperlink vs Button', 'Quando usar', 'Quando não usar', 'Conteúdo', 'Link externo', 'Ícones', 'Decisões registradas (não são lacunas)'],
+                    secoesA11y: ['Acessibilidade', 'Regra de uso obrigatória: o Default depende do contexto', 'Disabled', 'Force Underline'],
+                    aviso: 'O Default não é sublinhado, por decisão do time. Antes de usar em texto corrido, meça o contraste entre a cor do link e a cor do texto ao redor: abaixo de 3:1 (WCAG 1.4.1), ligue <strong>Force Underline</strong>.',
+                    notaTamanhos: () => LNK.sizeOrder.map((s) => `${s} ícone ${LNK.sizes[s].icon}px`).join(' · ') + ` · gap ${LNK.gap}px · alvo mínimo ${LNK.hitArea}px`,
+                    classes(S) {
+                        return ['bmb-hyperlink', 'bmb-hyperlink--' + slug(S.theme), 'bmb-hyperlink--' + this.SZ[S.size],
+                            S.content === 'Icon Only' ? 'bmb-hyperlink--icon-only' : '',
+                            S.state === 'Selected' ? 'bmb-hyperlink--selected' : '',
+                            S.state === 'Disabled' ? 'bmb-hyperlink--disabled-appearance' : '',
+                            S.forceUnderline ? 'bmb-hyperlink--force-underline' : ''].filter(Boolean);
+                    },
+                    no(S) {
+                        const n = document.createElement('a');
+                        n.className = this.classes(S).join(' ');
+                        /* Disabled do Hyperlink é a AUSÊNCIA de href — é isso que tira o
+                           elemento do Tab e do clique. O aria-disabled reforça no leitor de
+                           tela. Especificação do Figma, 2026-09-18. */
+                        if (S.state === 'Disabled') n.setAttribute('aria-disabled', 'true');
+                        else n.href = '#exemplo';
+                        const ic = '<span class="bmb-hyperlink__icon" aria-hidden="true">' + ICON_SVG + '</span>';
+                        const lb = '<span class="bmb-hyperlink__label">' + esc(S.label || '') + '</span>';
+                        n.innerHTML = S.content === 'Icon Only' ? ic : (S.left ? ic : '') + lb + (S.right ? ic : '');
+                        if (S.content === 'Icon Only') n.setAttribute('aria-label', 'Abrir documento');
+                        return n;
+                    },
+                    forcar(n, S) {
+                        const k = S.state.toLowerCase();
+                        n.style.color = `var(--_bmb-link-fg-${k}, var(--_bmb-link-fg))`;
+                        n.style.textDecoration = 'underline';
+                        n.style.textUnderlineOffset = '0.2em';
+                        if (S.state === 'Focus') {
+                            n.style.outline = '2px solid var(--_bmb-link-ring)';
+                            n.style.outlineOffset = '2px';
+                            n.style.borderRadius = '4px';
+                        }
+                    },
+                    corSwatch(t) { return resolver('bmb-hyperlink bmb-hyperlink--' + slug(t), 'color'); },
+                    markup(S) {
+                        const a = ['class="' + this.classes(S).join(' ') + '"'];
+                        if (S.state === 'Disabled') a.push('aria-disabled="true"');
+                        else a.unshift('href="/destino"');
+                        if (S.content === 'Icon Only') a.push('aria-label="Abrir documento"');
+                        const ic = '    <span class="bmb-hyperlink__icon" aria-hidden="true"><!-- svg --></span>';
+                        const p = S.content === 'Icon Only' ? [ic] : [S.left ? ic : null,
+                            '    <span class="bmb-hyperlink__label">' + (S.label || '') + '</span>',
+                            S.right ? ic : null].filter(Boolean);
+                        return '<a ' + a.join(' ') + '>\n' + p.join('\n') + '\n</a>';
+                    },
+                    tokens(S, cs) {
+                        const map = this.T.themeTokens[slug(S.theme)] || {};
+                        const st = S.state === 'Interativo' ? 'Default' : S.state;
+                        const sfx = { Hover: '-hover', Active: '-active', Selected: '-selected', Focus: '-focus' }[st] || '';
+                        const sub = ['Hover', 'Active', 'Selected', 'Focus'].includes(st) || S.forceUnderline;
+                        const r = [['texto', cs.color, map['fg' + sfx] || map.fg],
+                            ['sublinhado', sub ? cs.color : 'transparent', sub ? (map['fg' + sfx] || map.fg) + ' (currentColor)' : null]];
+                        if (st === 'Focus') r.push(['anel 2px', cs.color, map.ring]);
+                        const z = this.T.sizes[S.size];
+                        return { cores: r, fonte: '--bmb-font-size-paragraph-' + this.FONTE[this.SZ[S.size]],
+                            geo: `ícone ${z.icon}px · gap ${this.T.gap}px · alvo mínimo ${this.T.hitArea}px (Hit Area)`, extra: [] };
+                    },
+                    dica(S) {
+                        return FORCADOS.includes(S.state)
+                            ? `${S.state} é pseudo-estado — forçado aqui só para inspeção; no markup vem de :${S.state.toLowerCase()}${S.state === 'Focus' ? '-visible' : ''}.`
+                            : S.state === 'Disabled' ? `Disabled = sem href (é o que tira do Tab) + aria-disabled + opacity ${this.T.disabledOpacity}. Tente dar Tab: o link é pulado.`
+                            : 'Estado real — passe o mouse, clique e dê Tab.';
+                    },
+                    comoUsar: `<!-- Tema e tamanho são OBRIGATÓRIOS. O href tem de ser um destino real:
+     href="#" não é link para o navegador nem para o leitor de tela. -->
+<a href="/contrato" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+    <span class="bmb-hyperlink__label">Ver contrato</span>
+</a>
+
+<!-- Link externo: slot Right Icon com arrow-up-right-01-round.
+     target="_blank" EXIGE rel, e o aviso precisa estar no texto. -->
+<a href="https://exemplo.com" target="_blank" rel="noopener noreferrer"
+   class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+    <span class="bmb-hyperlink__label">Ver no site (abre em nova aba)</span>
+    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg>…</svg></span>
+</a>
+
+<!-- Baixo contraste contra o texto ao redor: ligue o sublinhado. -->
+<a href="/contrato" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md bmb-hyperlink--force-underline">
+    <span class="bmb-hyperlink__label">Ver contrato</span>
+</a>
+
+<!-- Desabilitado: SEM href. É a ausência dele que tira do Tab. -->
+<a class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md bmb-hyperlink--disabled-appearance"
+   aria-disabled="true">
+    <span class="bmb-hyperlink__label">Indisponível</span>
+</a>`,
+                },
             };
 
-            render();
+            let atual = 'button';
+            let aba = 'overview';
+            let vista = 'componente'; // 'indice' | 'componente'
+            const ESTADO = { button: { ...REG.button.inicial }, hyperlink: { ...REG.hyperlink.inicial } };
+            const GLOBAL = { brand: 'employer', mode: 'light' };
+            const CACHE = {}; // contrato + regras buscados
+
+            // ---------- markdown mínimo ----------
+            /* Só o subconjunto que o rules.md usa: títulos, listas, tabelas, código, negrito,
+               citação. Não é um renderer geral — é o suficiente para não duplicar a
+               documentação dentro desta página. */
+            function md(texto) {
+                const linhas = texto.split('\n');
+                const out = [];
+                let i = 0;
+                const inline = (s) => esc(s)
+                    .replace(/`([^`]+)`/g, '<code>$1</code>')
+                    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                while (i < linhas.length) {
+                    const l = linhas[i];
+                    if (/^```/.test(l)) {
+                        const buf = [];
+                        i++;
+                        while (i < linhas.length && !/^```/.test(linhas[i])) buf.push(linhas[i++]);
+                        i++;
+                        out.push('<pre>' + esc(buf.join('\n')) + '</pre>');
+                    } else if (/^\|/.test(l) && /^\|[\s:|-]+\|$/.test(linhas[i + 1] || '')) {
+                        const cels = (r) => r.split('|').slice(1, -1).map((c) => c.trim());
+                        const cab = cels(l);
+                        i += 2;
+                        const corpo = [];
+                        while (i < linhas.length && /^\|/.test(linhas[i])) corpo.push(cels(linhas[i++]));
+                        out.push('<table><thead><tr>' + cab.map((c) => '<th>' + inline(c) + '</th>').join('') +
+                            '</tr></thead><tbody>' + corpo.map((r) => '<tr>' + r.map((c) => '<td>' + inline(c) + '</td>').join('') + '</tr>').join('') +
+                            '</tbody></table>');
+                    } else if (/^\s*[-*]\s+/.test(l)) {
+                        const its = [];
+                        while (i < linhas.length && (/^\s*[-*]\s+/.test(linhas[i]) || /^\s{2,}\S/.test(linhas[i]))) {
+                            if (/^\s*[-*]\s+/.test(linhas[i])) its.push(linhas[i].replace(/^\s*[-*]\s+/, ''));
+                            else its[its.length - 1] += ' ' + linhas[i].trim();
+                            i++;
+                        }
+                        out.push('<ul class="lista neutra">' + its.map((t) => '<li><span>' + inline(t) + '</span></li>').join('') + '</ul>');
+                    } else if (/^\s*\d+\.\s+/.test(l)) {
+                        const its = [];
+                        while (i < linhas.length && (/^\s*\d+\.\s+/.test(linhas[i]) || (its.length && /^\s{2,}\S/.test(linhas[i])))) {
+                            if (/^\s*\d+\.\s+/.test(linhas[i])) its.push(linhas[i].replace(/^\s*\d+\.\s+/, ''));
+                            else its[its.length - 1] += ' ' + linhas[i].trim();
+                            i++;
+                        }
+                        out.push('<ol>' + its.map((t) => '<li>' + inline(t) + '</li>').join('') + '</ol>');
+                    } else if (/^>\s?/.test(l)) {
+                        const buf = [];
+                        while (i < linhas.length && /^>\s?/.test(linhas[i])) buf.push(linhas[i++].replace(/^>\s?/, ''));
+                        out.push('<div class="aviso">' + inline(buf.join(' ')) + '</div>');
+                    } else if (/^#{3,4}\s/.test(l)) {
+                        out.push('<h3>' + inline(l.replace(/^#{3,4}\s/, '')) + '</h3>');
+                        i++;
+                    } else if (l.trim() === '') {
+                        i++;
+                    } else {
+                        const buf = [];
+                        while (i < linhas.length && linhas[i].trim() !== '' &&
+                               !/^[#>|]|^```|^\s*[-*]\s|^\s*\d+\.\s/.test(linhas[i])) buf.push(linhas[i++]);
+                        /* Um parser TEM de avançar. Se nenhum ramo consumiu a linha e o laço
+                           acima também não — caso de uma linha que começa com um caractere
+                           reservado mas não forma o bloco correspondente —, engolimos uma
+                           linha como parágrafo. Sem isto o laço externo nunca termina e o
+                           array de saída cresce até estourar "Invalid array length". */
+                        if (!buf.length) buf.push(linhas[i++]);
+                        out.push('<p>' + inline(buf.join(' ')) + '</p>');
+                    }
+                }
+                return out.join('\n');
+            }
+
+            /* Extrai uma seção `## Titulo` do markdown, até o próximo `## `. */
+            function secao(texto, titulo) {
+                const re = new RegExp('^## ' + titulo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$', 'm');
+                const m = re.exec(texto);
+                if (!m) return null;
+                const resto = texto.slice(m.index + m[0].length);
+                const fim = resto.search(/^## /m);
+                return (fim < 0 ? resto : resto.slice(0, fim)).trim();
+            }
+
+            async function carregar(id) {
+                if (CACHE[id]) return CACHE[id];
+                const C = REG[id];
+                const r = { contrato: null, regras: null, erro: null };
+                try {
+                    const [c, g] = await Promise.all([fetch(C.contrato), fetch(C.regras)]);
+                    if (!c.ok || !g.ok) throw new Error('HTTP ' + c.status + '/' + g.status);
+                    r.contrato = await c.json();
+                    r.regras = await g.text();
+                } catch (e) {
+                    /* file:// bloqueia fetch por CORS. A página ainda funciona: só as abas que
+                       leem do contrato e das regras ficam sem conteúdo, com o motivo à vista. */
+                    r.erro = String(e.message || e);
+                }
+                CACHE[id] = r;
+                return r;
+            }
+
+            // ---------- controles ----------
+            function seg(host, valores, onPick, rotulos) {
+                valores.forEach((v, i) => {
+                    const b = el('button');
+                    b.type = 'button';
+                    b.textContent = rotulos ? rotulos[i] : v;
+                    b.dataset.val = v;
+                    b.onclick = () => { onPick(v); renderOverview(); };
+                    host.appendChild(b);
+                });
+            }
+
+            function campo(titulo) {
+                const d = el('div', 'campo');
+                d.appendChild(el('span', 'lbl', titulo));
+                return d;
+            }
+
+            function cardPlayground() {
+                const C = REG[atual];
+                const S = ESTADO[atual];
+                const card = el('div', 'card');
+                card.appendChild(el('p', 'titulo', 'Playground'));
+                if (C.aviso) card.appendChild(el('div', 'aviso', C.aviso));
+
+                const palco = el('div', 'palco');
+                palco.id = 'palco';
+                card.appendChild(palco);
+
+                const ctr = el('div', 'controles');
+                if (C.controles.includes('theme')) {
+                    const f = campo('Theme');
+                    const g = el('div', 'temas');
+                    g.id = 'g-theme';
+                    g.setAttribute('role', 'group');
+                    g.setAttribute('aria-label', 'Theme');
+                    for (const t of C.T.themeOrder) {
+                        const b = el('button', null, '<span class="sw"><i></i></span><span>' + t + '</span>');
+                        b.type = 'button';
+                        b.dataset.val = t;
+                        b.onclick = () => { S.theme = t; renderOverview(); };
+                        g.appendChild(b);
+                    }
+                    f.appendChild(g);
+                    ctr.appendChild(f);
+                }
+                for (const [k, tit, vals] of [
+                    ['state', 'State', ['Interativo', ...C.T.stateOrder]],
+                    ['size', 'Size', C.T.sizeOrder],
+                    ['content', 'Content', C.T.contentOrder || ['Label & Icon', 'Icon Only']],
+                    ['radius', 'Radius', ['round', 'straight', 'pill']],
+                ]) {
+                    if (!C.controles.includes(k)) continue;
+                    const f = campo(tit);
+                    const g = el('div', 'seg');
+                    g.id = 'g-' + k;
+                    g.setAttribute('role', 'group');
+                    g.setAttribute('aria-label', tit);
+                    seg(g, vals, (v) => (S[k] = v));
+                    f.appendChild(g);
+                    ctr.appendChild(f);
+                }
+                if (C.controles.includes('label')) {
+                    const f = campo('Label');
+                    const i = el('input');
+                    i.type = 'text';
+                    i.value = S.label;
+                    i.oninput = (e) => { S.label = e.target.value; renderOverview(); };
+                    f.appendChild(i);
+                    ctr.appendChild(f);
+                }
+                const chks = [];
+                if (C.controles.includes('icones')) chks.push(['left', 'Show Left Icon'], ['right', 'Show Right Icon']);
+                if (C.controles.includes('dot')) chks.push(['dot', 'Show Dot']);
+                if (C.controles.includes('forceUnderline')) chks.push(['forceUnderline', 'Force Underline']);
+                if (chks.length) {
+                    const f = campo('Booleans');
+                    const box = el('div', 'checks');
+                    box.setAttribute('role', 'group');
+                    box.setAttribute('aria-label', 'Booleans');
+                    for (const [k, t] of chks) {
+                        const l = el('label');
+                        const i = el('input');
+                        i.type = 'checkbox';
+                        i.checked = !!S[k];
+                        i.onchange = (e) => { S[k] = e.target.checked; renderOverview(); };
+                        l.appendChild(i);
+                        l.append(' ' + t);
+                        box.appendChild(l);
+                    }
+                    f.appendChild(box);
+                    ctr.appendChild(f);
+                }
+                card.appendChild(ctr);
+                card.appendChild(el('p', 'dica', ''));
+                card.lastChild.id = 'dica';
+
+                card.appendChild(el('h3', null, 'Tokens ativos'));
+                const tb = el('table', null, '<tbody id="tokens"></tbody>');
+                card.appendChild(tb);
+
+                const ch = el('div', 'codehead');
+                ch.appendChild(el('span', 'lbl', 'Markup'));
+                const bc = el('button', null, 'Copiar');
+                bc.type = 'button';
+                bc.onclick = async () => {
+                    try { await navigator.clipboard.writeText($('code').textContent); bc.textContent = 'Copiado'; }
+                    catch { bc.textContent = 'Falhou'; }
+                    setTimeout(() => (bc.textContent = 'Copiar'), 1200);
+                };
+                ch.appendChild(bc);
+                const wrap = el('div');
+                wrap.style.marginTop = '22px';
+                wrap.appendChild(ch);
+                wrap.appendChild(el('pre', null, ''));
+                wrap.lastChild.id = 'code';
+                card.appendChild(wrap);
+                return card;
+            }
+
+            function cardExemplos(titulo, conteudo, nota) {
+                const c = el('div', 'card');
+                c.appendChild(el('p', 'titulo', titulo));
+                c.appendChild(conteudo);
+                if (nota) c.appendChild(el('p', 'nota-spec', nota));
+                return c;
+            }
+
+            function amostra(no, rotulo) {
+                const a = el('div', 'amostra');
+                a.appendChild(no);
+                if (rotulo) a.appendChild(el('span', 'rot', rotulo));
+                return a;
+            }
+
+            function renderOverview() {
+                const C = REG[atual];
+                const S = ESTADO[atual];
+                const host = $('p-overview');
+                const primeira = !$('palco');
+
+                if (primeira) {
+                    host.innerHTML = '';
+                    host.appendChild(el('h2', null, 'Exemplos'));
+                    host.appendChild(cardPlayground());
+
+                    const gTemas = el('div', 'palco');
+                    gTemas.id = 'ex-temas';
+                    host.appendChild(cardExemplos('Temas', gTemas, C.T.themeOrder.length + ' temas'));
+
+                    const gTam = el('div', 'palco');
+                    gTam.id = 'ex-tamanhos';
+                    host.appendChild(cardExemplos('Tamanhos', gTam, C.notaTamanhos()));
+
+                    const gEst = el('div', 'palco');
+                    gEst.id = 'ex-estados';
+                    host.appendChild(cardExemplos('Estados', gEst));
+
+                    host.appendChild(el('h2', null, 'Como usar'));
+                    const cu = el('div', 'card');
+                    cu.appendChild(el('pre', null, esc(C.comoUsar)));
+                    host.appendChild(cu);
+                }
+
+                for (const p of host.querySelectorAll('.palco')) p.dataset.canvas = GLOBAL.mode;
+
+                // playground
+                const palco = $('palco');
+                const tinhaFoco = palco.contains(document.activeElement);
+                palco.innerHTML = '';
+                const no = C.no(S);
+                if (FORCADOS.includes(S.state)) C.forcar(no, S);
+                palco.appendChild(no);
+                if (tinhaFoco) no.focus();
+
+                for (const [id, v] of [['g-theme', S.theme], ['g-state', S.state], ['g-size', S.size],
+                    ['g-content', S.content], ['g-radius', S.radius]]) {
+                    const h = $(id);
+                    if (h) for (const b of h.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.val === v));
+                }
+                const ht = $('g-theme');
+                if (ht) for (const b of ht.querySelectorAll('button')) b.querySelector('i').style.background = C.corSwatch(b.dataset.val);
+
+                const cs = getComputedStyle(no);
+                const info = C.tokens(S, cs);
+                $('tokens').innerHTML =
+                    info.cores.map((r) => '<tr><td class="k">' + r[0] + '</td><td><span class="chip" style="background:' + r[1] +
+                        '"></span>' + hex(r[1]) + '</td><td class="mono">' + (r[2] ? '--bmb-color-' + r[2] : '—') + '</td></tr>').join('') +
+                    '<tr><td>fonte</td><td>' + cs.fontSize + '</td><td class="mono">' + info.fonte + ' · peso ' + cs.fontWeight + '</td></tr>' +
+                    '<tr><td>família</td><td>' + cs.fontFamily.split(',')[0].replace(/["']/g, '') +
+                    (fonteCarregada(cs.fontFamily) ? '' : ' <span title="não instalada; caiu no fallback">⚠</span>') +
+                    '</td><td class="mono">--bmb-font-family-body · muda com a marca</td></tr>' +
+                    '<tr><td>geometria</td><td>—</td><td class="mono">' + info.geo + '</td></tr>' +
+                    info.extra.map((r) => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td class="mono">' + r[2] + '</td></tr>').join('');
+                $('code').textContent = C.markup(S);
+                $('dica').textContent = C.dica(S);
+
+                // exemplos estáticos
+                const et = $('ex-temas');
+                et.innerHTML = '';
+                for (const t of C.T.themeOrder) et.appendChild(amostra(C.no({ ...S, theme: t, state: 'Interativo' }), t));
+
+                const ez = $('ex-tamanhos');
+                ez.innerHTML = '';
+                for (const z of C.T.sizeOrder) ez.appendChild(amostra(C.no({ ...S, size: z, state: 'Interativo' }), z));
+
+                const ee = $('ex-estados');
+                ee.innerHTML = '';
+                for (const st of C.T.stateOrder) {
+                    const linha = el('div', 'linha-estado');
+                    linha.appendChild(el('span', 'rot', st));
+                    const n = C.no({ ...S, state: st });
+                    if (FORCADOS.includes(st)) C.forcar(n, { ...S, state: st });
+                    const box = el('div');
+                    box.appendChild(n);
+                    linha.appendChild(box);
+                    ee.appendChild(linha);
+                }
+            }
+
+            async function renderSpecs() {
+                const C = REG[atual];
+                const host = $('p-specs');
+                const { contrato, erro } = await carregar(atual);
+                if (erro) { host.innerHTML = avisoFetch(erro, C.contrato); return; }
+
+                const linhas = [];
+                for (const [nome, v] of Object.entries(contrato.variants || {})) {
+                    /* `values` é o caso comum. `radius` do Button descreve os valores como
+                       chaves de `classes`; `content` os descreve como sub-objetos. */
+                    const brutos = v.values || (v.classes && Object.keys(v.classes)) ||
+                        Object.keys(v).filter((k) => typeof v[k] === 'object' && v[k] !== null);
+                    const vals = (brutos || []).map((x) => '<code>' + x + '</code>').join(' · ') || '—';
+                    linhas.push(['<code>' + nome + '</code>', vals,
+                        v.required ? '<strong>obrigatório</strong>' : v.default ? '<code>' + v.default + '</code>' : '—',
+                        v.noDefault || v.iconPositionNote || '']);
+                }
+                host.innerHTML =
+                    '<h2>Props</h2><div class="card"><table><thead><tr><th>Prop</th><th>Valores</th><th>Padrão</th><th>Observação</th></tr></thead><tbody>' +
+                    linhas.map((r) => '<tr>' + r.map((c) => '<td>' + c + '</td>').join('') + '</tr>').join('') +
+                    '</tbody></table></div>' +
+                    '<h2>Estados</h2><div class="card"><table><thead><tr><th>Estado</th><th>Como aplicar</th></tr></thead><tbody>' +
+                    Object.entries(contrato.states || {}).map(([k, v]) =>
+                        '<tr><td><code>' + k + '</code></td><td>' +
+                        (typeof v === 'string' ? esc(v) : esc(v.style || v.selector || v.spec || JSON.stringify(v).slice(0, 160))) +
+                        '</td></tr>').join('') +
+                    '</tbody></table></div>' +
+                    '<h2>Elemento e semântica</h2><div class="card"><table><tbody>' +
+                    '<tr><td>Elemento exigido</td><td><code>&lt;' + (contrato.element?.required || contrato.element?.action || '?') + '&gt;</code></td></tr>' +
+                    (contrato.element?.forbidden ? '<tr><td>Proibido</td><td>' + contrato.element.forbidden.map((f) => '<code>&lt;' + f + '&gt;</code>').join(' · ') + '</td></tr>' : '') +
+                    '<tr><td>Classe base</td><td><code>' + contrato.baseClass + '</code></td></tr>' +
+                    '<tr><td>Marcas</td><td>' + (contrato.globalTheme?.brands || []).map((b) => '<code>' + b + '</code>').join(' · ') + '</td></tr>' +
+                    '<tr><td>Modos</td><td>' + (contrato.globalTheme?.modes || []).map((b) => '<code>' + b + '</code>').join(' · ') + '</td></tr>' +
+                    '</tbody></table></div>' +
+                    (contrato.invalidCombinations ? '<h2>Combinações inválidas</h2><div class="card"><ul class="lista nao">' +
+                        contrato.invalidCombinations.map((c) => '<li><span><code>' + esc(c.combination) + '</code> — ' + esc(c.why) + '</span></li>').join('') +
+                        '</ul></div>' : '');
+            }
+
+            function avisoFetch(erro, caminho) {
+                return '<div class="aviso"><strong>Esta aba lê direto de <code>' + caminho + '</code> e não conseguiu.</strong><br>' +
+                    'Motivo: <code>' + esc(erro) + '</code>.<br><br>' +
+                    'Acontece ao abrir o arquivo por <code>file://</code>: o navegador bloqueia <code>fetch</code> por CORS. ' +
+                    'Sirva a pasta por HTTP — <code>python -m http.server</code> na raiz do pacote — e recarregue. ' +
+                    'A página lê o contrato e as regras em tempo de execução de propósito: assim a documentação não vira ' +
+                    'uma cópia que envelhece.</div>';
+            }
+
+            async function renderDoc(titulos, hostId) {
+                const C = REG[atual];
+                const host = $(hostId);
+                const { regras, erro } = await carregar(atual);
+                if (erro) { host.innerHTML = avisoFetch(erro, C.regras); return; }
+                const partes = [];
+                for (const t of titulos) {
+                    const s = secao(regras, t);
+                    if (!s) continue;
+                    partes.push('<h2>' + t + '</h2><div class="card">' + md(s) + '</div>');
+                }
+                host.innerHTML = partes.length ? partes.join('')
+                    : '<p class="vazio">Nenhuma destas seções existe em <code>' + C.regras + '</code>: ' + titulos.join(', ') + '.</p>';
+            }
+
+            // ---------- casca ----------
+            function trocar(id) { mostrarComponente(id); }
+
+            function renderTudo() {
+                const C = REG[atual];
+                ROOT.setAttribute('data-brand', GLOBAL.brand);
+                ROOT.setAttribute('data-theme', GLOBAL.mode);
+                if (vista === 'indice') { mostrarIndice(); return; }
+                $('crumb-atual').textContent = C.nome;
+                $('titulo').textContent = C.nome;
+                $('selo-status').textContent = 'experimental';
+                $('descricao').textContent = C.descricao;
+                $('fonte-doc').innerHTML =
+                    'Contrato: <code>' + C.contrato.replace('../', '') + '</code> · Regras: <code>' +
+                    C.regras.replace('../', '') + '</code> · Tokens: <code>' + C.T._source.slice(0, 90) + '…</code>';
+
+                renderOverview();
+                if (aba === 'specs') renderSpecs();
+                if (aba === 'guidelines') renderDoc(REG[atual].secoesGuidelines, 'p-guidelines');
+                if (aba === 'a11y') renderDoc(REG[atual].secoesA11y, 'p-a11y');
+            }
+
+            /* "Componentes" na trilha abre o ÍNDICE. Antes ele ciclava para o próximo
+               componente, o que é surpresa: breadcrumb aponta para o nível de cima, não troca
+               o conteúdo por baixo. Para trocar sem passar pelo índice existe o seletor no
+               topo. */
+            $('crumb-home').onclick = () => mostrarIndice();
+            $('crumb-home').title = 'Ver todos os componentes';
+            $('ir-indice').onclick = () => mostrarIndice();
+
+            function mostrarIndice() {
+                vista = 'indice';
+                $('vista-indice').hidden = false;
+                $('vista-componente').hidden = true;
+                $('crumb-sep').hidden = true;
+                $('crumb-atual').hidden = true;
+
+                const host = $('indice-cards');
+                host.innerHTML = '';
+                for (const [id, C] of Object.entries(REG)) {
+                    /* O card NÃO pode ser um <button>: as amostras dentro dele são o próprio
+                       componente, e o Button é um <button>. Botão dentro de botão é HTML
+                       inválido e o navegador desmonta a árvore. Então o card é uma <div>, o
+                       controle acessível é o título, e o clique no card inteiro é só atalho. */
+                    const card = el('div', 'card-indice');
+                    const titulo = el('button', 'nome', esc(C.nome) + ' <span class="selo">experimental</span>');
+                    titulo.type = 'button';
+                    titulo.onclick = () => mostrarComponente(id);
+                    card.appendChild(titulo);
+                    card.appendChild(el('p', 'desc', esc(C.descricao)));
+
+                    /* Amostras reais, não imagem: usam o mesmo CSS do componente, então
+                       acompanham marca e modo. `inert` as tira do Tab e do clique — aqui elas
+                       ilustram, não são para usar. */
+                    const amostras = el('div', 'amostras');
+                    amostras.dataset.canvas = GLOBAL.mode;
+                    amostras.inert = true;
+                    for (const t of ['Primary', 'Success', 'Error']) {
+                        amostras.appendChild(C.no({ ...ESTADO[id], theme: t, state: 'Interativo', size: C.T.sizeOrder[1] }));
+                    }
+                    card.appendChild(amostras);
+                    card.onclick = () => mostrarComponente(id);
+                    host.appendChild(card);
+                }
+            }
+
+            function mostrarComponente(id) {
+                const trocou = id !== atual;
+                vista = 'componente';
+                atual = id;
+                $('sel-comp').value = id;
+                $('vista-indice').hidden = true;
+                $('vista-componente').hidden = false;
+                $('crumb-sep').hidden = false;
+                $('crumb-atual').hidden = false;
+                if (trocou) $('p-overview').innerHTML = '';
+                renderTudo();
+            }
+
+            for (const b of document.querySelectorAll('.abas button')) {
+                b.onclick = () => {
+                    aba = b.dataset.aba;
+                    for (const o of document.querySelectorAll('.abas button')) o.setAttribute('aria-selected', String(o === b));
+                    for (const p of ['overview', 'specs', 'guidelines', 'a11y']) {
+                        $('p-' + p).hidden = p !== aba;
+                    }
+                    if (aba === 'specs') renderSpecs();
+                    if (aba === 'guidelines') renderDoc(REG[atual].secoesGuidelines, 'p-guidelines');
+                    if (aba === 'a11y') renderDoc(REG[atual].secoesA11y, 'p-a11y');
+                };
+            }
+
+            $('sel-comp').innerHTML = Object.entries(REG)
+                .map(([id, c]) => '<option value="' + id + '">' + c.nome + '</option>').join('');
+            $('sel-comp').onchange = (e) => mostrarComponente(e.target.value);
+
+            const marcas = BTN.brands || [{ id: 'employer', label: 'Employer' }];
+            $('sel-marca').innerHTML = marcas.map((b) => '<option value="' + b.id + '">' + b.label + '</option>').join('');
+            $('sel-marca').onchange = (e) => { GLOBAL.brand = e.target.value; renderTudo(); };
+            $('sel-modo').onchange = (e) => { GLOBAL.mode = e.target.value; renderTudo(); };
+
+            renderTudo();
 
             /* As fontes do Google chegam depois do primeiro render: sem isto o painel mostraria
                o aviso de fallback para sempre, e o cache guardaria a medição errada. */
-            if (document.fonts?.ready) {
-                document.fonts.ready.then(() => {
-                    _cacheFonte.clear();
-                    render();
-                });
-            }
+            if (document.fonts?.ready) document.fonts.ready.then(() => { _cacheFonte.clear(); renderOverview(); });
         </script>
     </body>
 </html>
