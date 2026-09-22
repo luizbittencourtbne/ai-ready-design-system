@@ -1,5 +1,10 @@
 # Exemplo de revisão inicial — Button
 
+> **Retrato de quando o pacote só tinha o Button.** Serve de modelo de **formato**, não de
+> resultado atual: os números envelheceram (eram 89 tokens CSS; hoje são 129, com Hyperlink e
+> Dot no índice). Não atualize este arquivo para "corrigir" os números — ele é um exemplo
+> congelado. Para o estado de agora, rode `npm run check`.
+
 ## Escopo e verificações
 
 Foram examinados `README.md`, `components.json`, `src/button.contract.json`, `src/button.rules.md`, demos e scripts de validação. `npm run check` foi executado neste pacote e passou: gerou os assets e validou 13 temas, quatro tamanhos, 89 tokens CSS e links das demos. Isso comprova consistência das verificações automatizadas atuais, não conformidade completa de acessibilidade.

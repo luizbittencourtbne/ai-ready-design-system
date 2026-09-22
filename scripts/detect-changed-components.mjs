@@ -52,6 +52,10 @@ const COMPARTILHADOS = [
     ['src/structural.css', 'snapshot de raio e tipografia que completa brands.css (README, "Estrutura")'],
     ['components.json', 'o próprio índice: muda quais arquivos pertencem a quem'],
     ['AGENTS.md', 'as regras contra as quais a revisão julga'],
+    /* Estes dois entram no contexto enviado ao revisor (ver `instrucoes`, mais abaixo). Mudar
+       a lista de verificação muda o parecer de TODO componente, exatamente como o AGENTS.md. */
+    ['agents/component-reviewer.md', 'a lista de verificação que a revisão segue'],
+    ['.claude/agents/component-reviewer.md', 'a definição do subagente revisor'],
 ];
 const MAPA_COMPARTILHADO = new Map(COMPARTILHADOS);
 
@@ -69,6 +73,9 @@ const POR_COMPONENTE = {
     ],
     hyperlink: [
         ['scripts/build-hyperlink-css.mjs', 'gerador do Hyperlink: mapeamento tema -> token e geometria'],
+    ],
+    dot: [
+        ['scripts/build-dot-css.mjs', 'gerador do Dot: mapeamento tom -> token e geometria'],
     ],
 };
 

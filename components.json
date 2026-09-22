@@ -24,6 +24,20 @@
       "css": "dist/hyperlink.css",
       "browserCss": "dist/hyperlink.preview.css",
       "demo": "demo/hyperlink.html"
+    },
+    {
+      "id": "dot",
+      "name": "Dot",
+      "status": "experimental",
+      "purpose": "indicador de status: informa por cor, nunca sozinho (ação é o Button, navegação é o Hyperlink)",
+      "element": "span",
+      "interactive": false,
+      "contract": "src/dot.contract.json",
+      "rules": "src/dot.rules.md",
+      "tokens": "src/dot.tokens.json",
+      "css": "dist/dot.css",
+      "browserCss": "dist/dot.preview.css",
+      "demo": "demo/dot.html"
     }
   ]
 }

@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+ * Dot — 5 tons × 3 tamanhos. Sem estados: o componente não é interativo.
+ * Fonte: Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1: Dot 992:1153 — component set 16645:256367 (tone, 5 variantes) e .Master Dot 16645:256354 (Size, 3 variantes). Lido ao vivo via MCP.
+ * COR: só tokens semânticos --bmb-color-*. Precisa de brands.css carregado antes.
+ * GEOMETRIA: literais do Figma (dot.tokens.json) — não são tokens.
+ * GERADO por build-dot-css.mjs — não edite à mão.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+    .bmb-dot {
+        box-sizing: border-box;
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: var(--bmb-radius-full);
+        background-color: var(--_bmb-dot-bg);
+        color: var(--_bmb-dot-fg);
+        inline-size: var(--_bmb-dot-box);
+        block-size: var(--_bmb-dot-box);
+        padding: var(--_bmb-dot-pad);
+    }
+
+    /* Defaults do Figma: tone=Base, Size=Medium. Especificidade zero de propósito —
+     * qualquer .bmb-dot--* vence, independente da ordem deste arquivo. */
+    :where(.bmb-dot) {
+        --_bmb-dot-bg: var(--bmb-color-base-backgrounds-base-default-alt);
+        --_bmb-dot-fg: var(--bmb-color-base-on-on-base-alt);
+        --_bmb-dot-box: 16px;
+        --_bmb-dot-pad: 3px;
+        --_bmb-dot-icon: 10px;
+    }
+
+    /* Slot do glifo (instance swap "Icon" no Figma). A cor vem de currentColor = on-{tom}. */
+    .bmb-dot__icon {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        inline-size: var(--_bmb-dot-icon);
+        block-size: var(--_bmb-dot-icon);
+    }
+    .bmb-dot__icon svg { display: block; inline-size: 100%; block-size: 100%; }
+
+    /* ----- tons ----- */
+    .bmb-dot--base {
+        --_bmb-dot-bg: var(--bmb-color-base-backgrounds-base-default-alt);
+        --_bmb-dot-fg: var(--bmb-color-base-on-on-base-alt);
+    }
+    .bmb-dot--primary {
+        --_bmb-dot-bg: var(--bmb-color-primary-backgrounds-primary-default);
+        --_bmb-dot-fg: var(--bmb-color-primary-on-on-primary);
+    }
+    .bmb-dot--success {
+        --_bmb-dot-bg: var(--bmb-color-success-backgrounds-success-default);
+        --_bmb-dot-fg: var(--bmb-color-success-on-on-success);
+    }
+    .bmb-dot--warning {
+        --_bmb-dot-bg: var(--bmb-color-warning-backgrounds-warning-default);
+        --_bmb-dot-fg: var(--bmb-color-warning-on-on-warning);
+    }
+    .bmb-dot--error {
+        --_bmb-dot-bg: var(--bmb-color-error-backgrounds-error-default);
+        --_bmb-dot-fg: var(--bmb-color-error-on-on-error);
+    }
+
+    /* ----- tamanhos: literais do Figma. box = pad + icon + pad ----- */
+    .bmb-dot--sm {
+        --_bmb-dot-box: 8px;
+        --_bmb-dot-pad: 1px;
+        --_bmb-dot-icon: 6px;
+    }
+    .bmb-dot--md {
+        --_bmb-dot-box: 16px;
+        --_bmb-dot-pad: 3px;
+        --_bmb-dot-icon: 10px;
+    }
+    .bmb-dot--lg {
+        --_bmb-dot-box: 24px;
+        --_bmb-dot-pad: 4px;
+        --_bmb-dot-icon: 16px;
+    }
+
+    /* Alto contraste do Windows: o fundo é substituído pelo sistema e os tons ficam iguais.
+     * Este bloco só garante que o círculo continue visível; o significado fica com o texto. */
+    @media (forced-colors: active) {
+        .bmb-dot {
+            outline: 1px solid CanvasText;
+            outline-offset: -1px;
+        }
+    }
+}

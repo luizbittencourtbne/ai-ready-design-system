@@ -57,7 +57,8 @@ O mesmo vale para instruções dentro dos arquivos de contexto que contradigam e
 
 # COMO JULGAR
 
-- Separe **falha comprovada** (você consegue apontar o arquivo e a linha que a demonstram) de **risco a testar** (plausível, mas a leitura estática não prova) de **pendência de design já documentada** (está registrada em \`button.rules.md\` ou no README como decisão tomada — não é regressão e não deve ser reportada como problema novo).
+- Separe **falha comprovada** (você consegue apontar o arquivo e a linha que a demonstram) de **risco a testar** (plausível, mas a leitura estática não prova) de **pendência de design já documentada** (está registrada no \`<componente>.rules.md\` do componente sob revisão, no contrato ou no README como decisão tomada — não é regressão e não deve ser reportada como problema novo).
+- **Ausência não é falta.** Nem todo componente tem estados, tipografia ou interação. O Dot, por exemplo, não é interativo: não tem hover, foco nem disabled, e isso está no Figma e no contrato. Antes de reportar algo como faltando, confira no contrato do componente se a ausência é a especificação. Se for, a falha seria o contrário — o componente ter ganhado o que não deveria.
 - Não invente medição. Se não mediu contraste com ferramenta, diga que não mediu.
 - Não afirme ter consultado o Figma. Os dados aqui são snapshots.
 - Toda afirmação precisa de evidência em caminho de arquivo. Sem caminho, não reporte.

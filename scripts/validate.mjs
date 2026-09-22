@@ -12,6 +12,10 @@ const failures = [];
 const check = (ok, message) => { if (!ok) failures.push(message); };
 const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
 const sameSet = (a, b) => same([...a].sort(), [...b].sort());
+/* Tira os comentários de um CSS antes de procurar texto dentro dele. Os geradores escrevem
+ * coisas como "Nunca use outline: none aqui", e uma checagem ingênua no texto bruto se reprova
+ * sozinha. Usado pelo Hyperlink e pelo Dot. */
+const semComentarios = (t) => t.split('/*').map((p, i) => (i === 0 ? p : p.split('*/')[1] ?? '')).join('');
 
 const manifest = json('components.json');
 check(manifest.schemaVersion === 1, 'Versão desconhecida do índice de componentes.');
@@ -141,7 +145,6 @@ if (link) {
     // "limpe" o CSS no futuro sem perceber.
     /* Comentários fora: o próprio gerador escreve "Nunca use outline: none aqui", e uma
      * checagem ingênua no texto bruto se reprova sozinha. */
-    const semComentarios = (t) => t.split('/*').map((p, i) => (i === 0 ? p : p.split('*/')[1] ?? '')).join('');
     check(!semComentarios(lCss).includes('outline: none') &&
         !semComentarios(lPreview).includes('outline: none'),
         'Hyperlink: o CSS não pode conter outline: none — é a única indicação de foco.');
@@ -226,6 +229,229 @@ if (link) {
     }
 }
 
+/* ---- Dot ---------------------------------------------------------------------------
+ * Checagens próprias. O Dot é o oposto dos outros dois: não é interativo, não tem estados e
+ * não carrega informação sozinho. Quase tudo aqui é uma checagem NEGATIVA — existe para
+ * impedir que alguém, no futuro, "melhore" o componente acrescentando o que o Figma
+ * deliberadamente não deu a ele. */
+const dot = (manifest.components ?? []).find((item) => item.id === 'dot');
+let dotRefs = new Set();
+let dContract = null;
+if (dot) {
+    dContract = json(dot.contract);
+    const dSource = json(dot.tokens);
+    const dCss = read(dot.css);
+    const dPreview = read(dot.browserCss);
+    const dLimpo = semComentarios(dCss);
+
+    check(dContract.component === dot.name, 'Nome do contrato do Dot difere do índice.');
+
+    // Semântica: informação, não ação. Nada de elemento interativo.
+    check(dContract.element?.required === 'span', 'Dot: o contrato precisa exigir o elemento <span>.');
+    for (const proibido of ['button', 'a']) {
+        check((dContract.element?.forbidden ?? []).includes(proibido),
+            `Dot: o contrato precisa proibir <${proibido}> explicitamente.`);
+    }
+
+    check(sameSet(dContract.variants.tone.values, dSource.toneOrder.map((x) => x.toLowerCase())),
+        'Tons do contrato do Dot diferem dos dados do Figma.');
+    const dSizeNames = { Small: 'sm', Medium: 'md', Large: 'lg' };
+    check(same(dContract.variants.size.values, dSource.sizeOrder.map((n) => dSizeNames[n])),
+        'Tamanhos do contrato do Dot diferem dos dados do Figma.');
+    check(Object.keys(dContract.states ?? {}).length === 0,
+        'Dot: o contrato não pode declarar estados — o componente não é interativo.');
+    check(same(dContract.globalTheme.brands, colors.brands),
+        'Marcas do contrato do Dot diferem do audit.');
+
+    for (const tone of dContract.variants.tone.values) {
+        const abre = `.bmb-dot--${tone} {`;
+        const ini = dCss.indexOf(abre);
+        check(ini >= 0, `Dot: tom sem CSS: ${tone}.`);
+        const bloco = ini < 0 ? '' : dCss.slice(ini, dCss.indexOf('}', ini));
+        check(bloco.includes('--_bmb-dot-bg:'), `Dot: tom sem token de fundo: ${tone}.`);
+        check(bloco.includes('--_bmb-dot-fg:'), `Dot: tom sem token de glifo: ${tone}.`);
+    }
+
+    /* Geometria: o diâmetro do Figma é padding + glifo + padding. Se a conta não fechar, o
+     * círculo sai com tamanho errado e ninguém percebe olhando um dot de 8px. */
+    for (const nome of dSource.sizeOrder) {
+        const z = dSource.sizes[nome];
+        const k = dSizeNames[nome];
+        check(z.pad * 2 + z.icon === z.box,
+            `Dot: geometria de ${nome} não fecha — ${z.pad} + ${z.icon} + ${z.pad} != ${z.box}.`);
+        const ini = dCss.indexOf(`.bmb-dot--${k} {`);
+        const bloco = ini < 0 ? '' : dCss.slice(ini, dCss.indexOf('}', ini));
+        check(bloco.includes(`--_bmb-dot-box: ${z.box}px;`), `Dot: tamanho ${k} sem diâmetro ${z.box}px.`);
+        check(bloco.includes(`--_bmb-dot-icon: ${z.icon}px;`), `Dot: tamanho ${k} sem glifo ${z.icon}px.`);
+    }
+
+    /* Defaults. O Figma define tone=Base e Size=Medium, então `.bmb-dot` sozinho tem de
+     * renderizar — e em :where(), com especificidade zero, para não depender da ordem em que o
+     * gerador imprime os blocos. */
+    check(dLimpo.includes(':where(.bmb-dot)'),
+        'Dot: os defaults precisam estar em :where(.bmb-dot) — especificidade zero.');
+    const iDefault = dCss.indexOf(':where(.bmb-dot)');
+    const blocoDefault = iDefault < 0 ? '' : dCss.slice(iDefault, dCss.indexOf('}', iDefault));
+    const zPadrao = dSource.sizes[dSource.defaults.size];
+    check(blocoDefault.includes(`--_bmb-dot-box: ${zPadrao.box}px;`),
+        `Dot: o default de tamanho precisa ser ${dSource.defaults.size} (${zPadrao.box}px).`);
+
+    /* NÃO É INTERATIVO. A descrição do componente no Figma é explícita, e o eixo foi renomeado
+     * de State para tone justamente por isso. Estas checagens são o que impede o componente de
+     * ganhar de volta, por acidente, tudo o que o design tirou dele. */
+    const interacao = dLimpo.match(/\.bmb-dot[\w-]*:(hover|active|focus|focus-visible|focus-within|checked|target)/);
+    check(!interacao, `Dot: o CSS não pode ter pseudo-classe de interação — achei "${interacao?.[0]}".`);
+    check(!dLimpo.includes('cursor:'),
+        'Dot: o CSS não pode declarar cursor — o Dot não faz nada quando clicado.');
+    check(!dLimpo.includes('transition'),
+        'Dot: o CSS não pode declarar transition — não há estado para transicionar.');
+    for (const classe of ['--selected', '--disabled']) {
+        check(!dLimpo.includes(`.bmb-dot${classe}`), `Dot: o CSS não pode ter .bmb-dot${classe}.`);
+    }
+
+    /* Nenhum hex, nem como fallback. on-{tom} NÃO é a mesma cor nas três marcas: em bne-cia
+     * on-success resolve para #000000, não #fafafa. Um fallback cravado quebraria justo ali. */
+    const hex = dLimpo.match(/#[0-9a-fA-F]{3,8}\b/);
+    check(!hex, `Dot: o CSS não pode conter cor cravada — achei "${hex?.[0]}". Use só tokens.`);
+    check(dLimpo.includes(`var(--bmb-radius-${dSource.radius})`),
+        `Dot: o raio precisa vir do token --bmb-radius-${dSource.radius}.`);
+
+    check(dCss.includes('forced-colors: active'),
+        'Dot: falta o bloco @media (forced-colors: active) que mantém o círculo visível.');
+    check(dCss.includes("@import 'tailwindcss';") && !dPreview.includes("@import 'tailwindcss';"),
+        'Dot: CSS de produção/preview com import incorreto.');
+
+    dotRefs = new Set([...dCss.matchAll(/var\((--bmb-[\w-]+)/g)].map((m) => m[1]));
+    for (const token of dotRefs) check(defs.has(token), `Dot: token CSS sem definição: ${token}.`);
+
+    /* A demo precisa praticar a semântica que as regras pregam. */
+    const dDemo = read(dot.demo).replace(/<!--[\s\S]*?-->/g, '');
+    for (const tag of ['button', 'a']) {
+        check(!new RegExp(`<${tag}[^>]*class="[^"]*bmb-dot`, 'i').test(dDemo),
+            `Dot: a demo não pode aplicar o componente em <${tag}>.`);
+    }
+    for (const [, ref] of dDemo.matchAll(/(?:href|src)="(\.\.\/dist\/[^"]+)"/g)) {
+        check(fs.existsSync(path.resolve(path.dirname(file(dot.demo)), ref)),
+            `${dot.demo}: link quebrado ${ref}.`);
+    }
+
+    /* WCAG 1.4.1 — a regra que manda em todas as outras. Cada Dot da demo é decoração ao lado
+     * de um texto que nomeia o status, ou carrega o rótulo ele mesmo. Não existe terceira
+     * opção: um círculo colorido sem nenhuma das duas coisas não comunica nada a quem não
+     * distingue as cores. */
+    let dots = 0;
+    for (const alvo of dDemo.matchAll(/<span[^>]*class="[^"]*\bbmb-dot\b[^"]*"[^>]*>/g)) {
+        dots++;
+        const marcacao = alvo[0];
+        check(!/tabindex=/.test(marcacao), 'Dot: a demo não pode dar tabindex a um Dot.');
+        check(!/onclick=/i.test(marcacao), 'Dot: a demo não pode dar onclick a um Dot.');
+        const escondido = /aria-hidden="true"/.test(marcacao);
+        const rotulado = /role="img"/.test(marcacao) && /aria-label="[^"]+"/.test(marcacao);
+        check(escondido || rotulado,
+            `Dot: ${marcacao.slice(0, 70)}… precisa de aria-hidden="true" (há texto ao lado) ` +
+            'ou de role="img" + aria-label (não há).');
+        if (escondido) {
+            const texto = textoDoPai(dDemo, alvo.index);
+            check(texto.length > 0,
+                `Dot: ${marcacao.slice(0, 70)}… está com aria-hidden mas não há texto ao lado — ` +
+                'assim o status não é comunicado a ninguém que não veja a cor.');
+        }
+    }
+    check(dots >= dContract.variants.tone.values.length,
+        `Dot: a demo precisa mostrar pelo menos os ${dContract.variants.tone.values.length} tons.`);
+}
+
+/* Devolve o texto visível do elemento que CONTÉM a posição `i`. Não é um parser de HTML: é uma
+ * varredura de profundidade, suficiente para o HTML bem formado das demos deste repositório.
+ * Existe porque a regra mais importante do Dot — nunca ser a única fonte da informação — é
+ * justamente sobre o que está AO LADO dele, e não sobre ele. */
+function textoDoPai(html, i) {
+    const VAZIAS = /^<(br|img|input|meta|link|hr|source|area|use|path)\b/i;
+    let profundidade = 0;
+    let inicio = -1;
+    for (let k = i - 1; k >= 0; k--) {
+        if (html[k] !== '<') continue;
+        const fimTag = html.indexOf('>', k);
+        if (fimTag < 0) continue;
+        const tag = html.slice(k, fimTag + 1);
+        if (tag.startsWith('</')) { profundidade++; continue; }
+        if (tag.endsWith('/>') || VAZIAS.test(tag)) continue;
+        if (profundidade > 0) { profundidade--; continue; }
+        inicio = k;
+        break;
+    }
+    if (inicio < 0) return '';
+    const nome = (html.slice(inicio + 1).match(/^[\w-]+/) ?? [''])[0];
+    if (!nome) return '';
+    const corpo = html.indexOf('>', inicio) + 1;
+    const re = new RegExp(`</?${nome}\\b[^>]*>`, 'gi');
+    re.lastIndex = corpo;
+    let prof = 1;
+    let fim = html.length;
+    let m;
+    while ((m = re.exec(html))) {
+        if (m[0].startsWith('</')) {
+            prof--;
+            if (prof === 0) { fim = m.index; break; }
+        } else if (!m[0].endsWith('/>')) prof++;
+    }
+    return html.slice(corpo, fim).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/* ---- snapshot da documentação ------------------------------------------------------
+ * dist/docs-data.js embute contrato e regras para o site de documentação funcionar por
+ * file://, onde fetch é bloqueado. É conteúdo DUPLICADO e gerado, então precisa de guarda:
+ * sem isto ele envelhece em silêncio e a página passa a mostrar uma versão que já mudou no
+ * disco — exatamente o problema que o site existe para evitar. */
+const docsPath = 'dist/docs-data.js';
+if (fs.existsSync(file(docsPath))) {
+    const bruto = read(docsPath);
+    const marca = 'window.BMB_DOCS = ';
+    const iMarca = bruto.indexOf(marca);
+    check(iMarca >= 0, 'Formato de dist/docs-data.js inesperado.');
+    if (iMarca >= 0) {
+        let docs = {};
+        try {
+            docs = JSON.parse(bruto.slice(iMarca + marca.length).replace(/;\s*$/, ''));
+        } catch {
+            check(false, 'dist/docs-data.js não contém JSON válido.');
+        }
+        for (const item of manifest.components ?? []) {
+            const d = docs[item.id];
+            check(Boolean(d), `dist/docs-data.js não tem o componente ${item.id} — rode npm run build.`);
+            if (!d) continue;
+            check(JSON.stringify(d.contrato) === JSON.stringify(json(item.contract)),
+                `dist/docs-data.js desatualizado: contrato de ${item.id} difere de ${item.contract}.`);
+            check(d.regras === read(item.rules),
+                `dist/docs-data.js desatualizado: regras de ${item.id} diferem de ${item.rules}.`);
+        }
+        for (const id of Object.keys(docs)) {
+            check((manifest.components ?? []).some((c) => c.id === id),
+                `dist/docs-data.js tem "${id}", que não está em components.json.`);
+        }
+    }
+} else {
+    check(false, 'dist/docs-data.js ausente — rode npm run build.');
+}
+
+/* ---- storybook ---------------------------------------------------------------------
+ * demo/playground.html documenta TODOS os componentes, não só o Button, que é quem o declara
+ * como demo em components.json. Sem esta guarda, acrescentar um componente ao índice e
+ * esquecer do storybook passa despercebido — e o site fica dizendo que o pacote tem menos
+ * componentes do que tem. */
+const storybook = 'demo/playground.html';
+if (fs.existsSync(file(storybook))) {
+    const sb = read(storybook);
+    for (const item of manifest.components ?? []) {
+        check(sb.includes(`../${item.browserCss}`),
+            `${storybook}: não carrega ${item.browserCss} — o ${item.name} apareceria sem estilo.`);
+        for (const chave of ['contract', 'rules']) {
+            check(sb.includes(`'../${item[chave]}'`),
+                `${storybook}: o registro não aponta ${item[chave]} — ${item.name} está fora do storybook.`);
+        }
+    }
+}
+
 if (failures.length) {
     console.error(`Validação falhou (${failures.length}):\n- ${failures.join('\n- ')}`);
     process.exit(1);
@@ -236,5 +462,9 @@ if (lContract) {
     partes.push(`Hyperlink ${lContract.variants.theme.values.length} temas/` +
         `${lContract.variants.size.values.length} tamanhos`);
 }
+if (dContract) {
+    partes.push(`Dot ${dContract.variants.tone.values.length} tons/` +
+        `${dContract.variants.size.values.length} tamanhos/0 estados`);
+}
 console.log(`Validação OK: ${partes.join(', ')}, ` +
-    `${refs.size + linkRefs.size} tokens CSS e links das demos.`);
+    `${refs.size + linkRefs.size + dotRefs.size} tokens CSS e links das demos.`);

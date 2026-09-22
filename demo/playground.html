@@ -9,8 +9,12 @@
              O painel de tokens avisa com ⚠ quando isso acontece. -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <!-- Roboto (employer), Nunito (epays) e Montserrat (bne-cia body + títulos) são as
+             famílias que as três marcas pedem em --bmb-font-family-body/title. Faltava Nunito,
+             e o ePays caía no fallback do sistema. A lista abaixo é conferida em tempo de
+             execução contra o que as marcas realmente declaram — ver `conferirFontes()`. -->
         <link
-            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
             rel="stylesheet"
         />
         <!-- brands.css PRIMEIRO: define os tokens --bmb-* por marca/tema.
@@ -18,6 +22,7 @@
         <link rel="stylesheet" href="../dist/brands.css" />
         <link rel="stylesheet" href="../dist/button.preview.css" />
         <link rel="stylesheet" href="../dist/hyperlink.preview.css" />
+        <link rel="stylesheet" href="../dist/dot.preview.css" />
         <style>
             :root {
                 --doc-bg: #ffffff;
@@ -78,6 +83,11 @@
                 border: 1px solid var(--doc-line);
             }
             .topbar .espaco { flex: 1; }
+            .alerta-fonte {
+                font-size: 12px; padding: 4px 10px; border-radius: 999px;
+                background: #fffbe6; border: 1px solid #e8d48b; color: #7a5b00;
+            }
+            .alerta-fonte[hidden] { display: none; }
             .topbar-ctrl { display: flex; align-items: center; gap: 6px; }
             .topbar-ctrl label { font-size: 11px; color: var(--doc-dim); text-transform: uppercase; letter-spacing: 0.05em; }
             select {
@@ -230,6 +240,7 @@
             </button>
             <span class="selo" id="selo-versao">experimental</span>
             <span class="espaco"></span>
+            <span class="alerta-fonte" id="alerta-fonte" hidden></span>
             <span class="topbar-ctrl">
                 <label for="sel-comp">Componente</label>
                 <select id="sel-comp"></select>
@@ -256,7 +267,9 @@
 
             <section id="vista-indice" hidden>
                 <h1>Componentes</h1>
-                <p class="descricao">Dois componentes documentados. Cada um traz exemplos, contrato, guidelines e acessibilidade, lidos direto dos arquivos do pacote.</p>
+                <!-- O número sai do registro, não fica escrito aqui: já estava desatualizado
+                     uma vez, e um texto que conta componentes à mão sempre volta a errar. -->
+                <p class="descricao" id="indice-descricao"></p>
                 <div class="indice" id="indice-cards"></div>
             </section>
 
@@ -282,6 +295,11 @@
 
         <script src="../dist/button.tokens.js"></script>
         <script src="../dist/hyperlink.tokens.js"></script>
+        <script src="../dist/dot.tokens.js"></script>
+        <!-- Snapshot de contrato e regras, gerado por build-docs-data.mjs. Serve de rede para
+             quando a página é aberta por file://, onde fetch é bloqueado por CORS. Servida por
+             HTTP, a página prefere os arquivos reais. -->
+        <script src="../dist/docs-data.js"></script>
         <script>
             const $ = (id) => document.getElementById(id);
             const ROOT = document.documentElement;
@@ -300,6 +318,11 @@
             const FORCADOS = ['Hover', 'Active', 'Focus'];
             const ICON_SVG =
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>';
+            /* Glifo do Dot: a barra horizontal que o Figma desenha, igual nos cinco tons. O
+               `fill` é currentColor de propósito — é assim que o token on-{tom} chega ao
+               desenho, e é o que o componente exige de quem traz o próprio ícone. */
+            const DOT_SVG =
+                '<svg viewBox="0 0 10 10"><path fill="currentColor" d="M8.63672 4.43164C8.95036 4.43183 9.2041 4.68632 9.2041 5C9.20409 5.31368 8.95035 5.56817 8.63672 5.56836H1.36328C1.04965 5.56817 0.795908 5.31367 0.795898 5C0.795898 4.68632 1.04964 4.43183 1.36328 4.43164H8.63672Z"/></svg>';
 
             const hex = (rgb) => {
                 const m = (rgb || '').match(/\d+(\.\d+)?/g);
@@ -325,6 +348,40 @@
                 return r;
             }
 
+            /* Cada marca declara sua própria família em --bmb-font-family-body. Se ela não
+               estiver carregada, o palco mostra uma tipografia que não é a do Design System —
+               e em silêncio, porque o fallback do sistema parece um texto normal. Foi assim
+               que o ePays ficou sem Nunito sem ninguém notar. Esta checagem roda a cada troca
+               de marca e avisa no topo. */
+            function conferirFontes() {
+                const antes = ROOT.getAttribute('data-brand');
+                const faltando = [];
+                for (const b of (BTN.brands || [])) {
+                    ROOT.setAttribute('data-brand', b.id);
+                    const fam = getComputedStyle(document.body).getPropertyValue('--bmb-font-family-body').trim();
+                    if (fam && !fonteCarregada(fam)) faltando.push({ marca: b.label, fonte: fam.split(',')[0].replace(/["']/g, '') });
+                }
+                ROOT.setAttribute('data-brand', antes);
+                return faltando;
+            }
+
+            /* O alerta NÃO pode ser calculado só no primeiro render: as fontes do Google
+               chegam depois, e até lá toda marca parece estar no fallback. Por isso ele mora
+               numa função própria, chamada também quando `document.fonts.ready` resolve. Sem
+               isso o aviso ficava permanentemente aceso, inclusive para o Roboto. */
+            function atualizarAlertaFonte() {
+                const alerta = $('alerta-fonte');
+                if (!alerta) return;
+                const marcaAtiva = (BTN.brands || []).find((b) => b.id === GLOBAL.brand) || {};
+                const faltando = conferirFontes().find((f) => f.marca === marcaAtiva.label);
+                alerta.hidden = !faltando;
+                if (faltando) {
+                    alerta.textContent = '⚠ ' + faltando.fonte + ' não carregou — o texto está no fallback do sistema';
+                    alerta.title = 'A marca ' + faltando.marca + ' pede ' + faltando.fonte +
+                        ' em --bmb-font-family-body. Sem ela, o que você vê não é a tipografia do Design System.';
+                }
+            }
+
             function resolver(classe, prop) {
                 const p = document.createElement('span');
                 p.className = classe;
@@ -337,10 +394,12 @@
 
             const BTN = window.BMB_TOKENS;
             const LNK = window.BMB_HYPERLINK_TOKENS;
+            const DOT = window.BMB_DOT_TOKENS;
 
             /* Sem os tokens a página não tem o que mostrar. Falhar com uma frase é melhor do
                que morrer com "cannot read properties of undefined" e uma tela em branco. */
-            const FALTANDO = [!BTN && 'dist/button.tokens.js', !LNK && 'dist/hyperlink.tokens.js'].filter(Boolean);
+            const FALTANDO = [!BTN && 'dist/button.tokens.js', !LNK && 'dist/hyperlink.tokens.js',
+                !DOT && 'dist/dot.tokens.js'].filter(Boolean);
             if (FALTANDO.length) {
                 document.body.innerHTML =
                     '<div style="padding:40px;max-width:60ch;font:15px/1.6 ui-sans-serif,system-ui,sans-serif">' +
@@ -367,9 +426,9 @@
                     FONTE: { sm: 'small', md: 'medium', lg: 'large', xl: 'xlarge' },
                     controles: ['theme', 'state', 'size', 'content', 'radius', 'label', 'icones', 'dot'],
                     inicial: { theme: 'Primary', state: 'Interativo', size: 'Medium', content: 'Label & Icon', radius: 'round', label: 'Button', left: true, right: false, dot: false },
-                    /* Títulos que existem em button.rules.md. Os dois componentes têm seções
-                       diferentes, então a lista é por componente — pedir seção inexistente faz
-                       a aba avisar em vez de mostrar vazio. */
+                    /* Títulos que existem em button.rules.md. Cada componente tem as suas
+                       seções, então a lista é por componente — pedir seção inexistente faz a
+                       aba avisar em vez de mostrar vazio. */
                     secoesGuidelines: ['Desvios do Figma (autorizados)', 'Achados conhecidos — mantidos por decisão'],
                     secoesA11y: ['Acessibilidade'],
                     notaTamanhos: () => BTN.sizeOrder.map((s) => `${s} ${BTN.sizes[s].h}px`).join(' · '),
@@ -559,12 +618,107 @@
     <span class="bmb-hyperlink__label">Indisponível</span>
 </a>`,
                 },
+
+                /* O Dot é o primeiro componente aqui que NÃO é interativo. Por isso ele não
+                   declara `estados`, não tem `forcar` e não tem tipografia: um Dot não escreve
+                   nada. As três coisas são ausências de propósito, e a página trata cada uma
+                   delas em vez de fingir que o componente tem o formato dos outros dois. */
+                dot: {
+                    nome: 'Dot',
+                    descricao: 'Status: informa por cor. Nunca sozinho — sempre com texto ao lado ou rótulo próprio.',
+                    base: 'bmb-dot',
+                    T: DOT,
+                    contrato: '../src/dot.contract.json',
+                    regras: '../src/dot.rules.md',
+                    /* O eixo de cor do Dot se chama `tone` no Figma, não `Theme`. A propriedade
+                       foi renomeada lá justamente porque os valores são tons, não estados. */
+                    rotuloTema: 'Tone',
+                    temas: DOT.toneOrder,
+                    estados: [],
+                    tamanhos: DOT.sizeOrder,
+                    semTipografia: true,
+                    SZ: { Small: 'sm', Medium: 'md', Large: 'lg' },
+                    controles: ['theme', 'size', 'showIcon'],
+                    inicial: { theme: 'Success', size: 'Medium', showIcon: false, state: 'Interativo' },
+                    secoesGuidelines: ['Dot vs Button vs Hyperlink', 'Os cinco tons', 'Geometria',
+                        'O glifo é opcional', 'Desvios e acréscimos em relação ao Figma',
+                        'Divergências abertas', 'Decisões registradas'],
+                    secoesA11y: ['A regra que manda em todas as outras'],
+                    aviso: 'O Dot comunica por cor, e só por cor — o glifo não muda de forma entre os tons. <strong>Ele nunca pode ser a única fonte da informação de status.</strong> Ou vem com texto visível ao lado (e <code>aria-hidden</code>), ou carrega <code>role="img"</code> + <code>aria-label</code>.',
+                    notaTamanhos: () => DOT.sizeOrder.map((s) => `${s} ${DOT.sizes[s].box}px`).join(' · ') +
+                        ' · diâmetro = padding + glifo + padding',
+                    classes(S) {
+                        return ['bmb-dot', 'bmb-dot--' + slug(S.theme), 'bmb-dot--' + this.SZ[S.size]];
+                    },
+                    no(S) {
+                        const n = document.createElement('span');
+                        n.className = this.classes(S).join(' ');
+                        /* Decorativo: nos exemplos o rótulo ao lado já nomeia o tom. É o padrão
+                           mais comum de uso, e é o que a demo estática pratica. */
+                        n.setAttribute('aria-hidden', 'true');
+                        if (S.showIcon) n.innerHTML = '<span class="bmb-dot__icon">' + DOT_SVG + '</span>';
+                        return n;
+                    },
+                    corSwatch(t) { return resolver('bmb-dot bmb-dot--' + slug(t), 'backgroundColor'); },
+                    markup(S) {
+                        const c = 'class="' + this.classes(S).join(' ') + '"';
+                        const corpo = S.showIcon
+                            ? '\n    <span class="bmb-dot__icon"><!-- svg com currentColor --></span>\n'
+                            : '';
+                        return '<!-- Há texto ao lado nomeando o status: o Dot é decoração. -->\n' +
+                            '<span ' + c + ' aria-hidden="true">' + corpo + '</span> ' + S.theme;
+                    },
+                    tokens(S, cs) {
+                        const map = this.T.toneTokens[slug(S.theme)] || {};
+                        const r = [['fundo', cs.backgroundColor, map.bg]];
+                        /* A cor do glifo só entra se houver glifo: mostrar uma cor que não está
+                           na tela seria inventar informação. */
+                        if (S.showIcon) r.push(['glifo', cs.color, map.fg]);
+                        const z = this.T.sizes[S.size];
+                        return {
+                            cores: r,
+                            geo: `diâmetro ${z.box}px = ${z.pad} + ${z.icon} + ${z.pad} · raio --bmb-radius-${this.T.radius}`,
+                            extra: S.showIcon ? [] : [['glifo', 'ausente', 'Show icon = false (default do Figma)']],
+                        };
+                    },
+                    dica() {
+                        return 'Não há estados: o Dot não é interativo. Passar o mouse, clicar e dar Tab não fazem nada — e é assim mesmo.';
+                    },
+                    comoUsar: `<!-- 1. Há texto visível nomeando o status: o Dot é decoração. -->
+<span class="bmb-dot bmb-dot--success bmb-dot--md" aria-hidden="true"></span> Ativo
+
+<!-- 2. Não há texto ao lado (numa coluna "Status", por exemplo): o Dot passa a
+     carregar a informação sozinho e precisa de rótulo próprio. -->
+<span class="bmb-dot bmb-dot--error bmb-dot--md" role="img" aria-label="Offline"></span>
+
+<!-- Com glifo: o SVG é seu e precisa usar currentColor, que resolve para o
+     token on-{tom} da marca ativa. Em BNE CIA ele é preto, não branco. -->
+<span class="bmb-dot bmb-dot--warning bmb-dot--lg" aria-hidden="true">
+    <span class="bmb-dot__icon"><svg>…</svg></span>
+</span> Pendente
+
+<!-- Sem classe de tom nem de tamanho vale o default do Figma: Base, Medium. -->
+<span class="bmb-dot" aria-hidden="true"></span> Sem categoria`,
+                },
             };
+
+            /* Os três componentes não têm o mesmo formato, e não deveriam ter. O Button e o
+               Hyperlink chamam o eixo de cor de "Theme" e têm seis estados; o Dot chama de
+               "tone" e não tem nenhum. Em vez de espalhar `if (atual === 'dot')` pela página,
+               cada entrada declara seus eixos aqui — e o resto do código fala uma língua só. */
+            for (const C of Object.values(REG)) {
+                C.temas ??= C.T.themeOrder ?? C.T.toneOrder;
+                C.estados ??= C.T.stateOrder ?? [];
+                C.tamanhos ??= C.T.sizeOrder;
+                C.rotuloTema ??= 'Theme';
+            }
 
             let atual = 'button';
             let aba = 'overview';
             let vista = 'componente'; // 'indice' | 'componente'
-            const ESTADO = { button: { ...REG.button.inicial }, hyperlink: { ...REG.hyperlink.inicial } };
+            const ESTADO = Object.fromEntries(
+                Object.entries(REG).map(([id, C]) => [id, { ...C.inicial }]),
+            );
             const GLOBAL = { brand: 'employer', mode: 'light' };
             const CACHE = {}; // contrato + regras buscados
 
@@ -647,23 +801,41 @@
                 return (fim < 0 ? resto : resto.slice(0, fim)).trim();
             }
 
+            /* Duas fontes, nesta ordem:
+                 1. `fetch` dos arquivos reais — sempre frescos, exige HTTP;
+                 2. o snapshot embutido em dist/docs-data.js — funciona por file://, mas é do
+                    último build.
+               A página diz qual usou, para ninguém depurar um texto que já mudou no disco. */
             async function carregar(id) {
                 if (CACHE[id]) return CACHE[id];
                 const C = REG[id];
-                const r = { contrato: null, regras: null, erro: null };
+                const r = { contrato: null, regras: null, erro: null, fonte: null };
                 try {
                     const [c, g] = await Promise.all([fetch(C.contrato), fetch(C.regras)]);
                     if (!c.ok || !g.ok) throw new Error('HTTP ' + c.status + '/' + g.status);
                     r.contrato = await c.json();
                     r.regras = await g.text();
+                    r.fonte = 'arquivos';
                 } catch (e) {
-                    /* file:// bloqueia fetch por CORS. A página ainda funciona: só as abas que
-                       leem do contrato e das regras ficam sem conteúdo, com o motivo à vista. */
-                    r.erro = String(e.message || e);
+                    const snap = (window.BMB_DOCS || {})[id];
+                    if (snap) {
+                        r.contrato = snap.contrato;
+                        r.regras = snap.regras;
+                        r.fonte = 'snapshot';
+                    } else {
+                        r.erro = String(e.message || e);
+                    }
                 }
                 CACHE[id] = r;
                 return r;
             }
+
+            const avisoSnapshot =
+                '<div class="aviso">Conteúdo vindo do <strong>snapshot do último build</strong> ' +
+                '(<code>dist/docs-data.js</code>), porque a página foi aberta por <code>file://</code> ' +
+                'e o navegador bloqueia <code>fetch</code> por CORS. Se você acabou de editar o ' +
+                'contrato ou as regras, rode <code>npm run build</code> para ver a mudança — ou ' +
+                'sirva a pasta por HTTP, que aí a página lê os arquivos direto.</div>';
 
             // ---------- controles ----------
             function seg(host, valores, onPick, rotulos) {
@@ -696,12 +868,12 @@
 
                 const ctr = el('div', 'controles');
                 if (C.controles.includes('theme')) {
-                    const f = campo('Theme');
+                    const f = campo(C.rotuloTema);
                     const g = el('div', 'temas');
                     g.id = 'g-theme';
                     g.setAttribute('role', 'group');
-                    g.setAttribute('aria-label', 'Theme');
-                    for (const t of C.T.themeOrder) {
+                    g.setAttribute('aria-label', C.rotuloTema);
+                    for (const t of C.temas) {
                         const b = el('button', null, '<span class="sw"><i></i></span><span>' + t + '</span>');
                         b.type = 'button';
                         b.dataset.val = t;
@@ -712,8 +884,8 @@
                     ctr.appendChild(f);
                 }
                 for (const [k, tit, vals] of [
-                    ['state', 'State', ['Interativo', ...C.T.stateOrder]],
-                    ['size', 'Size', C.T.sizeOrder],
+                    ['state', 'State', ['Interativo', ...C.estados]],
+                    ['size', 'Size', C.tamanhos],
                     ['content', 'Content', C.T.contentOrder || ['Label & Icon', 'Icon Only']],
                     ['radius', 'Radius', ['round', 'straight', 'pill']],
                 ]) {
@@ -739,6 +911,7 @@
                 const chks = [];
                 if (C.controles.includes('icones')) chks.push(['left', 'Show Left Icon'], ['right', 'Show Right Icon']);
                 if (C.controles.includes('dot')) chks.push(['dot', 'Show Dot']);
+                if (C.controles.includes('showIcon')) chks.push(['showIcon', 'Show icon']);
                 if (C.controles.includes('forceUnderline')) chks.push(['forceUnderline', 'Force Underline']);
                 if (chks.length) {
                     const f = campo('Booleans');
@@ -813,15 +986,29 @@
 
                     const gTemas = el('div', 'palco');
                     gTemas.id = 'ex-temas';
-                    host.appendChild(cardExemplos('Temas', gTemas, C.T.themeOrder.length + ' temas'));
+                    host.appendChild(cardExemplos(C.rotuloTema === 'Tone' ? 'Tons' : 'Temas', gTemas,
+                        C.temas.length + (C.rotuloTema === 'Tone' ? ' tons' : ' temas')));
 
                     const gTam = el('div', 'palco');
                     gTam.id = 'ex-tamanhos';
                     host.appendChild(cardExemplos('Tamanhos', gTam, C.notaTamanhos()));
 
-                    const gEst = el('div', 'palco');
-                    gEst.id = 'ex-estados';
-                    host.appendChild(cardExemplos('Estados', gEst));
+                    /* Sem estados o card não é escondido: ele explica a ausência. Uma seção que
+                       some deixa a pergunta "cadê?"; uma seção que diz "não existe, e por quê"
+                       responde. */
+                    if (C.estados.length) {
+                        const gEst = el('div', 'palco');
+                        gEst.id = 'ex-estados';
+                        host.appendChild(cardExemplos('Estados', gEst));
+                    } else {
+                        const vazio = el('div');
+                        vazio.appendChild(el('p', 'nota-spec',
+                            'Este componente não tem estados. Não é omissão da documentação: ' +
+                            'o Dot não é interativo, e no Figma a propriedade foi renomeada de ' +
+                            'State para tone justamente porque os valores são tons, não estados. ' +
+                            'A validação reprova o CSS se qualquer pseudo-classe de interação aparecer nele.'));
+                        host.appendChild(cardExemplos('Estados', vazio));
+                    }
 
                     host.appendChild(el('h2', null, 'Como usar'));
                     const cu = el('div', 'card');
@@ -836,7 +1023,7 @@
                 const tinhaFoco = palco.contains(document.activeElement);
                 palco.innerHTML = '';
                 const no = C.no(S);
-                if (FORCADOS.includes(S.state)) C.forcar(no, S);
+                if (C.forcar && FORCADOS.includes(S.state)) C.forcar(no, S);
                 palco.appendChild(no);
                 if (tinhaFoco) no.focus();
 
@@ -850,13 +1037,18 @@
 
                 const cs = getComputedStyle(no);
                 const info = C.tokens(S, cs);
-                $('tokens').innerHTML =
-                    info.cores.map((r) => '<tr><td class="k">' + r[0] + '</td><td><span class="chip" style="background:' + r[1] +
-                        '"></span>' + hex(r[1]) + '</td><td class="mono">' + (r[2] ? '--bmb-color-' + r[2] : '—') + '</td></tr>').join('') +
+                /* Um Dot não escreve nada. Listar "fonte 16px" para ele seria inventar uma
+                   informação que não está na tela — e ainda disparar o aviso de fallback de
+                   fonte num componente que não usa fonte nenhuma. */
+                const tipografia = C.semTipografia ? '' :
                     '<tr><td>fonte</td><td>' + cs.fontSize + '</td><td class="mono">' + info.fonte + ' · peso ' + cs.fontWeight + '</td></tr>' +
                     '<tr><td>família</td><td>' + cs.fontFamily.split(',')[0].replace(/["']/g, '') +
                     (fonteCarregada(cs.fontFamily) ? '' : ' <span title="não instalada; caiu no fallback">⚠</span>') +
-                    '</td><td class="mono">--bmb-font-family-body · muda com a marca</td></tr>' +
+                    '</td><td class="mono">--bmb-font-family-body · muda com a marca</td></tr>';
+                $('tokens').innerHTML =
+                    info.cores.map((r) => '<tr><td class="k">' + r[0] + '</td><td><span class="chip" style="background:' + r[1] +
+                        '"></span>' + hex(r[1]) + '</td><td class="mono">' + (r[2] ? '--bmb-color-' + r[2] : '—') + '</td></tr>').join('') +
+                    tipografia +
                     '<tr><td>geometria</td><td>—</td><td class="mono">' + info.geo + '</td></tr>' +
                     info.extra.map((r) => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td class="mono">' + r[2] + '</td></tr>').join('');
                 $('code').textContent = C.markup(S);
@@ -865,19 +1057,20 @@
                 // exemplos estáticos
                 const et = $('ex-temas');
                 et.innerHTML = '';
-                for (const t of C.T.themeOrder) et.appendChild(amostra(C.no({ ...S, theme: t, state: 'Interativo' }), t));
+                for (const t of C.temas) et.appendChild(amostra(C.no({ ...S, theme: t, state: 'Interativo' }), t));
 
                 const ez = $('ex-tamanhos');
                 ez.innerHTML = '';
-                for (const z of C.T.sizeOrder) ez.appendChild(amostra(C.no({ ...S, size: z, state: 'Interativo' }), z));
+                for (const z of C.tamanhos) ez.appendChild(amostra(C.no({ ...S, size: z, state: 'Interativo' }), z));
 
                 const ee = $('ex-estados');
+                if (!ee) return; // componente sem estados: o card já explica a ausência
                 ee.innerHTML = '';
-                for (const st of C.T.stateOrder) {
+                for (const st of C.estados) {
                     const linha = el('div', 'linha-estado');
                     linha.appendChild(el('span', 'rot', st));
                     const n = C.no({ ...S, state: st });
-                    if (FORCADOS.includes(st)) C.forcar(n, { ...S, state: st });
+                    if (C.forcar && FORCADOS.includes(st)) C.forcar(n, { ...S, state: st });
                     const box = el('div');
                     box.appendChild(n);
                     linha.appendChild(box);
@@ -888,8 +1081,9 @@
             async function renderSpecs() {
                 const C = REG[atual];
                 const host = $('p-specs');
-                const { contrato, erro } = await carregar(atual);
+                const { contrato, erro, fonte } = await carregar(atual);
                 if (erro) { host.innerHTML = avisoFetch(erro, C.contrato); return; }
+                const cabecalho = fonte === 'snapshot' ? avisoSnapshot : '';
 
                 const linhas = [];
                 for (const [nome, v] of Object.entries(contrato.variants || {})) {
@@ -898,20 +1092,32 @@
                     const brutos = v.values || (v.classes && Object.keys(v.classes)) ||
                         Object.keys(v).filter((k) => typeof v[k] === 'object' && v[k] !== null);
                     const vals = (brutos || []).map((x) => '<code>' + x + '</code>').join(' · ') || '—';
+                    /* `v.default` pode ser `false` — é o caso de Show icon no Dot. Testar a
+                       verdade do valor mostraria "—" e faria parecer que não há padrão. */
                     linhas.push(['<code>' + nome + '</code>', vals,
-                        v.required ? '<strong>obrigatório</strong>' : v.default ? '<code>' + v.default + '</code>' : '—',
-                        v.noDefault || v.iconPositionNote || '']);
+                        v.required ? '<strong>obrigatório</strong>'
+                            : v.default !== undefined ? '<code>' + v.default + '</code>' : '—',
+                        /* Escapado: a observação é prosa vinda do JSON e às vezes CITA markup
+                           (o `howToEnable` do Dot mostra a tag do glifo). Sem escapar, o
+                           navegador renderiza a tag em vez de mostrá-la, e a frase some. */
+                        esc(v.noDefault || v.defaultBehaviour || v.iconPositionNote || v.howToEnable || '')]);
                 }
-                host.innerHTML =
+                /* Um componente sem estados precisa DIZER que não tem, e por quê. Uma tabela
+                   vazia parece documentação faltando. */
+                const semEstados = !Object.keys(contrato.states || {}).length;
+                const blocoEstados = semEstados
+                    ? '<div class="card"><p class="nota-spec">' +
+                        esc(contrato.statesWhy || 'Este componente não declara estados.') + '</p></div>'
+                    : '<div class="card"><table><thead><tr><th>Estado</th><th>Como aplicar</th></tr></thead><tbody>' +
+                        Object.entries(contrato.states).map(([k, v]) =>
+                            '<tr><td><code>' + k + '</code></td><td>' +
+                            (typeof v === 'string' ? esc(v) : esc(v.style || v.selector || v.spec || JSON.stringify(v).slice(0, 160))) +
+                            '</td></tr>').join('') + '</tbody></table></div>';
+                host.innerHTML = cabecalho +
                     '<h2>Props</h2><div class="card"><table><thead><tr><th>Prop</th><th>Valores</th><th>Padrão</th><th>Observação</th></tr></thead><tbody>' +
                     linhas.map((r) => '<tr>' + r.map((c) => '<td>' + c + '</td>').join('') + '</tr>').join('') +
                     '</tbody></table></div>' +
-                    '<h2>Estados</h2><div class="card"><table><thead><tr><th>Estado</th><th>Como aplicar</th></tr></thead><tbody>' +
-                    Object.entries(contrato.states || {}).map(([k, v]) =>
-                        '<tr><td><code>' + k + '</code></td><td>' +
-                        (typeof v === 'string' ? esc(v) : esc(v.style || v.selector || v.spec || JSON.stringify(v).slice(0, 160))) +
-                        '</td></tr>').join('') +
-                    '</tbody></table></div>' +
+                    '<h2>Estados</h2>' + blocoEstados +
                     '<h2>Elemento e semântica</h2><div class="card"><table><tbody>' +
                     '<tr><td>Elemento exigido</td><td><code>&lt;' + (contrato.element?.required || contrato.element?.action || '?') + '&gt;</code></td></tr>' +
                     (contrato.element?.forbidden ? '<tr><td>Proibido</td><td>' + contrato.element.forbidden.map((f) => '<code>&lt;' + f + '&gt;</code>').join(' · ') + '</td></tr>' : '') +
@@ -936,15 +1142,15 @@
             async function renderDoc(titulos, hostId) {
                 const C = REG[atual];
                 const host = $(hostId);
-                const { regras, erro } = await carregar(atual);
+                const { regras, erro, fonte } = await carregar(atual);
                 if (erro) { host.innerHTML = avisoFetch(erro, C.regras); return; }
-                const partes = [];
+                const partes = fonte === 'snapshot' ? [avisoSnapshot] : [];
                 for (const t of titulos) {
                     const s = secao(regras, t);
                     if (!s) continue;
                     partes.push('<h2>' + t + '</h2><div class="card">' + md(s) + '</div>');
                 }
-                host.innerHTML = partes.length ? partes.join('')
+                host.innerHTML = partes.filter((x) => x !== avisoSnapshot).length ? partes.join('')
                     : '<p class="vazio">Nenhuma destas seções existe em <code>' + C.regras + '</code>: ' + titulos.join(', ') + '.</p>';
             }
 
@@ -955,6 +1161,7 @@
                 const C = REG[atual];
                 ROOT.setAttribute('data-brand', GLOBAL.brand);
                 ROOT.setAttribute('data-theme', GLOBAL.mode);
+                atualizarAlertaFonte();
                 if (vista === 'indice') { mostrarIndice(); return; }
                 $('crumb-atual').textContent = C.nome;
                 $('titulo').textContent = C.nome;
@@ -985,6 +1192,12 @@
                 $('crumb-sep').hidden = true;
                 $('crumb-atual').hidden = true;
 
+                const n = Object.keys(REG).length;
+                const porExtenso = { 1: 'Um componente documentado', 2: 'Dois componentes documentados',
+                    3: 'Três componentes documentados' }[n] || `${n} componentes documentados`;
+                $('indice-descricao').textContent = porExtenso +
+                    '. Cada um traz exemplos, contrato, guidelines e acessibilidade, lidos direto dos arquivos do pacote.';
+
                 const host = $('indice-cards');
                 host.innerHTML = '';
                 for (const [id, C] of Object.entries(REG)) {
@@ -1006,7 +1219,7 @@
                     amostras.dataset.canvas = GLOBAL.mode;
                     amostras.inert = true;
                     for (const t of ['Primary', 'Success', 'Error']) {
-                        amostras.appendChild(C.no({ ...ESTADO[id], theme: t, state: 'Interativo', size: C.T.sizeOrder[1] }));
+                        amostras.appendChild(C.no({ ...ESTADO[id], theme: t, state: 'Interativo', size: C.tamanhos[1] }));
                     }
                     card.appendChild(amostras);
                     card.onclick = () => mostrarComponente(id);
@@ -1053,7 +1266,13 @@
 
             /* As fontes do Google chegam depois do primeiro render: sem isto o painel mostraria
                o aviso de fallback para sempre, e o cache guardaria a medição errada. */
-            if (document.fonts?.ready) document.fonts.ready.then(() => { _cacheFonte.clear(); renderOverview(); });
+            if (document.fonts?.ready) {
+                document.fonts.ready.then(() => {
+                    _cacheFonte.clear();
+                    atualizarAlertaFonte();
+                    if (vista === 'componente') renderOverview();
+                });
+            }
         </script>
     </body>
 </html>

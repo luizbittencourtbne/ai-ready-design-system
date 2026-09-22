@@ -1,0 +1,166 @@
+{
+  "component": "Dot",
+  "version": "experimental",
+  "purpose": "indicador visual de status: reforça, com cor, um estado que o texto ao lado já nomeia",
+  "notAnAction": "O Dot não é acionável. Se algo precisa ser clicado, o componente é o Button; se leva a outro destino, é o Hyperlink. Ver src/dot.rules.md, 'Dot vs Button vs Hyperlink'.",
+  "source": {
+    "figma": "04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1 — Dot 992:1153, set 16645:256367 (tone), master 16645:256354 (Size)",
+    "spec": "dot.rules.md recebido com a tarefa em 2026-09-22 — mapeamento variante↔prop, defaults e notas de acessibilidade",
+    "geometry": "src/dot.tokens.json",
+    "toneMappings": "scripts/build-dot-css.mjs",
+    "brandColors": "audit/core-brands-audit.json",
+    "rules": "src/dot.rules.md"
+  },
+  "element": {
+    "required": "span",
+    "forbidden": [
+      "button",
+      "a",
+      "input",
+      "summary"
+    ],
+    "why": "O Dot é conteúdo inline sem comportamento. Qualquer elemento interativo o colocaria na ordem de tabulação e prometeria uma ação que não existe.",
+    "forbiddenAttributes": [
+      "tabindex",
+      "onclick",
+      "href",
+      "role=\"button\""
+    ]
+  },
+  "baseClass": "bmb-dot",
+  "variants": {
+    "tone": {
+      "required": false,
+      "default": "base",
+      "defaultBehaviour": "sem classe de tom o Dot renderiza como base — o default vem do Figma e está em :where(.bmb-dot), com especificidade zero",
+      "classPrefix": "bmb-dot--",
+      "values": [
+        "base",
+        "primary",
+        "success",
+        "warning",
+        "error"
+      ],
+      "figmaNames": {
+        "base": "Base",
+        "primary": "Primary",
+        "success": "Success",
+        "warning": "Warning",
+        "error": "Error"
+      },
+      "meaning": {
+        "base": "status padrão, sem significado semântico — contagem genérica, presença neutra",
+        "primary": "remete à MARCA, não a um estado semântico — destaque de novidade, plano ou feature. Não é sinônimo de sucesso",
+        "success": "status positivo — online, ativo, aprovado, concluído",
+        "warning": "exige atenção, mas não é falha — pendente, atrasado, aguardando revisão",
+        "error": "status negativo ou crítico — offline, falhou, bloqueado"
+      }
+    },
+    "size": {
+      "required": false,
+      "default": "md",
+      "defaultBehaviour": "sem classe de tamanho o Dot renderiza como md — o default vem do Figma e está em :where(.bmb-dot), com especificidade zero",
+      "classPrefix": "bmb-dot--",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "figmaNames": {
+        "sm": "Small",
+        "md": "Medium",
+        "lg": "Large"
+      },
+      "figmaAxisLocation": "No Figma o eixo Size não fica no set Dot: fica na instância aninhada .Master Dot. Em CSS os dois eixos viram classes irmãs."
+    },
+    "showIcon": {
+      "required": false,
+      "default": false,
+      "figmaProperty": "Show icon",
+      "figmaPropertyLocation": ".Master Dot aninhado (16645:256354)",
+      "howToEnable": "acrescente o filho <span class=\"bmb-dot__icon\" aria-hidden=\"true\"><svg>…</svg></span>. Não existe classe para ligar/desligar: o glifo é a presença do filho.",
+      "iconClass": "bmb-dot__icon",
+      "iconIsDecorative": "O glifo NÃO muda de forma entre os tons: só a cor diferencia. Ele não é um diferenciador visual independente da cor e nunca deve ser lido como tal.",
+      "iconColor": "currentColor, que resolve para o token on-{tom}. O SVG de quem consome precisa usar currentColor em fill ou stroke."
+    },
+    "icon": {
+      "required": false,
+      "figmaProperty": "Icon (instance swap, só relevante se Show icon estiver ligado)",
+      "implementation": "slot: o SVG é fornecido por quem consome, dentro de .bmb-dot__icon. O Design System não embute nenhum ícone."
+    }
+  },
+  "states": {},
+  "statesWhy": "O Dot não tem estados. A descrição do componente no Figma é explícita: 'Dot não é interativo — não tem hover, foco nem disabled'. A propriedade foi renomeada de State para tone justamente porque os valores são tons, não estados.",
+  "notSupported": {
+    "hover": "não existe. O CSS gerado não pode conter :hover — a validação reprova.",
+    "focus": "não existe. O Dot não recebe foco de teclado e não deve ganhar tabindex.",
+    "active": "não existe.",
+    "disabled": "não existe.",
+    "selected": "não existe.",
+    "onClick": "não existe. Um Dot clicável é um componente diferente, não este.",
+    "tone=Primary como sucesso": "Primary remete à marca. Usar Primary para comunicar 'deu certo' é erro de semântica — o tom é Success."
+  },
+  "accessibility": {
+    "colorOnly": "O Dot comunica status MAJORITARIAMENTE POR COR. WCAG 1.4.1 (Uso de Cor).",
+    "requiredPairing": "O Dot nunca pode ser a única fonte da informação de status. Uma das duas formas é obrigatória:",
+    "patterns": {
+      "decorativo": {
+        "when": "há texto visível nomeando o status ao lado do Dot",
+        "markup": "<span class=\"bmb-dot bmb-dot--success bmb-dot--md\" aria-hidden=\"true\"></span> Ativo",
+        "why": "o texto já carrega a informação; o Dot repetido no leitor de tela seria ruído"
+      },
+      "standalone": {
+        "when": "não há texto visível ao lado",
+        "markup": "<span class=\"bmb-dot bmb-dot--error bmb-dot--md\" role=\"img\" aria-label=\"Offline\"></span>",
+        "why": "sem rótulo o Dot é um retângulo colorido sem significado para quem não enxerga a cor"
+      }
+    },
+    "forbidden": "Um .bmb-dot sem aria-hidden=\"true\" e sem role=\"img\"+aria-label. A validação reprova.",
+    "insideLargerComponent": "Num item de lista com nome + Dot de status, o texto do item costuma satisfazer o requisito — mas confirme que ele NOMEIA o status, e não só a entidade. 'Maria' não diz se ela está online.",
+    "forcedColors": "Em alto contraste o fundo é substituído pelo sistema e os cinco tons ficam iguais. Isso não é corrigido de propósito; é mais uma razão para o texto ao lado ser obrigatório. Ver src/dot.rules.md.",
+    "keyboard": "nenhuma interação de teclado: o Dot não é focável."
+  },
+  "tokens": {
+    "radius": "--bmb-radius-full (1000px) — o mesmo border-radius-full do Figma",
+    "noHardcodedColor": "Nenhum hex pode aparecer em dist/dot.css, nem como fallback. A validação reprova.",
+    "perTone": {
+      "base": {
+        "bg": "--bmb-color-base-backgrounds-base-default-alt",
+        "fg": "--bmb-color-base-on-on-base-alt"
+      },
+      "primary": {
+        "bg": "--bmb-color-primary-backgrounds-primary-default",
+        "fg": "--bmb-color-primary-on-on-primary"
+      },
+      "success": {
+        "bg": "--bmb-color-success-backgrounds-success-default",
+        "fg": "--bmb-color-success-on-on-success"
+      },
+      "warning": {
+        "bg": "--bmb-color-warning-backgrounds-warning-default",
+        "fg": "--bmb-color-warning-on-on-warning"
+      },
+      "error": {
+        "bg": "--bmb-color-error-backgrounds-error-default",
+        "fg": "--bmb-color-error-on-on-error"
+      }
+    },
+    "onColorIsNotConstant": "on-{tom} NÃO é a mesma cor nas três marcas. Em bne-cia, on-success resolve para #000000, não #fafafa, porque o success-default daquela marca é um verde muito mais claro. Nunca cravar a cor do glifo."
+  },
+  "globalTheme": {
+    "brands": [
+      "employer",
+      "epays",
+      "bne-cia"
+    ],
+    "modes": [
+      "light",
+      "dark"
+    ],
+    "howToSwitch": "atributos data-brand e data-theme no <html>"
+  },
+  "openDivergences": [
+    "Cor do glifo no tom Base: a variante liga on-base-alt (#a3a3a3) e on-surface-base-alt (#e5e5e5); o SVG exportado renderiza #e5e5e5. Implementado como on-base-alt, seguindo a especificação recebida. Ver src/dot.rules.md.",
+    "Default de Show icon: a especificação diz false; todas as variantes do Figma renderizam com glifo. Implementado como false. Ver src/dot.rules.md."
+  ]
+}

@@ -2,7 +2,7 @@
   "name": "bamboods-button-experiment",
   "private": true,
   "scripts": {
-    "build": "node scripts/build-core-brands.mjs && node scripts/build-brands.mjs && node scripts/build-css.mjs && node scripts/build-hyperlink-css.mjs",
+    "build": "node scripts/build-core-brands.mjs && node scripts/build-brands.mjs && node scripts/build-css.mjs && node scripts/build-hyperlink-css.mjs && node scripts/build-dot-css.mjs && node scripts/build-docs-data.mjs",
     "validate": "node scripts/validate.mjs",
     "check": "npm run build && npm run validate"
   }
