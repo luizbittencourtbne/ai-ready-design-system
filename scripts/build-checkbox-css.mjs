@@ -92,20 +92,30 @@ const mascara = (box, x, y, pathData, cap, join) => {
     return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 };
 
+/* Posição horizontal do check que vai para o CSS. É o x medido no Figma, salvo quando o
+ * tamanho traz `centerX`: aí o check é centrado na caixa. Hoje só o sm — o x do Figma (4) o
+ * deixava 0,45px à esquerda do centro, e o time decidiu centralizar (desvio registrado em
+ * src/checkbox.rules.md). No md e no lg o x do Figma já é o centro. */
+const xDoCheck = (z) => (z.check.centerX ? Math.round(((z.box - z.check.w) / 2) * 10000) / 10000 : z.check.x);
+
 /* Geometria que não fecha quebra o build com o nome do tamanho, em vez de emitir um glifo
  * fora do lugar. O traço do indeterminate é centrado nos dois eixos no Figma (x*2 + w = caixa,
  * y*2 = caixa), e o check precisa caber dentro da caixa, com meia espessura de folga. */
 function conferirGeometria(nome, z) {
     const meio = d.glyph.stroke / 2;
+    const x = xDoCheck(z);
+    if (Math.abs(x * 2 + z.check.w - z.box) > 0.01) {
+        throw new Error(`geometria inconsistente em ${nome}: o check ${z.check.w} em x=${x} não está centrado na caixa ${z.box}`);
+    }
     if (z.dash.x * 2 + z.dash.w !== z.box) {
         throw new Error(`geometria inconsistente em ${nome}: traço do indeterminate ${z.dash.x}+${z.dash.w}+${z.dash.x} != ${z.box}`);
     }
     if (z.dash.y * 2 !== z.box) {
         throw new Error(`geometria inconsistente em ${nome}: traço do indeterminate fora do centro vertical (y=${z.dash.y}, caixa ${z.box})`);
     }
-    if (z.check.x - meio < 0 || z.check.y - meio < 0 ||
-        z.check.x + z.check.w + meio > z.box || z.check.y + z.check.h + meio > z.box) {
-        throw new Error(`geometria inconsistente em ${nome}: o check ${z.check.w}×${z.check.h} em ${z.check.x},${z.check.y} não cabe na caixa ${z.box}`);
+    if (x - meio < 0 || z.check.y - meio < 0 ||
+        x + z.check.w + meio > z.box || z.check.y + z.check.h + meio > z.box) {
+        throw new Error(`geometria inconsistente em ${nome}: o check ${z.check.w}×${z.check.h} em ${x},${z.check.y} não cabe na caixa ${z.box}`);
     }
 }
 
@@ -158,7 +168,7 @@ p('    :where(.bmb-checkbox) {');
 for (const k of PAPEIS) p(`        --_bmb-checkbox-${VAR[k]}: var(--bmb-color-${t0[k]});`);
 p(`        --_bmb-checkbox-box: ${z0.box}px;`);
 p(`        --_bmb-checkbox-font: var(--bmb-font-size-${z0.font});`);
-p(`        --_bmb-checkbox-check: ${mascara(z0.box, z0.check.x, z0.check.y, z0.check.path, 'round', 'round')};`);
+p(`        --_bmb-checkbox-check: ${mascara(z0.box, xDoCheck(z0), z0.check.y, z0.check.path, 'round', 'round')};`);
 p(`        --_bmb-checkbox-dash: ${mascara(z0.box, z0.dash.x, z0.dash.y, `M 0 0 L ${z0.dash.w} 0`, 'round', 'miter')};`);
 p('    }');
 p();
@@ -275,7 +285,7 @@ for (const k of d.sizeOrder) {
     p(`    .bmb-checkbox--${k} {`);
     p(`        --_bmb-checkbox-box: ${z.box}px;`);
     p(`        --_bmb-checkbox-font: var(--bmb-font-size-${z.font});`);
-    p(`        --_bmb-checkbox-check: ${mascara(z.box, z.check.x, z.check.y, z.check.path, 'round', 'round')};`);
+    p(`        --_bmb-checkbox-check: ${mascara(z.box, xDoCheck(z), z.check.y, z.check.path, 'round', 'round')};`);
     p(`        --_bmb-checkbox-dash: ${mascara(z.box, z.dash.x, z.dash.y, `M 0 0 L ${z.dash.w} 0`, 'round', 'miter')};`);
     p('    }');
 }

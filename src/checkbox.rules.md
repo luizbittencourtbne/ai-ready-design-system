@@ -132,7 +132,7 @@ Medida nos nós do `.Master Checkbox`, não nos valores declarados.
 | --- | --- | --- | --- |
 | Caixa | 14 | 16 | 18 |
 | Glifo `check` (L × A) | 5,09 × 3,5 | 8 × 5,5 | 9 × 6,19 |
-| Posição do `check` | 4, 5 | 4, 5 | 4,5, 5,625 |
+| Posição do `check` | **4,4545**, 5 (Figma: 4, 5 — ver desvio 7) | 4, 5 | 4,5, 5,625 |
 | Traço do `indeterminate` | 6 | 8 | 10 |
 | Posição do traço | 4, 7 | 4, 8 | 4, 9 |
 
@@ -144,8 +144,8 @@ Medida nos nós do `.Master Checkbox`, não nos valores declarados.
 - Distância caixa ↔ rótulo: 8px.
 
 A conta é verificada no build: o traço do `indeterminate` é centrado nos dois eixos
-(`x + w + x = caixa`, `y × 2 = caixa`) e o `check` precisa caber na caixa com meia espessura
-de folga. Se alguém mexer em `checkbox.tokens.json` e a conta deixar de fechar, o gerador
+(`x + w + x = caixa`, `y × 2 = caixa`), o `check` é centrado na horizontal em todos os tamanhos
+e precisa caber na caixa com meia espessura de folga. Se alguém mexer em `checkbox.tokens.json` e a conta deixar de fechar, o gerador
 quebra com o nome do tamanho.
 
 ## Anel de foco
@@ -202,6 +202,14 @@ Dot.
 **6. Cores forçadas — acréscimo.** O sistema substitui fundo e borda, e um glifo pintado por
 `background-color` sumiria. O glifo sai do ajuste automático e fica em `CanvasText`; a borda
 em `CanvasText` e o anel em `Highlight`.
+
+**7. `check` do `sm` centrado na horizontal.** No Figma, o `check` do `sm` (5,09 × 3,5) está
+em x = 4 numa caixa de 14, e o centro dele fica 0,45px à esquerda do centro da caixa. No `md` e
+no `lg` o x do Figma já é o centro. Por decisão do time em 24/09/2026, o `sm` também é
+centrado: x = (14 − 5,0909) / 2 = **4,4545**. O x do Figma continua registrado em
+`checkbox.tokens.json` (`sizes.sm.check.x`); a marca `centerX` é que manda o gerador
+centralizar, e o build e a validação quebram se algum `check` sair do centro na horizontal. O
+tamanho e a posição vertical do glifo não mudaram — seguem o Figma.
 
 ## Acessibilidade
 
@@ -271,10 +279,13 @@ ou decidir que é `sm` e mudar `defaults.size` em `src/checkbox.tokens.json`.
 | `md` | 16 | 8 × 5,5 em (4, 5) | 8, 7,75 | 8, 8 |
 | `lg` | 18 | 9 × 6,19 em (4,5, 5,625) | 9, 8,72 | 9, 9 |
 
-No `sm` o glifo está deslocado meio pixel para a esquerda e para cima, e é proporcionalmente
-menor (36% da caixa, contra 50% no `md` e no `lg`). Parece que o glifo foi reduzido sem ser
-recentrado. **Implementado** como medido. **Como fechar:** o design confirma ou corrige o
-`check` do `sm` no `.Master Checkbox`.
+No `sm` o glifo estava deslocado 0,45px para a esquerda e é proporcionalmente menor (36% da
+caixa, contra 50% no `md` e no `lg`). Parece que o glifo foi reduzido sem ser recentrado.
+
+**Implementado:** centrado na horizontal (x = 4,4545), por decisão do time — ver o desvio 7. O
+tamanho continua o do Figma, e o deslocamento vertical (0,25px acima, como no `md` e no `lg`)
+também. **Continua aberto:** a proporção do glifo no `sm`. **Como fechar:** o design recentra o
+`check` no `.Master Checkbox` (aí o desvio 7 deixa de existir) e decide se ele deve crescer.
 
 ### 4. O `leading-trim` do rótulo
 
