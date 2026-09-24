@@ -6,6 +6,7 @@ Atualmente contém:
 - Button
 - Hyperlink
 - Dot
+- Checkbox
 
 ## Componentes
 
@@ -50,6 +51,26 @@ validação reprova as duas violações.
 
 Cinco tons (`base`, `primary`, `success`, `warning`, `error`) e três tamanhos (8, 16, 24px).
 Arquivos em `components.json` sob o id `dot`; demo em `demo/dot.html` e no storybook.
+
+### Checkbox
+Opção independente: cada caixa liga ou desliga uma opção sem afetar as outras, e o valor só
+vale quando o formulário é enviado. Escolha única é o Radio; efeito imediato é o Switch.
+
+O componente é um `<label>` que envolve um `<input type="checkbox">` **nativo** — é dele que
+vêm a semântica, o Espaço e o envio no formulário. Hover, foco, disabled, `checked` e
+`indeterminate` **não são classes**: vêm do input. O `indeterminate` existe só para o pai de
+um grupo parcialmente marcado ("selecionar todos") e é definido por script
+(`input.indeterminate = true`).
+
+Três tons (`neutral`, `brand`, `invert` — o último só sobre o painel da marca) e três
+tamanhos (`sm`, `md`, `lg`), com default `neutral`/`md`. O foco é um anel de 2px com folga
+de 2px que não muda o tamanho; o disabled é opacidade 0,4, sem token próprio. Seis
+divergências com o Figma estão registradas em `src/checkbox.rules.md`, "Divergências
+abertas" — entre elas a DS-053 (token de texto como fundo no `brand` desmarcado); não as trate
+como regressão.
+
+Arquivos em `components.json` sob o id `checkbox`; demo em `demo/checkbox.html` e no
+storybook.
 
 ## Arquitetura
 

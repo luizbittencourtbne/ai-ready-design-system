@@ -361,6 +361,182 @@ if (dot) {
         `Dot: a demo precisa mostrar pelo menos os ${dContract.variants.tone.values.length} tons.`);
 }
 
+/* ---- Controles: Checkbox, Radio, Switch --------------------------------------------
+ * Os três vêm da mesma página do Figma (✅ 08. Controls) e compartilham a arquitetura: um
+ * <label> que envolve um <input> nativo, tom e tamanho como classes irmãs, estado vindo do
+ * input. `validarControle` confere o que é igual nos três. O que é de cada um — indeterminate
+ * só no Checkbox, grupo só no Radio, ausência de hover só no Switch — fica na seção própria
+ * logo abaixo. Não é um componente "Controls": cada um tem contrato, tokens e gerador seus. */
+const regrasDe = (css) => [...semComentarios(css).matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .map((m) => ({ sel: m[1].trim(), corpo: m[2] }));
+const blocoDe = (css, abre) => {
+    const ini = css.indexOf(abre);
+    return ini < 0 ? '' : css.slice(ini, css.indexOf('}', ini));
+};
+const semComentariosHtml = (t) => t.replace(/<!--[\s\S]*?-->/g, '');
+
+/* Todo elemento da demo que carrega a classe base do componente. */
+function ocorrencias(html, base) {
+    const out = [];
+    for (const m of html.matchAll(/<([a-zA-Z][\w-]*)\b[^>]*\bclass="([^"]*)"[^>]*>/g)) {
+        if (!m[2].split(/\s+/).includes(base)) continue;
+        const tag = m[1].toLowerCase();
+        const fim = tag === 'label' ? html.indexOf('</label>', m.index) : m.index + m[0].length;
+        out.push({ tag, abertura: m[0], interno: html.slice(m.index + m[0].length, fim < 0 ? html.length : fim) });
+    }
+    return out;
+}
+
+function validarControle(item, cfg) {
+    const N = item.name;
+    const c = json(item.contract);
+    const s = json(item.tokens);
+    const cCss = read(item.css);
+    const cPreview = read(item.browserCss);
+    const limpo = semComentarios(cCss);
+    const base = `bmb-${item.id}`;
+    const input = `${base}__input`;
+    const priv = `--_bmb-${item.id}`;
+
+    const bruto = read(`dist/${item.id}.tokens.js`);
+    const marca = `window.${cfg.global} = `;
+    check(bruto.startsWith(marca), `Formato de dist/${item.id}.tokens.js inesperado.`);
+    const gerado = bruto.startsWith(marca) ? JSON.parse(bruto.slice(marca.length).replace(/;\s*$/, '')) : {};
+
+    check(c.component === item.name, `Nome do contrato do ${N} difere do índice.`);
+    check(c.baseClass === base, `${N}: a classe base do contrato precisa ser ${base}.`);
+    check(c.element?.required === 'label', `${N}: o contrato precisa exigir <label> envolvendo o input.`);
+    check(c.element?.input === cfg.inputContrato, `${N}: o contrato precisa exigir ${cfg.inputContrato}.`);
+    for (const proibido of ['div', 'span']) {
+        check((c.element?.forbidden ?? []).includes(proibido),
+            `${N}: o contrato precisa proibir <${proibido}> no lugar do input nativo.`);
+    }
+
+    // Eixos: contrato × tokens.json × JavaScript gerado × audit.
+    check(same(c.variants.tone.values, s.toneOrder), `${N}: tons do contrato diferem de ${item.tokens}.`);
+    check(same(c.variants.tone.values, Object.keys(gerado.toneTokens ?? {})),
+        `${N}: tons do contrato diferem de dist/${item.id}.tokens.js.`);
+    check(same(c.variants.size.values, s.sizeOrder), `${N}: tamanhos do contrato diferem de ${item.tokens}.`);
+    check(same(Object.keys(c.states ?? {}), s.stateOrder), `${N}: estados do contrato diferem de ${item.tokens}.`);
+    check(c.variants.tone.default === s.defaults.tone && c.variants.size.default === s.defaults.size,
+        `${N}: defaults do contrato diferem de ${item.tokens}.`);
+    check(same(c.globalTheme.brands, colors.brands) &&
+        same(c.globalTheme.brands, (gerado.brands ?? []).map((b) => b.id)),
+        `${N}: marcas do contrato diferem do audit ou de dist/${item.id}.tokens.js.`);
+    for (const key of ['toneOrder', 'stateOrder', 'sizeOrder', 'defaults', 'disabledOpacity', 'gap', 'focus', 'sizes']) {
+        check(JSON.stringify(s[key]) === JSON.stringify(gerado[key]),
+            `dist/${item.id}.tokens.js desatualizado em relação a ${item.tokens}: ${key}.`);
+    }
+
+    // Cada tom precisa de token para cada papel. Um papel sem token herda o default em silêncio.
+    for (const tom of c.variants.tone.values) {
+        const bloco = blocoDe(cCss, `.${base}--${tom} {`);
+        check(bloco.length > 0, `${N}: tom sem CSS: ${tom}.`);
+        for (const papel of cfg.papeis) {
+            check(bloco.includes(`${priv}-${papel}:`), `${N}: tom ${tom} sem token de ${papel}.`);
+        }
+    }
+    for (const tam of c.variants.size.values) {
+        check(cCss.includes(`.${base}--${tam} {`), `${N}: tamanho sem CSS: ${tam}.`);
+    }
+    check(limpo.includes(`:where(.${base})`), `${N}: os defaults precisam estar em :where(.${base}) — especificidade zero.`);
+
+    // Nenhum hex, nem como fallback: on-* e base-default mudam por marca e tema.
+    const hex = limpo.match(/#[0-9a-fA-F]{3,8}\b/);
+    check(!hex, `${N}: o CSS não pode conter cor cravada — achei "${hex?.[0]}". Use só tokens.`);
+    const refsC = new Set([...cCss.matchAll(/var\((--bmb-[\w-]+)/g)].map((m) => m[1]));
+    for (const token of refsC) check(defs.has(token), `${N}: token CSS sem definição: ${token}.`);
+
+    // Foco: nunca suprimir, nunca mudar a caixa.
+    for (const t of [limpo, semComentarios(cPreview)]) {
+        check(!/outline:\s*(none|0)\s*[;}]/.test(t), `${N}: o CSS não pode conter outline: none nem outline: 0.`);
+    }
+    const regras = regrasDe(cCss);
+    const focos = regras.filter((r) => r.sel.includes(':focus-visible') && !r.sel.startsWith('@'));
+    check(focos.length > 0, `${N}: falta a regra de :focus-visible.`);
+    for (const r of focos) {
+        check(/outline-offset:\s*2px/.test(r.corpo), `${N}: "${r.sel}" precisa de outline-offset: 2px.`);
+        const muda = r.corpo.match(/(^|[\s;])(border(-[\w-]+)?|padding(-[\w-]+)?|box-shadow)\s*:/);
+        check(!muda, `${N}: o foco não pode mudar a caixa — "${r.sel}" declara ${muda?.[2]}.`);
+    }
+    const anel = regras.find((r) => r.sel === `.${base}:has(.${input}:focus-visible)`);
+    check(Boolean(anel) && anel.corpo.includes(`outline: 2px solid var(${priv}-ring)`),
+        `${N}: o anel de foco precisa ser outline: 2px solid var(${priv}-ring) no <label>, via :has().`);
+
+    // Disabled: opacidade 0,4, a mesma de tokens.json, no controle inteiro.
+    check(s.disabledOpacity === 0.4, `${N}: disabledOpacity precisa ser 0.4 (DS-037).`);
+    const desab = regras.find((r) => r.sel === `.${base}:has(.${input}:disabled)`);
+    check(Boolean(desab) && new RegExp(`opacity:\\s*${s.disabledOpacity}\\s*;`).test(desab.corpo) &&
+        s.disabledOpacity === 0.4,
+        `${N}: o disabled precisa de opacity: 0.4 no <label> (.${base}:has(.${input}:disabled)).`);
+
+    check(cCss.includes('forced-colors: active'), `${N}: falta o bloco @media (forced-colors: active).`);
+    check(cCss.includes("@import 'tailwindcss';") && !cPreview.includes("@import 'tailwindcss';"),
+        `${N}: CSS de produção/preview com import incorreto.`);
+
+    // Demo: o markup que as pessoas copiam.
+    const demo = semComentariosHtml(read(item.demo));
+    for (const [, ref] of demo.matchAll(/(?:href|src)="(\.\.\/dist\/[^"]+)"/g)) {
+        check(fs.existsSync(path.resolve(path.dirname(file(item.demo)), ref)), `${item.demo}: link quebrado ${ref}.`);
+    }
+    const achados = ocorrencias(demo, base);
+    check(achados.length > 0, `${N}: a demo não usa o componente.`);
+    let desabilitados = 0;
+    for (const o of achados) {
+        check(o.tag === 'label', `${N}: a demo aplica ${base} em <${o.tag}> — o componente é o <label>.`);
+        const inp = o.interno.match(/<input\b[^>]*>/);
+        const tipoOk = inp && new RegExp(`type="${cfg.inputType}"`).test(inp[0]) &&
+            new RegExp(`class="[^"]*\\b${input}\\b`).test(inp[0]);
+        check(Boolean(tipoOk),
+            `${N}: ${o.abertura.slice(0, 70)}… precisa de <input type="${cfg.inputType}" class="${input}"> dentro.`);
+        if (!inp) continue;
+        check(!/aria-pressed/.test(inp[0]), `${N}: a demo não pode usar aria-pressed — é outro papel.`);
+        check(!/aria-disabled/.test(inp[0]), `${N}: disabled é o atributo nativo, não aria-disabled.`);
+        if (/\sdisabled\b/.test(inp[0])) desabilitados++;
+        const texto = o.interno.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        check(texto.length > 0 || /aria-label="[^"]+"/.test(inp[0]),
+            `${N}: ${inp[0].slice(0, 70)}… não tem rótulo visível nem aria-label.`);
+        if (cfg.porInput) cfg.porInput(inp[0], o);
+    }
+    check(!new RegExp(`${base}--(disabled|hover|focus|checked|selected)\\b`).test(demo + limpo),
+        `${N}: estado não vira classe — use o input nativo.`);
+    check(desabilitados > 0, `${N}: a demo precisa mostrar o disabled com o atributo disabled nativo no input.`);
+
+    return { contrato: c, fonte: s, css: cCss, limpo, demo, achados, refs: refsC };
+}
+
+/* ---- Checkbox ----------------------------------------------------------------------
+ * Opção independente. É o ÚNICO dos três com indeterminate (D4), e o indeterminate só existe
+ * para o pai de um grupo parcialmente marcado — por isso a demo precisa mostrar esse uso. */
+const cbItem = (manifest.components ?? []).find((item) => item.id === 'checkbox');
+let cb = null;
+if (cbItem) {
+    cb = validarControle(cbItem, {
+        global: 'BMB_CHECKBOX_TOKENS',
+        inputType: 'checkbox',
+        inputContrato: 'input[type="checkbox"]',
+        papeis: ['bg', 'bg-checked', 'glyph', 'border', 'label', 'ring'],
+        porInput(inp) {
+            check(!/role="switch"/.test(inp), 'Checkbox: um checkbox da demo tem role="switch" — isso é o Switch.');
+        },
+    });
+    check(same(cb.contrato.checked?.values ?? [], cb.fonte.checkedOrder ?? []) &&
+        (cb.fonte.checkedOrder ?? []).includes('indeterminate'),
+        'Checkbox: checked precisa ser false/true/indeterminate no contrato e em checkbox.tokens.json.');
+    check(regrasDe(cb.css).some((r) => r.sel.includes(':indeterminate')),
+        'Checkbox: falta a regra de :indeterminate.');
+    check(regrasDe(cb.css).some((r) => r.sel.includes(':checked')), 'Checkbox: falta a regra de :checked.');
+    check(/data-select-all=/.test(cb.demo) && /\.indeterminate\s*=/.test(cb.demo),
+        'Checkbox: a demo precisa de um pai indeterminado ("selecionar todos") definido por script.');
+    for (const nome of cb.fonte.sizeOrder) {
+        const z = cb.fonte.sizes[nome];
+        check(z.dash.x * 2 + z.dash.w === z.box && z.dash.y * 2 === z.box,
+            `Checkbox: o traço do indeterminate de ${nome} não está centrado na caixa de ${z.box}.`);
+        check(blocoDe(cb.css, `.bmb-checkbox--${nome} {`).includes(`--_bmb-checkbox-box: ${z.box}px;`),
+            `Checkbox: tamanho ${nome} sem caixa de ${z.box}px.`);
+    }
+}
+
 /* Devolve o texto visível do elemento que CONTÉM a posição `i`. Não é um parser de HTML: é uma
  * varredura de profundidade, suficiente para o HTML bem formado das demos deste repositório.
  * Existe porque a regra mais importante do Dot — nunca ser a única fonte da informação — é
@@ -466,5 +642,10 @@ if (dContract) {
     partes.push(`Dot ${dContract.variants.tone.values.length} tons/` +
         `${dContract.variants.size.values.length} tamanhos/0 estados`);
 }
-console.log(`Validação OK: ${partes.join(', ')}, ` +
-    `${refs.size + linkRefs.size + dotRefs.size} tokens CSS e links das demos.`);
+const controles = [cb].filter(Boolean);
+for (const k of controles) {
+    partes.push(`${k.contrato.component} ${k.contrato.variants.tone.values.length} tons/` +
+        `${k.contrato.variants.size.values.length} tamanhos/${Object.keys(k.contrato.states).length} estados`);
+}
+const totalRefs = refs.size + linkRefs.size + dotRefs.size + controles.reduce((n, k) => n + k.refs.size, 0);
+console.log(`Validação OK: ${partes.join(', ')}, ${totalRefs} tokens CSS e links das demos.`);

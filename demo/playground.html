@@ -23,6 +23,7 @@
         <link rel="stylesheet" href="../dist/button.preview.css" />
         <link rel="stylesheet" href="../dist/hyperlink.preview.css" />
         <link rel="stylesheet" href="../dist/dot.preview.css" />
+        <link rel="stylesheet" href="../dist/checkbox.preview.css" />
         <style>
             :root {
                 --doc-bg: #ffffff;
@@ -159,6 +160,15 @@
             .palco[data-canvas='dark'] .rot { color: #9aa0aa; }
             .linha-estado { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px 16px; width: 100%; }
             .linha-estado .rot { justify-self: end; }
+            /* O tom invert dos controles só existe sobre o painel da marca. */
+            .superficie-marca {
+                display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px 20px;
+                padding: 12px 16px; border-radius: 8px;
+                background: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+            }
+            /* Grupo do Radio: um <fieldset> de verdade, com <legend>, sem a moldura do navegador. */
+            .grupo-controle { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+            .grupo-controle legend { float: left; margin-right: 12px; font: 11px ui-monospace, monospace; color: var(--doc-dim); }
 
             /* ---------- controles do playground ---------- */
             .controles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 20px; margin-top: 18px; }
@@ -296,6 +306,7 @@
         <script src="../dist/button.tokens.js"></script>
         <script src="../dist/hyperlink.tokens.js"></script>
         <script src="../dist/dot.tokens.js"></script>
+        <script src="../dist/checkbox.tokens.js"></script>
         <!-- Snapshot de contrato e regras, gerado por build-docs-data.mjs. Serve de rede para
              quando a página é aberta por file://, onde fetch é bloqueado por CORS. Servida por
              HTTP, a página prefere os arquivos reais. -->
@@ -395,11 +406,12 @@
             const BTN = window.BMB_TOKENS;
             const LNK = window.BMB_HYPERLINK_TOKENS;
             const DOT = window.BMB_DOT_TOKENS;
+            const CBX = window.BMB_CHECKBOX_TOKENS;
 
             /* Sem os tokens a página não tem o que mostrar. Falhar com uma frase é melhor do
                que morrer com "cannot read properties of undefined" e uma tela em branco. */
             const FALTANDO = [!BTN && 'dist/button.tokens.js', !LNK && 'dist/hyperlink.tokens.js',
-                !DOT && 'dist/dot.tokens.js'].filter(Boolean);
+                !DOT && 'dist/dot.tokens.js', !CBX && 'dist/checkbox.tokens.js'].filter(Boolean);
             if (FALTANDO.length) {
                 document.body.innerHTML =
                     '<div style="padding:40px;max-width:60ch;font:15px/1.6 ui-sans-serif,system-ui,sans-serif">' +
@@ -409,6 +421,119 @@
                     'página carrega <code>../dist/</code> de forma relativa e precisa ser servida a partir ' +
                     'da raiz do pacote.</p></div>';
                 throw new Error('tokens ausentes: ' + FALTANDO.join(', '));
+            }
+
+            /* Checkbox, Radio e Switch compartilham a arquitetura — um <label> que envolve um
+               <input> nativo, tom e tamanho como classes irmãs, estado vindo do input —, então
+               o que é igual mora aqui. Cada um continua sendo uma entrada própria no registro,
+               com seus eixos, estados, forcar, guidelines e "como usar". */
+            let _nomeGrupo = 0;
+            function registroControle(cfg) {
+                const id = cfg.id;
+                const base = 'bmb-' + id;
+                const priv = '--_bmb-' + id + '-';
+                const T = cfg.T;
+                const rotulo = (S) => esc(S.label || '');
+                function item(S, nome, marcado, texto) {
+                    const l = document.createElement('label');
+                    l.className = this.classes(S).join(' ');
+                    const i = document.createElement('input');
+                    i.type = cfg.tipo;
+                    i.className = base + '__input';
+                    if (cfg.role) i.setAttribute('role', cfg.role);
+                    if (nome) i.name = nome;
+                    if (marcado === 'true') i.checked = true;
+                    /* indeterminate não tem atributo HTML: só existe como propriedade. */
+                    if (marcado === 'indeterminate') i.indeterminate = true;
+                    if (S.state === 'Disabled') i.disabled = true;
+                    l.appendChild(i);
+                    if (texto) l.appendChild(el('span', base + '__label', texto));
+                    return l;
+                }
+                return {
+                    base,
+                    T,
+                    rotuloTema: 'Tone',
+                    temas: T.toneOrder,
+                    tamanhos: T.sizeOrder,
+                    SZ: Object.fromEntries(T.sizeOrder.map((z) => [z, z])),
+                    amostrasIndice: ['neutral', 'brand'],
+                    classes(S) { return [base, base + '--' + S.theme, base + '--' + S.size]; },
+                    no(S) {
+                        let corpo;
+                        if (cfg.grupo) {
+                            /* Radio nunca sozinho: sempre um grupo de 2+ com o mesmo name. */
+                            corpo = el('fieldset', 'grupo-controle');
+                            corpo.appendChild(el('legend', null, 'Grupo'));
+                            const nome = 'pg-' + id + '-' + (++_nomeGrupo);
+                            corpo.appendChild(item.call(this, S, nome, S.checked, rotulo(S)));
+                            corpo.appendChild(item.call(this, S, nome, 'false', 'Outra opção'));
+                        } else {
+                            corpo = item.call(this, S, null, S.checked, rotulo(S));
+                        }
+                        if (S.theme !== 'invert') return corpo;
+                        const painel = el('span', 'superficie-marca');
+                        painel.appendChild(corpo);
+                        return painel;
+                    },
+                    alvo(n) { return n.matches?.('label.' + base) ? n : n.querySelector('label.' + base); },
+                    /* Hover e Focus são pseudo-estados: forçados aqui por style inline que aponta
+                       para as MESMAS custom properties privadas que o CSS gerado expõe. Não
+                       existe classe de estado. */
+                    forcar(n, S) {
+                        const l = this.alvo(n);
+                        const i = l.querySelector('input');
+                        if (S.state === 'Hover' && cfg.hover) i.style.boxShadow = cfg.hover;
+                        if (S.state === 'Focus') {
+                            l.style.outline = '2px solid var(' + priv + 'ring)';
+                            l.style.outlineOffset = '2px';
+                        }
+                    },
+                    corSwatch(t) {
+                        const p = document.createElement('span');
+                        p.className = base + ' ' + base + '--' + t;
+                        p.style.display = 'none';
+                        document.body.appendChild(p);
+                        const v = getComputedStyle(p).getPropertyValue(priv + cfg.swatch).trim();
+                        p.remove();
+                        return v;
+                    },
+                    markup(S) {
+                        const at = ['type="' + cfg.tipo + '"', 'class="' + base + '__input"'];
+                        if (cfg.role) at.push('role="' + cfg.role + '"');
+                        if (cfg.grupo) at.push('name="grupo"');
+                        if (S.checked === 'true') at.push('checked');
+                        if (S.state === 'Disabled') at.push('disabled');
+                        const um = (txt, extra) => '<label class="' + this.classes(S).join(' ') + '">\n' +
+                            '    <input ' + at.concat(extra || []).join(' ') + '>\n' +
+                            '    <span class="' + base + '__label">' + txt + '</span>\n</label>';
+                        let m = cfg.grupo
+                            ? '<fieldset>\n<legend>Grupo</legend>\n' + um(S.label || '') + '\n' +
+                              um('Outra opção').replace(' checked', '') + '\n</fieldset>'
+                            : um(S.label || '');
+                        if (S.checked === 'indeterminate') m += '\n<script>input.indeterminate = true;<\/script>';
+                        return m;
+                    },
+                    tokens(S, cs, l) {
+                        const map = T.toneTokens[S.theme] || {};
+                        const i = l.querySelector('input');
+                        const ci = getComputedStyle(i);
+                        const cb = getComputedStyle(i, '::before');
+                        const r = cfg.linhas(S, ci, cb, cs).map(([rot, valor, papel]) => [rot, valor, map[papel]]);
+                        if (S.state === 'Focus') r.push(['anel 2px', cs.outlineColor, map.ring]);
+                        const z = T.sizes[S.size];
+                        return { cores: r, fonte: '--bmb-font-size-' + z.font, geo: cfg.geo(z), extra: [] };
+                    },
+                    dica(S) {
+                        if (FORCADOS.includes(S.state)) {
+                            return S.state + ' é pseudo-estado — forçado aqui só para inspeção; no markup vem de ' +
+                                (S.state === 'Focus' ? ':focus-visible no input, desenhado no <label> via :has().' : ':hover no <label>.');
+                        }
+                        if (S.state === 'Disabled') return 'Disabled = atributo disabled nativo no input + opacity ' + T.disabledOpacity + ' no <label>. Tente dar Tab: o controle é pulado.';
+                        return cfg.dica;
+                    },
+                    ...cfg.extra,
+                };
             }
 
             // =================================================================
@@ -700,6 +825,60 @@
 <!-- Sem classe de tom nem de tamanho vale o default do Figma: Base, Medium. -->
 <span class="bmb-dot" aria-hidden="true"></span> Sem categoria`,
                 },
+
+                checkbox: registroControle({
+                    id: 'checkbox', T: CBX, tipo: 'checkbox', swatch: 'bg-checked',
+                    hover: '0 0 0 1px var(--_bmb-checkbox-border)',
+                    dica: 'Estado real — passe o mouse, clique e dê Tab. Espaço alterna.',
+                    linhas: (S, ci, cb, cs) => {
+                        const marcado = S.checked !== 'false';
+                        const r = [['caixa', ci.backgroundColor, marcado ? 'bgChecked' : 'bg'], ['borda', ci.borderColor, 'border']];
+                        if (marcado) r.push(['glifo', cb.backgroundColor, 'glyph']);
+                        r.push(['rótulo', cs.color, 'label']);
+                        return r;
+                    },
+                    geo: (z) => `caixa ${z.box}px · check ${z.check.w}×${z.check.h} em ${z.check.x},${z.check.y} · traço ${z.dash.w}px · gap ${CBX.gap}px · raio --bmb-radius-sm`,
+                    extra: {
+                        nome: 'Checkbox',
+                        descricao: 'Opção independente: o valor vale no envio. Escolha única é o Radio; efeito imediato é o Switch.',
+                        contrato: '../src/checkbox.contract.json',
+                        regras: '../src/checkbox.rules.md',
+                        estados: ['Default', 'Hover', 'Focus', 'Disabled'],
+                        checkedVals: CBX.checkedOrder,
+                        controles: ['theme', 'state', 'size', 'checked', 'label'],
+                        inicial: { theme: 'neutral', state: 'Interativo', size: 'md', checked: 'true', label: 'Aceito os termos' },
+                        secoesGuidelines: ['Checkbox vs os outros dois', 'Quando usar', 'Quando não usar', 'Anatomia', 'Cor',
+                            'Estados', 'Geometria', 'Desvios do Figma (autorizados)', 'Divergências abertas',
+                            'Decisões registradas (não são lacunas)'],
+                        secoesA11y: ['Acessibilidade', 'Anel de foco'],
+                        aviso: 'O <strong>indeterminate</strong> existe só para o pai de um grupo parcialmente marcado ("selecionar todos"). Não é terceiro estado de negócio, e não tem atributo HTML: é <code>input.indeterminate = true</code>.',
+                        notaTamanhos: () => CBX.sizeOrder.map((z) => `${z} caixa ${CBX.sizes[z].box}px`).join(' · ') + ` · gap ${CBX.gap}px`,
+                        comoUsar: `<!-- O <label> é o componente e envolve o input: o rótulo inteiro é clicável.
+     Sem classe de tom nem de tamanho vale o default: neutral, md. -->
+<label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+    <input type="checkbox" class="bmb-checkbox__input" name="termos">
+    <span class="bmb-checkbox__label">Aceito os termos</span>
+</label>
+
+<!-- Disabled: atributo nativo, não classe. -->
+<label class="bmb-checkbox bmb-checkbox--brand bmb-checkbox--md">
+    <input type="checkbox" class="bmb-checkbox__input" checked disabled>
+    <span class="bmb-checkbox__label">Indisponível</span>
+</label>
+
+<!-- Pai de um grupo parcialmente marcado: indeterminate por script. -->
+<label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+    <input type="checkbox" class="bmb-checkbox__input" id="todos">
+    <span class="bmb-checkbox__label">Selecionar todos</span>
+</label>
+<script>document.getElementById('todos').indeterminate = true;<\/script>
+
+<!-- Sem rótulo visível: aria-label no input é obrigatório. -->
+<label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+    <input type="checkbox" class="bmb-checkbox__input" aria-label="Selecionar linha de Maria Souza">
+</label>`,
+                    },
+                }),
             };
 
             /* Os três componentes não têm o mesmo formato, e não deveriam ter. O Button e o
@@ -886,6 +1065,7 @@
                 for (const [k, tit, vals] of [
                     ['state', 'State', ['Interativo', ...C.estados]],
                     ['size', 'Size', C.tamanhos],
+                    ['checked', 'Checked', C.checkedVals || []],
                     ['content', 'Content', C.T.contentOrder || ['Label & Icon', 'Icon Only']],
                     ['radius', 'Radius', ['round', 'straight', 'pill']],
                 ]) {
@@ -1028,15 +1208,18 @@
                 if (tinhaFoco) no.focus();
 
                 for (const [id, v] of [['g-theme', S.theme], ['g-state', S.state], ['g-size', S.size],
-                    ['g-content', S.content], ['g-radius', S.radius]]) {
+                    ['g-content', S.content], ['g-radius', S.radius], ['g-checked', S.checked]]) {
                     const h = $(id);
                     if (h) for (const b of h.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.dataset.val === v));
                 }
                 const ht = $('g-theme');
                 if (ht) for (const b of ht.querySelectorAll('button')) b.querySelector('i').style.background = C.corSwatch(b.dataset.val);
 
-                const cs = getComputedStyle(no);
-                const info = C.tokens(S, cs);
+                /* Os controles devolvem um invólucro (painel da marca, grupo do Radio); os
+                   tokens e a tipografia são lidos do componente de dentro. */
+                const alvo = C.alvo ? C.alvo(no) : no;
+                const cs = getComputedStyle(alvo);
+                const info = C.tokens(S, cs, alvo);
                 /* Um Dot não escreve nada. Listar "fonte 16px" para ele seria inventar uma
                    informação que não está na tela — e ainda disparar o aviso de fallback de
                    fonte num componente que não usa fonte nenhuma. */
@@ -1194,7 +1377,8 @@
 
                 const n = Object.keys(REG).length;
                 const porExtenso = { 1: 'Um componente documentado', 2: 'Dois componentes documentados',
-                    3: 'Três componentes documentados' }[n] || `${n} componentes documentados`;
+                    3: 'Três componentes documentados', 4: 'Quatro componentes documentados',
+                    5: 'Cinco componentes documentados', 6: 'Seis componentes documentados' }[n] || `${n} componentes documentados`;
                 $('indice-descricao').textContent = porExtenso +
                     '. Cada um traz exemplos, contrato, guidelines e acessibilidade, lidos direto dos arquivos do pacote.';
 
@@ -1218,7 +1402,7 @@
                     const amostras = el('div', 'amostras');
                     amostras.dataset.canvas = GLOBAL.mode;
                     amostras.inert = true;
-                    for (const t of ['Primary', 'Success', 'Error']) {
+                    for (const t of (C.amostrasIndice || ['Primary', 'Success', 'Error'])) {
                         amostras.appendChild(C.no({ ...ESTADO[id], theme: t, state: 'Interativo', size: C.tamanhos[1] }));
                     }
                     card.appendChild(amostras);

@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="pt-BR" data-brand="employer" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Checkbox</title>
+        <!-- As marcas declaram famílias diferentes em --bmb-font-family-body: Roboto
+             (employer), Nunito (epays) e Montserrat (bne-cia). Sem carregá-las, o rótulo cai no
+             fallback do sistema e a página mostra uma tipografia que não é a do Design System. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/checkbox.preview.css" />
+        <style>
+            /* apenas a pagina de demo — os estilos do componente vem de checkbox.preview.css */
+            body {
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                margin: 0;
+                padding: 40px;
+                color: #1b2439;
+                background: var(--bmb-color-base-backgrounds-base-default);
+            }
+            h1 { font-size: 20px; margin: 0 0 4px; }
+            p.sub { margin: 0 0 32px; color: #5b6478; font-size: 14px; max-width: 70ch; }
+            h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #5b6478;
+                margin: 32px 0 12px;
+                font-weight: 600;
+            }
+            .row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+            .cell { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+            .cap { font-size: 11px; color: #8890a0; }
+            /* O tom invert só existe sobre o painel da marca. */
+            .painel-marca {
+                background: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+                padding: 20px;
+                border-radius: 8px;
+            }
+            fieldset { border: 1px solid #e5e8ee; border-radius: 8px; padding: 12px 16px 16px; margin: 0; }
+            legend { font-size: 13px; color: #5b6478; padding: 0 4px; }
+            .filhos { display: flex; flex-direction: column; gap: 10px; margin: 10px 0 0 24px; }
+            .nota {
+                background: #fffbe6;
+                border: 1px solid #e8d48b;
+                border-radius: 8px;
+                padding: 12px 16px;
+                font-size: 13px;
+                max-width: 70ch;
+                margin: 8px 0 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Checkbox</h1>
+        <p class="sub">
+            Figma CORE-Basics · ✅ 08. Controls 827:887 · set Checkbox 1451:1360 (3 tons × 4
+            estados × 3 valores de checked) e .Master Checkbox 1451:1285 (3 tamanhos). Hover e
+            foco são reais — passe o mouse e navegue com Tab. O indeterminate é definido por
+            script, porque não existe atributo HTML para ele.
+        </p>
+
+        <h2>Tamanhos · neutral</h2>
+        <div class="row">
+            <div class="cell">
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--sm">
+                    <input type="checkbox" class="bmb-checkbox__input" name="tam-sm" checked />
+                    <span class="bmb-checkbox__label">Opção</span>
+                </label>
+                <span class="cap">sm · caixa 14 · paragraph-small</span>
+            </div>
+            <div class="cell">
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                    <input type="checkbox" class="bmb-checkbox__input" name="tam-md" checked />
+                    <span class="bmb-checkbox__label">Opção</span>
+                </label>
+                <span class="cap">md · caixa 16 · paragraph-medium (default)</span>
+            </div>
+            <div class="cell">
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--lg">
+                    <input type="checkbox" class="bmb-checkbox__input" name="tam-lg" checked />
+                    <span class="bmb-checkbox__label">Opção</span>
+                </label>
+                <span class="cap">lg · caixa 18 · paragraph-large</span>
+            </div>
+        </div>
+
+        <h2>Tons × checked</h2>
+        <div class="row">
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="n-f" />
+                <span class="bmb-checkbox__label">neutral</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="n-t" checked />
+                <span class="bmb-checkbox__label">neutral marcado</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="n-i" data-indeterminate />
+                <span class="bmb-checkbox__label">neutral indeterminado</span>
+            </label>
+        </div>
+        <div class="row" style="margin-top: 16px">
+            <label class="bmb-checkbox bmb-checkbox--brand bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="b-f" />
+                <span class="bmb-checkbox__label">brand</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--brand bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="b-t" checked />
+                <span class="bmb-checkbox__label">brand marcado</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--brand bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="b-i" data-indeterminate />
+                <span class="bmb-checkbox__label">brand indeterminado</span>
+            </label>
+        </div>
+        <div class="row painel-marca" style="margin-top: 16px">
+            <label class="bmb-checkbox bmb-checkbox--invert bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="i-f" />
+                <span class="bmb-checkbox__label">invert</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--invert bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="i-t" checked />
+                <span class="bmb-checkbox__label">invert marcado</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--invert bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="i-i" data-indeterminate />
+                <span class="bmb-checkbox__label">invert indeterminado</span>
+            </label>
+        </div>
+        <p class="nota">
+            No <strong>invert</strong> a caixa marcada tem o mesmo fundo da desmarcada: só o glifo
+            muda. O estado nunca é comunicado só pela cor.
+        </p>
+
+        <h2>Disabled — atributo nativo, opacidade 0,4</h2>
+        <div class="row">
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="d-f" disabled />
+                <span class="bmb-checkbox__label">Indisponível</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--brand bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="d-t" checked disabled />
+                <span class="bmb-checkbox__label">Indisponível, marcado</span>
+            </label>
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="d-i" data-indeterminate disabled />
+                <span class="bmb-checkbox__label">Indisponível, indeterminado</span>
+            </label>
+        </div>
+
+        <h2>Uso correto — grupo com título</h2>
+        <fieldset>
+            <legend>Canais de contato</legend>
+            <div class="filhos" style="margin-left: 0">
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                    <input type="checkbox" class="bmb-checkbox__input" name="canal" value="email" checked />
+                    <span class="bmb-checkbox__label">E-mail</span>
+                </label>
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                    <input type="checkbox" class="bmb-checkbox__input" name="canal" value="sms" />
+                    <span class="bmb-checkbox__label">SMS</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <h2>Uso correto — pai indeterminado ("selecionar todos")</h2>
+        <fieldset>
+            <legend>Colunas da tabela</legend>
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" id="todos" data-select-all="colunas" />
+                <span class="bmb-checkbox__label">Selecionar todos</span>
+            </label>
+            <div class="filhos">
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                    <input type="checkbox" class="bmb-checkbox__input" name="colunas" value="nome" checked />
+                    <span class="bmb-checkbox__label">Nome</span>
+                </label>
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                    <input type="checkbox" class="bmb-checkbox__input" name="colunas" value="cargo" />
+                    <span class="bmb-checkbox__label">Cargo</span>
+                </label>
+                <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                    <input type="checkbox" class="bmb-checkbox__input" name="colunas" value="salario" />
+                    <span class="bmb-checkbox__label">Salário</span>
+                </label>
+            </div>
+        </fieldset>
+        <p class="nota">
+            O pai fica <strong>indeterminado</strong> quando só parte dos filhos está marcada.
+            Clicar nele marca todos. É o único uso do indeterminate — nunca como terceiro estado
+            de negócio.
+        </p>
+
+        <h2>Uso correto — sem rótulo visível</h2>
+        <div class="row">
+            <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
+                <input type="checkbox" class="bmb-checkbox__input" name="linha-1" aria-label="Selecionar linha de Maria Souza" />
+            </label>
+            <span class="cap">Sem texto ao lado (célula de tabela): aria-label no input é obrigatório.</span>
+        </div>
+
+        <script>
+            /* indeterminate não tem atributo HTML: só existe como propriedade. */
+            for (const i of document.querySelectorAll('input[data-indeterminate]')) i.indeterminate = true;
+
+            /* "Selecionar todos": o pai reflete os filhos, e clicar nele marca ou desmarca todos. */
+            for (const pai of document.querySelectorAll('input[data-select-all]')) {
+                const filhos = [...document.querySelectorAll(`input[name="${pai.dataset.selectAll}"]`)];
+                const refletir = () => {
+                    const n = filhos.filter((f) => f.checked).length;
+                    pai.checked = n === filhos.length;
+                    pai.indeterminate = n > 0 && n < filhos.length;
+                };
+                pai.addEventListener('change', () => {
+                    for (const f of filhos) f.checked = pai.checked;
+                    refletir();
+                });
+                for (const f of filhos) f.addEventListener('change', refletir);
+                refletir();
+            }
+        </script>
+    </body>
+</html>

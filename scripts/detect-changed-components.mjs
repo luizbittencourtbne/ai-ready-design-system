@@ -77,6 +77,9 @@ const POR_COMPONENTE = {
     dot: [
         ['scripts/build-dot-css.mjs', 'gerador do Dot: mapeamento tom -> token e geometria'],
     ],
+    checkbox: [
+        ['scripts/build-checkbox-css.mjs', 'gerador do Checkbox: mapeamento tom -> token e geometria'],
+    ],
 };
 
 /* Demo preferida no contexto, quando a declarada no índice não é a melhor para revisão. */

@@ -501,5 +501,189 @@ window.BMB_DOCS = {
       "contrato": "src/dot.contract.json",
       "regras": "src/dot.rules.md"
     }
+  },
+  "checkbox": {
+    "contrato": {
+      "component": "Checkbox",
+      "version": "experimental",
+      "purpose": "opção independente: cada caixa liga ou desliga uma opção sem afetar as outras, e o valor só vale quando o formulário é enviado",
+      "notTheOthers": "Escolha única entre opções é o Radio. Configuração com efeito imediato, sem confirmar, é o Switch. Ver src/checkbox.rules.md, 'Checkbox vs os outros dois'.",
+      "source": {
+        "figma": "04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1, página ✅ 08. Controls 827:887 — set Checkbox 1451:1360 (tone × state × checked, 36 variantes) e .Master Checkbox 1451:1285 (size). Lido ao vivo via MCP em 2026-09-24.",
+        "spec": "checkbox.rules.md recebido com a tarefa (conferido pelo design em 2026-09-23) — mapeamento variante↔prop, cores por tom e notas de acessibilidade. Reescrito em src/checkbox.rules.md.",
+        "geometry": "src/checkbox.tokens.json",
+        "toneMappings": "scripts/build-checkbox-css.mjs",
+        "brandColors": "audit/core-brands-audit.json",
+        "rules": "src/checkbox.rules.md"
+      },
+      "element": {
+        "required": "label",
+        "input": "input[type=\"checkbox\"]",
+        "markup": "<label class=\"bmb-checkbox\"><input type=\"checkbox\" class=\"bmb-checkbox__input\"> <span class=\"bmb-checkbox__label\">Rótulo</span></label>",
+        "forbidden": [
+          "div",
+          "span",
+          "button"
+        ],
+        "forbiddenAttributes": [
+          "role=\"switch\"",
+          "aria-pressed",
+          "role=\"checkbox\" num elemento que não é input"
+        ],
+        "why": "A semântica, o teclado (Espaço alterna) e o envio no formulário vêm do <input type=\"checkbox\"> nativo. O <label> que o envolve faz o rótulo inteiro ser área clicável. Trocar o input por <div> ou <span> perde as três coisas; role=\"switch\" transformaria a caixa em interruptor, que é outro componente."
+      },
+      "baseClass": "bmb-checkbox",
+      "parts": {
+        "input": "bmb-checkbox__input",
+        "label": "bmb-checkbox__label"
+      },
+      "variants": {
+        "tone": {
+          "required": false,
+          "default": "neutral",
+          "defaultBehaviour": "sem classe de tom o Checkbox renderiza como neutral — o default vem do Figma e está em :where(.bmb-checkbox), com especificidade zero",
+          "classPrefix": "bmb-checkbox--",
+          "values": [
+            "neutral",
+            "brand",
+            "invert"
+          ],
+          "figmaNames": {
+            "neutral": "neutral",
+            "brand": "brand",
+            "invert": "invert"
+          },
+          "meaning": {
+            "neutral": "padrão, para formulários e listas comuns",
+            "brand": "só quando a escolha precisa remeter à marca",
+            "invert": "só sobre o painel da marca (surface-brand); valor transitório, até invert virar modo de superfície"
+          }
+        },
+        "size": {
+          "required": false,
+          "default": "md",
+          "defaultBehaviour": "sem classe de tamanho o Checkbox renderiza como md — ver a divergência sobre o default em openDivergences",
+          "classPrefix": "bmb-checkbox--",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "figmaNames": {
+            "sm": "sm",
+            "md": "md",
+            "lg": "lg"
+          },
+          "figmaAxisLocation": "No Figma o eixo size não fica no set Checkbox: fica na instância aninhada .Master Checkbox. Em CSS os dois eixos viram classes irmãs."
+        }
+      },
+      "checked": {
+        "values": [
+          "false",
+          "true",
+          "indeterminate"
+        ],
+        "figmaProperty": "checked (VARIANT de três valores no set)",
+        "howToApply": {
+          "false": "input sem o atributo checked",
+          "true": "atributo checked no input, ou input.checked = true",
+          "indeterminate": "input.indeterminate = true por script — não existe atributo HTML. A pseudo-classe é :indeterminate."
+        },
+        "indeterminateRule": "Só para o controle pai de um grupo parcialmente marcado, como o 'selecionar todos' de Table e List. Nunca como terceiro estado de negócio ('talvez', 'parcial'). Clicar num pai indeterminado marca todos os filhos."
+      },
+      "states": {
+        "default": "repouso — o <input> sem pseudo-classe",
+        "hover": ":hover no <label> — a borda passa de 1px por dentro para 2px centralizada (sombra externa de 1px). Nenhuma cor muda. Não é classe nem prop.",
+        "focus": {
+          "selector": ".bmb-checkbox:has(.bmb-checkbox__input:focus-visible)",
+          "ring": "outline de 2px, outline-offset 2px, no <label> — envolve caixa + rótulo e não muda o tamanho do componente",
+          "token": "--_bmb-checkbox-ring: border-base-focus-alt em neutral e brand; on-surface-subtle-brand em invert"
+        },
+        "disabled": {
+          "requiredMarkup": "atributo disabled nativo no <input>",
+          "style": "opacidade 0.4 no <label> inteiro, mantendo a cor do tom; sem hover e sem foco",
+          "token": "nenhum — DS-037"
+        }
+      },
+      "notSupported": {
+        "selected": "não existe. A seleção se chama checked (decisão D2).",
+        "active": "não existe no Figma.",
+        "stateClasses": "Não há bmb-checkbox--hover, --focus, --disabled nem --checked. Estado vem do input nativo.",
+        "showCopy": "O booleano Show copy do master não vira classe (DS-049): o rótulo é conteúdo, e a presença do texto é o mecanismo. Sem rótulo visível, aria-label no input é obrigatório.",
+        "diagonalGlyph": "O traço diagonal oculto (Icon 1840:3860, 1840:3388, 1840:3426) é uma camada escondida do master. Não é implementado."
+      },
+      "accessibility": {
+        "keyboard": "Espaço alterna. Tab entra e sai de cada caixa individualmente — não é grupo com setas.",
+        "label": "O <label> envolve o input e o rótulo: a área clicável inclui o texto. Sem rótulo visível, aria-label no input.",
+        "group": "Grupo de checkboxes com título: <fieldset> + <legend>.",
+        "stateNotColorOnly": "Marcado e indeterminado se distinguem pelo glifo, não só pela cor da caixa. No invert a caixa marcada tem o mesmo fundo da desmarcada — só o glifo muda.",
+        "indeterminate": "Com o input nativo, o leitor de tela anuncia 'misto' a partir de input.indeterminate. aria-checked=\"mixed\" só se aplica a quem usar role=\"checkbox\", o que este pacote não faz.",
+        "focusRing": "outline de 2px com offset de 2px no <label>. Nunca outline: none — a validação reprova.",
+        "forcedColors": "@media (forced-colors: active) mantém borda e glifo em CanvasText e o anel em Highlight.",
+        "keepCheckedBorder": "No brand marcado, o preenchimento primary-default fica abaixo de 3:1 contra a página no modo escuro. Quem delimita o controle é a borda on-surface-primary. A borda do controle marcado NÃO pode ser removida.",
+        "notVerified": "Nada disto foi exercitado em navegador, teclado ou leitor de tela. O contraste citado nas regras foi medido no Figma (especificação) e recalculado a partir de dist/brands.css, não no navegador."
+      },
+      "tokens": {
+        "radius": "--bmb-radius-sm na caixa (4px no Desktop, 2px abaixo de 1024px) — o border-radius-sm do Figma",
+        "typography": "--bmb-font-family-body, --bmb-font-weight-regular, --bmb-font-size-paragraph-{small,medium,large}, --bmb-line-height-130",
+        "noHardcodedColor": "Nenhum hex pode aparecer em dist/checkbox.css, nem como fallback. A validação reprova.",
+        "perTone": {
+          "neutral": {
+            "bg": "--bmb-color-base-backgrounds-base-default",
+            "bgChecked": "--bmb-color-base-backgrounds-base-default-alt",
+            "glyph": "--bmb-color-base-on-on-surface-base-alt",
+            "border": "--bmb-color-base-on-on-surface-base",
+            "label": "--bmb-color-base-on-on-surface-base",
+            "ring": "--bmb-color-base-borders-border-base-focus-alt"
+          },
+          "brand": {
+            "bg": "--bmb-color-primary-on-on-primary",
+            "bgChecked": "--bmb-color-primary-backgrounds-primary-default",
+            "glyph": "--bmb-color-primary-on-on-primary",
+            "border": "--bmb-color-primary-on-on-surface-primary",
+            "label": "--bmb-color-primary-on-on-surface-primary",
+            "ring": "--bmb-color-base-borders-border-base-focus-alt"
+          },
+          "invert": {
+            "bg": "--bmb-color-surface-brand-backgrounds-surface-brand",
+            "bgChecked": "--bmb-color-surface-brand-backgrounds-surface-brand",
+            "glyph": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+            "border": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+            "label": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+            "ring": "--bmb-color-surface-brand-on-on-surface-subtle-brand"
+          }
+        },
+        "onColorIsNotConstant": "on-* e base-default mudam por marca e tema: on-primary é #000000 em bne-cia/dark, base-default é #000000 em employer/dark. Nunca cravar a cor."
+      },
+      "globalTheme": {
+        "brands": [
+          "employer",
+          "epays",
+          "bne-cia"
+        ],
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "howToSwitch": "atributos data-brand e data-theme no <html>"
+      },
+      "openDivergences": [
+        "DS-053: no brand desmarcado, o fundo da caixa é on-primary, um token de texto usado como fundo. Implementado como o Figma mostra.",
+        "Default de size: a propriedade do .Master Checkbox diz sm; as 36 variantes públicas instanciam md e a especificação diz md. Implementado md.",
+        "Glifo check do sm: 5,09 × 3,5 em (4, 5) numa caixa de 14 — fora do centro e proporcionalmente menor que no md e no lg. Implementado como medido.",
+        "Rótulo: o Figma aplica leading-trim CAP_HEIGHT; o CSS não implementa (suporte parcial a text-box-trim).",
+        "Contraste: os números da especificação (Figma) e os recalculados a partir de dist/brands.css não coincidem. Ver src/checkbox.rules.md."
+      ],
+      "generatedFiles": [
+        "dist/checkbox.css",
+        "dist/checkbox.preview.css",
+        "dist/checkbox.tokens.js"
+      ]
+    },
+    "regras": "# Checkbox\n\nFonte de verdade: o componente **Checkbox** em **04. CORE-Basics (Audit)**\n`BWdzK06j2tX1Dt62ZSxNR1`, página **✅ 08. Controls** `827:887` — component set `1451:1360`\n(`tone` × `state` × `checked`, 36 variantes) e `.Master Checkbox` `1451:1285` (`size`, 3\nvariantes, privado).\n\nDados lidos **ao vivo** do Figma via MCP em 24/09/2026, com `skipInvisibleInstanceChildren =\nfalse`: descrição do set, das 36 variantes e do master; variáveis ligadas a cada camada,\nincluindo a opacidade; geometria medida nos nós; path dos glifos. Junto veio a especificação\n`checkbox.rules.md` recebida com a tarefa (conferida pelo design em 23/09/2026), reescrita\naqui no formato deste repositório. Nenhum valor foi inventado.\n\n## Checkbox vs os outros dois\n\n| | Checkbox | Radio | Switch |\n| --- | --- | --- | --- |\n| Para quê | opção **independente** | escolha **única** num grupo | configuração com **efeito imediato** |\n| Quando vale | ao **enviar** o formulário | ao enviar o formulário | **na hora**, sem confirmar |\n| Elemento | `<input type=\"checkbox\">` | `<input type=\"radio\">` em `<fieldset>` | `<input type=\"checkbox\" role=\"switch\">` |\n| Sozinho | pode | **nunca** — mínimo 2 | pode |\n| `indeterminate` | **sim**, só no pai de um grupo | não | não |\n| Hover | borda passa a 2px | borda passa a 2px | **nenhum** |\n| Teclado | Espaço; Tab por caixa | setas dentro do grupo; um Tab por grupo | Espaço |\n\nA pergunta que decide: **marcar esta opção muda alguma outra?** Se muda — marcar uma desmarca\nas outras —, é Radio. Se não muda, pergunte de novo: **o efeito acontece no clique, sem\nbotão de salvar?** Se acontece, é Switch. Se só vale quando a pessoa envia, é Checkbox.\n\n## Quando usar\n\n- Aceitar termos, marcar preferências que só valem ao salvar.\n- Listas de opções independentes: \"Quais canais você usa?\" com várias respostas possíveis.\n- O \"selecionar todos\" no cabeçalho de Table ou List — é o único uso do `indeterminate`.\n\n## Quando não usar\n\n- Escolha única entre opções → Radio.\n- Ligar ou desligar algo com efeito imediato (\"Notificações\", \"Modo escuro\") → Switch.\n- Terceiro estado de negócio (\"talvez\", \"parcial\") → não existe; o `indeterminate` é só do pai.\n- Disparar efeito colateral no clique → Switch ou Button.\n\n## Anatomia\n\n`[ caixa ] [ rótulo ]` — `<label>` flex horizontal, alinhado ao centro, `gap: 8px`.\n\n```html\n<label class=\"bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md\">\n    <input type=\"checkbox\" class=\"bmb-checkbox__input\" name=\"termos\">\n    <span class=\"bmb-checkbox__label\">Aceito os termos</span>\n</label>\n```\n\n- O `<label>` é o componente e recebe tom e tamanho. Ele envolve o input, então o rótulo\n  inteiro é área clicável.\n- O `<input type=\"checkbox\">` é **nativo**, com `appearance: none`. Não troque por `<div>` ou\n  `<span>`: a semântica, o teclado e o envio no formulário vêm dele.\n- O glifo é desenho do componente, não slot: é o `::before` do input, com o path medido no\n  Figma.\n\n## Props\n\n| Prop | Valores | Default | Onde mora no Figma |\n| --- | --- | --- | --- |\n| `tone` | `neutral` · `brand` · `invert` | `neutral` | set `Checkbox` |\n| `size` | `sm` · `md` · `lg` | `md` | `.Master Checkbox` aninhado |\n| `checked` | `false` · `true` · `indeterminate` | `false` | set `Checkbox` |\n| `state=disabled` | atributo `disabled` no input | — | set `Checkbox` |\n| `state=hover` / `focus` | — (pseudo-classe) | — | set `Checkbox` |\n| rótulo | conteúdo do `<span class=\"bmb-checkbox__label\">` | — | `Text` no master |\n\nEm CSS, `tone` e `size` viram **classes irmãs** (`bmb-checkbox--brand bmb-checkbox--lg`),\ncomo no Dot. `checked`, `hover`, `focus` e `disabled` **não são classes**: vêm do input\nnativo.\n\nSão **3 tons**, não os 13 temas do Button nem os 9 do Hyperlink. O eixo se chama `tone`, não\n`theme`. Não copie a escala do Button.\n\n## Cor\n\nA cor vem dos tokens semânticos e muda com `data-brand` e `data-theme`. O mapeamento\ntom → token está em `../scripts/build-checkbox-css.mjs`.\n\n| Tom | Caixa desmarcada | Caixa marcada | Glifo | Borda | Rótulo | Anel |\n| --- | --- | --- | --- | --- | --- | --- |\n| `neutral` | `base-default` | `base-default-alt` | `on-surface-base-alt` | `on-surface-base` | `on-surface-base` | `border-base-focus-alt` |\n| `brand` | `on-primary` ⚠️ DS-053 | `primary-default` | `on-primary` | `on-surface-primary` | `on-surface-primary` | `border-base-focus-alt` |\n| `invert` | `surface-brand` | `surface-brand` | `on-surface-neutral-brand` | `on-surface-neutral-brand` | `on-surface-neutral-brand` | `on-surface-subtle-brand` |\n\nTodos com o prefixo `--bmb-color-` e o grupo do token (por exemplo\n`--bmb-color-base-on-on-surface-base`). Os nomes completos estão no contrato, em\n`tokens.perTone`.\n\n**Zero tokens novos.** Os 11 tokens distintos que as 36 variantes ligam foram conferidos um a\num contra `../dist/brands.css`: todos já existiam, com 6 definições cada (3 marcas × 2\nmodos). Em Employer claro e escuro — os dois modos que o arquivo do Figma expõe — o valor\nresolvido é o mesmo que o Figma reporta.\n\n**A cor não muda por estado.** Hover só engrossa a borda, focus acrescenta o anel e disabled\naplica opacidade. Conferido nas 36 variantes.\n\n### `on-*` e `base-default` não são constantes\n\n| | employer | epays | bne-cia |\n| --- | --- | --- | --- |\n| `on-primary` (dark) | `#fafafa` | `#fafafa` | **`#000000`** |\n| `base-default` (dark) | **`#000000`** | `#0e141c` | `#0e1c13` |\n| `on-surface-primary` (dark) | `#a5b3d5` | `#90a1de` | `#7bffde` |\n\nResolva sempre pelo token. Nenhum hex é escrito em `dist/checkbox.css`, nem como fallback; a\nvalidação reprova se aparecer.\n\n## Estados\n\n| Estado | Como acontece | O que muda |\n| --- | --- | --- |\n| default | input em repouso | — |\n| hover | `:hover` no `<label>` | borda de 1px por dentro → 2px centralizada; nenhuma cor muda |\n| focus | `:focus-visible` no input | anel de 2px com folga de 2px em volta de caixa + rótulo |\n| disabled | atributo `disabled` no input | opacidade 0,4 no controle inteiro, sem hover e sem foco |\n| checked | `:checked` | fundo da caixa marcada + glifo `check` |\n| indeterminate | `:indeterminate` (`input.indeterminate = true`) | fundo da caixa marcada + traço horizontal |\n\n`indeterminate` **não tem atributo HTML**: é definido por script. Existe só para o pai de um\ngrupo parcialmente marcado. Clicar nele marca todos os filhos.\n\n## Geometria\n\nMedida nos nós do `.Master Checkbox`, não nos valores declarados.\n\n| | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Caixa | 14 | 16 | 18 |\n| Glifo `check` (L × A) | 5,09 × 3,5 | 8 × 5,5 | 9 × 6,19 |\n| Posição do `check` | 4, 5 | 4, 5 | 4,5, 5,625 |\n| Traço do `indeterminate` | 6 | 8 | 10 |\n| Posição do traço | 4, 7 | 4, 8 | 4, 9 |\n\n- Traço dos dois glifos: **1,6666px**. `check` com ponta e junção arredondadas;\n  `indeterminate` com ponta arredondada.\n- Borda: 1px por dentro. No hover, 2px centralizada.\n- Raio da caixa: `--bmb-radius-sm` — o mesmo `border-radius-sm` que o Figma liga (4px no\n  Desktop, 2px abaixo de 1024px).\n- Distância caixa ↔ rótulo: 8px.\n\nA conta é verificada no build: o traço do `indeterminate` é centrado nos dois eixos\n(`x + w + x = caixa`, `y × 2 = caixa`) e o `check` precisa caber na caixa com meia espessura\nde folga. Se alguém mexer em `checkbox.tokens.json` e a conta deixar de fechar, o gerador\nquebra com o nome do tamanho.\n\n## Anel de foco\n\n- `outline: 2px solid var(--_bmb-checkbox-ring)` com `outline-offset: 2px`, no `<label>`,\n  a partir do `:focus-visible` do input, via `:has()`. O anel envolve caixa + rótulo.\n- Token: `border-base-focus-alt` em `neutral` e `brand`; `on-surface-subtle-brand` em\n  `invert`.\n- **Não** é `border-{tom}-focus`: `border-base-focus` e `border-primary-focus` reprovam 3:1\n  (DS-046/047). Decisão fechada, não é lacuna.\n- **O foco não muda o tamanho do componente.** `outline` não ocupa espaço. Nunca `border`,\n  `padding` ou `box-shadow` no foco.\n- Raio: no Figma o anel é um retângulo em −4px, com traço de 2px por dentro e\n  `border-radius-md` na borda externa. O `<label>` recebe\n  `calc(var(--bmb-radius-md) - 4px)`, e a borda externa do outline dá 8px no Desktop e 4px\n  abaixo de 1024px, como no Figma.\n\n## Tipografia\n\n| | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Estilo do Figma | `Paragraph/Small/Regular` | `Paragraph/Medium/Regular` | `Paragraph/Large/Regular` |\n| Token | `--bmb-font-size-paragraph-small` | `--bmb-font-size-paragraph-medium` | `--bmb-font-size-paragraph-large` |\n\nFamília `--bmb-font-family-body`, peso `--bmb-font-weight-regular`, entrelinha\n`--bmb-line-height-130` (130% no Figma). Nenhum px de fonte é cravado: os tokens\n`paragraph-*` encolhem abaixo de 1024px, como no Button e no Hyperlink.\n\n## Desvios do Figma (autorizados)\n\n**1. Hover por sombra externa, não por borda de 2px.** No Figma a borda passa a 2px\ncentralizada, ou seja, 1px a mais para fora. Em CSS, trocar `border-width` mudaria a caixa e\nempurraria o rótulo. A borda fica em 1px e uma `box-shadow: 0 0 0 1px` na cor da borda\nacrescenta o pixel de fora — o desenho é o mesmo e a caixa não muda.\n\n**2. Anel por `outline` no `<label>`, não por retângulo.** O Figma desenha o anel como um\nretângulo absoluto em −4px. `outline` com `outline-offset: 2px` reproduz a folga e a espessura\nsem ocupar espaço.\n\n**3. Anel nativo do input transparente.** O navegador desenharia um segundo anel em volta da\ncaixa. Ele é neutralizado com `outline: 2px solid transparent`, não com `outline: none`, que a\nvalidação proíbe. Efeito colateral: em cores forçadas o sistema pinta esse outline, e aparecem\ndois anéis concêntricos — ambos visíveis.\n\n**4. Glifo por máscara SVG.** O glifo é o `::before` do input, recortado por uma máscara com o\npath do Figma e pintado pelo token do tom. A máscara só recorta; a cor não está nela.\nRisco: `::before` num `<input>` com `appearance: none` funciona em Chromium, Firefox e WebKit,\nmas não é garantido pela especificação do HTML. Não foi testado em navegador.\n\n**5. Defaults em `:where()`.** O Figma define `tone=neutral` e as variantes públicas usam\n`size=md`. `.bmb-checkbox` sozinho renderiza exatamente isso, com especificidade zero, como no\nDot.\n\n**6. Cores forçadas — acréscimo.** O sistema substitui fundo e borda, e um glifo pintado por\n`background-color` sumiria. O glifo sai do ajuste automático e fica em `CanvasText`; a borda\nem `CanvasText` e o anel em `Highlight`.\n\n## Acessibilidade\n\n- `<input type=\"checkbox\">` nativo dentro de `<label>`. Sem rótulo visível, `aria-label` no\n  input é obrigatório.\n- Espaço alterna. Tab entra e sai de cada caixa — não é grupo com setas.\n- Grupo com título: `<fieldset>` + `<legend>`.\n- **Estado nunca só pela cor:** marcado e indeterminado se distinguem pelo glifo. No `invert` a\n  caixa marcada tem o mesmo fundo da desmarcada, e só o glifo muda.\n- `indeterminate`: com o input nativo, o leitor de tela anuncia o estado misto a partir de\n  `input.indeterminate`. `aria-checked=\"mixed\"` só se aplica a `role=\"checkbox\"`, que este\n  pacote não usa.\n- Proibido: `role=\"switch\"` (é outro componente) e `aria-pressed` (é botão de alternância).\n- Disabled: atributo `disabled` nativo. Ele já tira do Tab.\n- **A borda do controle marcado não pode ser removida.** No `brand` marcado, o preenchimento\n  `primary-default` fica abaixo de 3:1 contra a página no modo escuro; quem delimita o controle\n  é a borda `on-surface-primary`.\n\n### Contraste\n\n**Medido no Figma** (especificação recebida, 23/09/2026, 3 marcas × 2 temas): borda e rótulo\n≥ 4,5:1 nos três tons; `on-surface-primary` ≥ 6,04; anel ≥ 3:1 — pior 3,78 com\n`border-base-focus-alt` e 3,22 com `on-surface-subtle-brand` sobre o navy; `brand` marcado\nabaixo de 3:1 no Dark (Employer 2,81, Epays 1,45).\n\n**Recalculado a partir de `dist/brands.css`** (24/09/2026, fórmula da WCAG, contra\n`base-default` e, no `invert`, contra `surface-brand`): borda `neutral` ≥ 15,82; borda e\nrótulo `brand` ≥ 7,34; borda e rótulo `invert` ≥ 14,52; glifo sobre a caixa marcada ≥ 5,17;\nanel `border-base-focus-alt` ≥ 6,49; anel `on-surface-subtle-brand` ≥ 3,48; `brand` marcado\n2,45 em epays/dark e 3,90 em employer/dark.\n\nNenhum dos dois conjuntos foi medido no navegador. Eles não coincidem — ver \"Divergências\nabertas\".\n\n## Divergências abertas\n\nRegistradas, não resolvidas por conta própria. `AGENTS.md` pede que uma diferença entre Figma,\naudit e especificação seja exposta com a fonte de cada versão, em vez de escolhida em silêncio.\n\n### 1. DS-053 — token de texto como fundo\n\n| Fonte | Diz |\n| --- | --- |\n| Figma, `tone=brand, checked=false` (as 4 variantes) | fundo da caixa = `on-primary` |\n| Especificação recebida | `on-primary`, com o aviso ⚠️ DS-053 |\n\n`on-primary` é um token de **texto** usado como fundo. **Implementado** como o Figma mostra.\n**Como fechar:** decidir no `01. CORE-Brands` se existe um fundo de controle da marca; se\nexistir, trocar `TONS.brand.bg` em `scripts/build-checkbox-css.mjs`.\n\n### 2. O default de `size`\n\n| Fonte | Diz |\n| --- | --- |\n| Propriedade `size` do `.Master Checkbox` 1451:1285 | default **`sm`** |\n| As 36 variantes públicas do set 1451:1360 | todas instanciam **`md`** |\n| Especificação recebida | **`md`** |\n\n**Implementado:** `md`. **Como fechar:** trocar o default da propriedade do master para `md`,\nou decidir que é `sm` e mudar `defaults.size` em `src/checkbox.tokens.json`.\n\n### 3. O glifo `check` do `sm`\n\n| Tamanho | Caixa | `check` | Centro do `check` | Centro da caixa |\n| --- | --- | --- | --- | --- |\n| `sm` | 14 | 5,09 × 3,5 em (4, 5) | 6,55, 6,75 | 7, 7 |\n| `md` | 16 | 8 × 5,5 em (4, 5) | 8, 7,75 | 8, 8 |\n| `lg` | 18 | 9 × 6,19 em (4,5, 5,625) | 9, 8,72 | 9, 9 |\n\nNo `sm` o glifo está deslocado meio pixel para a esquerda e para cima, e é proporcionalmente\nmenor (36% da caixa, contra 50% no `md` e no `lg`). Parece que o glifo foi reduzido sem ser\nrecentrado. **Implementado** como medido. **Como fechar:** o design confirma ou corrige o\n`check` do `sm` no `.Master Checkbox`.\n\n### 4. O `leading-trim` do rótulo\n\nO texto do master usa `leading-trim: CAP_HEIGHT`. O CSS não implementa: `text-box-trim` ainda\ntem suporte parcial nos navegadores. A entrelinha de 130% está implementada.\n\n### 5. Contraste: especificação × `brands.css`\n\nOs números da especificação e os recalculados a partir de `dist/brands.css` (seção\n\"Contraste\") não coincidem — por exemplo, o pior anel `border-base-focus-alt` é 3,78 num e\n6,49 no outro, e o `brand` marcado em epays/dark é 1,45 num e 2,45 no outro. A superfície de\nreferência da medição do Figma não está registrada. Os dois conjuntos concordam no que\nimporta: tudo passa, exceto o preenchimento `brand` marcado no escuro, e é por isso que a borda\nfica.\n\n### 6. `on-surface-primary` na bne-cia/dark\n\nA especificação recebida diz que `on-surface-primary` é `#00F4B7` na bne-cia/dark.\n`dist/brands.css` resolve para `#7bffde`; `#00f4b7` é o `primary-default` dessa marca e modo.\nNão afeta o CSS (a cor sai do token), só o texto da especificação.\n\n## Decisões registradas (não são lacunas)\n\n- **D0 — `tone`, não `theme`.** Três valores: `neutral`, `brand`, `invert`. `invert` só sobre o\n  painel da marca (`surface-brand`).\n- **D1 — disabled sem token.** Mesma cor do tom em repouso, opacidade 0,4 no controle inteiro\n  (DS-037).\n- **D2 — `checked`, não `selected`.**\n- **D3 — `size` no master.** Em CSS, classe irmã, como no Dot.\n- **D4 — `indeterminate` só no Checkbox.**\n- **D5 — anel `border-base-focus-alt`.** Não `border-{tom}-focus` (DS-046/047).\n- **D6 — o foco não muda o tamanho.** `outline` + `outline-offset`, nunca `border`, `padding`\n  ou `box-shadow`.\n- **DS-049 — sem classe para o rótulo.** O master tem o booleano `Show copy`; em código o\n  rótulo é conteúdo e a presença do texto é o mecanismo. Não existe `--show-label`.\n- **Traço diagonal oculto não é implementado.** As camadas `Icon` `1840:3860`, `1840:3388` e\n  `1840:3426` do `.Master Checkbox` estão escondidas nas três variantes de tamanho.\n- **O rótulo não recebe `user-select: none`.** Selecionar o texto de um rótulo é comportamento\n  do navegador, e o componente não decide isso.\n",
+    "origem": {
+      "contrato": "src/checkbox.contract.json",
+      "regras": "src/checkbox.rules.md"
+    }
   }
 };

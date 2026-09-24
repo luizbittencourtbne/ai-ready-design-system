@@ -38,6 +38,19 @@
       "css": "dist/dot.css",
       "browserCss": "dist/dot.preview.css",
       "demo": "demo/dot.html"
+    },
+    {
+      "id": "checkbox",
+      "name": "Checkbox",
+      "status": "experimental",
+      "purpose": "opção independente: o valor vale no envio (escolha única é o Radio, efeito imediato é o Switch)",
+      "element": "label > input[type=checkbox]",
+      "contract": "src/checkbox.contract.json",
+      "rules": "src/checkbox.rules.md",
+      "tokens": "src/checkbox.tokens.json",
+      "css": "dist/checkbox.css",
+      "browserCss": "dist/checkbox.preview.css",
+      "demo": "demo/checkbox.html"
     }
   ]
 }
