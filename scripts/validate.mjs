@@ -382,7 +382,7 @@ function ocorrencias(html, base) {
         if (!m[2].split(/\s+/).includes(base)) continue;
         const tag = m[1].toLowerCase();
         const fim = tag === 'label' ? html.indexOf('</label>', m.index) : m.index + m[0].length;
-        out.push({ tag, abertura: m[0], interno: html.slice(m.index + m[0].length, fim < 0 ? html.length : fim) });
+        out.push({ tag, pos: m.index, abertura: m[0], interno: html.slice(m.index + m[0].length, fim < 0 ? html.length : fim) });
     }
     return out;
 }
@@ -537,6 +537,60 @@ if (cbItem) {
     }
 }
 
+/* ---- Radio -------------------------------------------------------------------------
+ * Escolha única. Sem indeterminate (D4), e nunca sozinho: o comportamento de grupo — um valor,
+ * um ponto de Tab, setas — vem do mesmo `name` dentro de um <fieldset>. A especificação põe
+ * tone e size no RadioGroup; aqui, sem RadioGroup, a regra é: iguais em todo o <fieldset>. */
+const rdItem = (manifest.components ?? []).find((item) => item.id === 'radio');
+let rd = null;
+if (rdItem) {
+    rd = validarControle(rdItem, {
+        global: 'BMB_RADIO_TOKENS',
+        inputType: 'radio',
+        inputContrato: 'input[type="radio"]',
+        papeis: ['border', 'fill', 'dot', 'label', 'ring'],
+    });
+    const { notSupported, ...semAusencias } = rd.contrato;
+    check(!/indeterminate/i.test(JSON.stringify(semAusencias)) && !/indeterminate/i.test(rd.limpo) &&
+        !(rd.fonte.checkedOrder ?? []).includes('indeterminate'),
+        'Radio: não existe indeterminate no Radio (D4) — o CSS, o contrato e os tokens não podem ter.');
+    check(same(rd.contrato.checked?.values ?? [], rd.fonte.checkedOrder ?? []),
+        'Radio: checked do contrato difere de radio.tokens.json.');
+    check(regrasDe(rd.css).some((r) => r.sel.includes(':checked')), 'Radio: falta a regra de :checked.');
+    for (const nome of rd.fonte.sizeOrder) {
+        const z = rd.fonte.sizes[nome];
+        check(Math.abs(z.dotAt * 2 + z.dot - z.box) < 1e-9,
+            `Radio: o ponto de ${nome} não está centrado no círculo de ${z.box}.`);
+        check(blocoDe(rd.css, `.bmb-radio--${nome} {`).includes(`--_bmb-radio-dot-size: ${z.dot}px;`),
+            `Radio: tamanho ${nome} sem ponto de ${z.dot}px.`);
+    }
+
+    // Grupos da demo: todo radio dentro de um <fieldset> com <legend>, 2+ itens, mesmo name,
+    // mesmo tom e mesmo tamanho.
+    const grupos = [...rd.demo.matchAll(/<fieldset\b[^>]*>([\s\S]*?)<\/fieldset>/g)]
+        .map((m) => ({ ini: m.index, fim: m.index + m[0].length, html: m[1] }));
+    for (const o of rd.achados) {
+        check(grupos.some((g) => o.pos > g.ini && o.pos < g.fim),
+            `Radio: ${o.abertura.slice(0, 60)}… está fora de um <fieldset> — Radio nunca fica sozinho.`);
+    }
+    const eixo = (classes, valores) => classes.split(/\s+/).filter((c) => valores.some((v) => c === `bmb-radio--${v}`)).join(' ');
+    for (const g of grupos) {
+        const itens = ocorrencias(g.html, 'bmb-radio');
+        if (!itens.length) continue;
+        const rotulo = (g.html.match(/<legend[^>]*>([\s\S]*?)<\/legend>/) ?? [])[1] ?? '';
+        const qual = rotulo.replace(/<[^>]*>/g, '').trim() || '(sem legend)';
+        check(/<legend\b/.test(g.html) && qual !== '(sem legend)', 'Radio: grupo sem <legend> — o grupo precisa de nome.');
+        check(itens.length >= 2, `Radio: o grupo "${qual}" tem ${itens.length} radio — o mínimo é 2.`);
+        const nomes = new Set(itens.map((o) => (o.interno.match(/\bname="([^"]*)"/) ?? [])[1] ?? ''));
+        check(nomes.size === 1 && !nomes.has(''), `Radio: o grupo "${qual}" tem name diferente entre os itens (ou sem name).`);
+        const classesDe = (o) => (o.abertura.match(/class="([^"]*)"/) ?? [])[1] ?? '';
+        const tons = new Set(itens.map((o) => eixo(classesDe(o), rd.fonte.toneOrder)));
+        const tams = new Set(itens.map((o) => eixo(classesDe(o), rd.fonte.sizeOrder)));
+        check(tons.size === 1, `Radio: o grupo "${qual}" mistura tons — o tom é do grupo inteiro.`);
+        check(tams.size === 1, `Radio: o grupo "${qual}" mistura tamanhos — o tamanho é do grupo inteiro.`);
+    }
+}
+
 /* Devolve o texto visível do elemento que CONTÉM a posição `i`. Não é um parser de HTML: é uma
  * varredura de profundidade, suficiente para o HTML bem formado das demos deste repositório.
  * Existe porque a regra mais importante do Dot — nunca ser a única fonte da informação — é
@@ -642,7 +696,7 @@ if (dContract) {
     partes.push(`Dot ${dContract.variants.tone.values.length} tons/` +
         `${dContract.variants.size.values.length} tamanhos/0 estados`);
 }
-const controles = [cb].filter(Boolean);
+const controles = [cb, rd].filter(Boolean);
 for (const k of controles) {
     partes.push(`${k.contrato.component} ${k.contrato.variants.tone.values.length} tons/` +
         `${k.contrato.variants.size.values.length} tamanhos/${Object.keys(k.contrato.states).length} estados`);

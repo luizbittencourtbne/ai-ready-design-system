@@ -51,6 +51,19 @@
       "css": "dist/checkbox.css",
       "browserCss": "dist/checkbox.preview.css",
       "demo": "demo/checkbox.html"
+    },
+    {
+      "id": "radio",
+      "name": "Radio",
+      "status": "experimental",
+      "purpose": "escolha única dentro de um grupo de 2+ (opções independentes são o Checkbox, efeito imediato é o Switch)",
+      "element": "fieldset > label > input[type=radio]",
+      "contract": "src/radio.contract.json",
+      "rules": "src/radio.rules.md",
+      "tokens": "src/radio.tokens.json",
+      "css": "dist/radio.css",
+      "browserCss": "dist/radio.preview.css",
+      "demo": "demo/radio.html"
     }
   ]
 }

@@ -685,5 +685,190 @@ window.BMB_DOCS = {
       "contrato": "src/checkbox.contract.json",
       "regras": "src/checkbox.rules.md"
     }
+  },
+  "radio": {
+    "contrato": {
+      "component": "Radio",
+      "version": "experimental",
+      "purpose": "escolha única dentro de um grupo: marcar uma opção desmarca as outras, e o valor só vale quando o formulário é enviado",
+      "notTheOthers": "Opções independentes são o Checkbox. Configuração com efeito imediato, sem confirmar, é o Switch. Ver src/radio.rules.md, 'Radio vs os outros dois'.",
+      "source": {
+        "figma": "04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1, página ✅ 08. Controls 827:887 — set Radio 1575:189 (tone × state × checked, 24 variantes) e .Master Radio 1575:175 (size). Lido ao vivo via MCP em 2026-09-24. No Figma existe só o item; o grupo é regra de código.",
+        "spec": "radio.rules.md recebido com a tarefa (conferido pelo design em 2026-09-23) — mapeamento variante↔prop (incluindo o RadioGroup), cores por tom e notas de acessibilidade. Reescrito em src/radio.rules.md.",
+        "geometry": "src/radio.tokens.json",
+        "toneMappings": "scripts/build-radio-css.mjs",
+        "brandColors": "audit/core-brands-audit.json",
+        "rules": "src/radio.rules.md"
+      },
+      "element": {
+        "required": "label",
+        "input": "input[type=\"radio\"]",
+        "group": "fieldset + legend",
+        "markup": "<fieldset><legend>Título</legend><label class=\"bmb-radio\"><input type=\"radio\" class=\"bmb-radio__input\" name=\"grupo\" value=\"a\"> <span class=\"bmb-radio__label\">A</span></label> … </fieldset>",
+        "forbidden": [
+          "div",
+          "span",
+          "button"
+        ],
+        "forbiddenAttributes": [
+          "aria-pressed",
+          "role=\"radio\" num elemento que não é input"
+        ],
+        "why": "O <input type=\"radio\"> nativo com o mesmo name dá o comportamento de grupo sem JavaScript: um único ponto de Tab, setas movendo foco e seleção, e só um valor enviado no formulário. O <fieldset> + <legend> dá o nome do grupo ao leitor de tela. Trocar o input por <div> perde tudo isso."
+      },
+      "baseClass": "bmb-radio",
+      "parts": {
+        "input": "bmb-radio__input",
+        "label": "bmb-radio__label"
+      },
+      "group": {
+        "minimum": 2,
+        "rule": "Sempre em grupo de duas ou mais opções, dentro do mesmo <fieldset>, com o mesmo name. Nunca um Radio sozinho.",
+        "uniformToneAndSize": "tone e size são iguais em todos os itens do mesmo grupo. A especificação descreve isso como prop do RadioGroup; este pacote é CSS, então a regra vira: todas as classes de tom e de tamanho iguais dentro do <fieldset>. A validação reprova uma demo que misture tons ou tamanhos no mesmo grupo.",
+        "noDeselect": "Um radio marcado não se desmarca com um novo clique. Se o produto precisa permitir 'nenhuma escolha', inclua uma opção explícita, como 'Nenhum'.",
+        "tooMany": "Com mais de ~6 opções, prefira Dropdown."
+      },
+      "variants": {
+        "tone": {
+          "required": false,
+          "default": "neutral",
+          "defaultBehaviour": "sem classe de tom o Radio renderiza como neutral — o default vem do Figma e está em :where(.bmb-radio), com especificidade zero",
+          "classPrefix": "bmb-radio--",
+          "values": [
+            "neutral",
+            "brand",
+            "invert"
+          ],
+          "figmaNames": {
+            "neutral": "neutral",
+            "brand": "brand",
+            "invert": "invert"
+          },
+          "meaning": {
+            "neutral": "padrão, para formulários e listas comuns",
+            "brand": "só quando a escolha precisa remeter à marca",
+            "invert": "só sobre o painel da marca (surface-brand); valor transitório, até invert virar modo de superfície"
+          }
+        },
+        "size": {
+          "required": false,
+          "default": "md",
+          "defaultBehaviour": "sem classe de tamanho o Radio renderiza como md — ver a divergência sobre o default em openDivergences",
+          "classPrefix": "bmb-radio--",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "figmaNames": {
+            "sm": "sm",
+            "md": "md",
+            "lg": "lg"
+          },
+          "figmaAxisLocation": "No Figma o eixo size não fica no set Radio: fica na instância aninhada .Master Radio. Em CSS os dois eixos viram classes irmãs."
+        }
+      },
+      "checked": {
+        "values": [
+          "false",
+          "true"
+        ],
+        "figmaProperty": "checked (VARIANT de dois valores no set)",
+        "howToApply": {
+          "false": "input sem o atributo checked",
+          "true": "atributo checked em UM input do grupo — o navegador desmarca os outros do mesmo name"
+        }
+      },
+      "states": {
+        "default": "repouso — o <input> sem pseudo-classe",
+        "hover": ":hover no <label> — a borda do círculo passa de 1px por dentro para 2px centralizada (sombra externa de 1px). Nenhuma cor muda. Não é classe nem prop.",
+        "focus": {
+          "selector": ".bmb-radio:has(.bmb-radio__input:focus-visible)",
+          "ring": "outline de 2px, outline-offset 2px, no <label> — envolve círculo + rótulo e não muda o tamanho do componente",
+          "token": "--_bmb-radio-ring: border-base-focus-alt em neutral e brand; on-surface-neutral-brand em invert (não o subtle, que já é a cor da borda)"
+        },
+        "disabled": {
+          "requiredMarkup": "atributo disabled nativo no <input> (ou no <fieldset>, para o grupo inteiro)",
+          "style": "opacidade 0.4 no <label> inteiro, mantendo a cor do tom; sem hover e sem foco",
+          "token": "nenhum — DS-037"
+        }
+      },
+      "notSupported": {
+        "indeterminate": "não existe no Radio (decisão D4). O CSS gerado não pode ter a pseudo-classe — a validação reprova.",
+        "single": "Radio sozinho não existe: o mínimo é 2 no grupo.",
+        "selected": "não existe. A seleção se chama checked (decisão D2).",
+        "stateClasses": "Não há bmb-radio--hover, --focus, --disabled nem --checked. Estado vem do input nativo.",
+        "radioGroupComponent": "Não há classe de grupo. O grupo é o <fieldset> nativo; tom e tamanho ficam iguais em todos os itens.",
+        "showCopy": "O booleano Show copy do master não vira classe (DS-049): o rótulo é conteúdo, e a presença do texto é o mecanismo."
+      },
+      "accessibility": {
+        "keyboard": "O grupo tem UM ponto de Tab — o item marcado, ou o primeiro se nenhum estiver. Setas movem foco e seleção. Tudo isso é nativo com o mesmo name; não implemente roving tabindex à mão.",
+        "label": "O <label> envolve o input e o rótulo: a área clicável inclui o texto.",
+        "group": "<fieldset> + <legend> dão o nome do grupo ao leitor de tela.",
+        "stateNotColorOnly": "Marcado se distingue pelo ponto, não só pelo preenchimento.",
+        "focusRing": "outline de 2px com offset de 2px no <label>. Nunca outline: none — a validação reprova.",
+        "forcedColors": "@media (forced-colors: active) mantém borda e ponto em CanvasText e o anel em Highlight.",
+        "keepCheckedBorder": "No brand marcado, o preenchimento primary-default fica abaixo de 3:1 contra a página no modo escuro. Quem delimita o controle é a borda. A borda do controle marcado NÃO pode ser removida.",
+        "notVerified": "Leitor de tela e alto contraste real não foram exercitados. O contraste citado nas regras foi medido no Figma (especificação) e recalculado a partir de dist/brands.css, não no navegador."
+      },
+      "tokens": {
+        "radius": "--bmb-radius-full no círculo e no ponto — o border-radius-full do Figma",
+        "typography": "--bmb-font-family-body, --bmb-font-weight-regular, --bmb-font-size-paragraph-{small,medium,large}, --bmb-line-height-130",
+        "noHardcodedColor": "Nenhum hex pode aparecer em dist/radio.css, nem como fallback. A validação reprova.",
+        "perTone": {
+          "neutral": {
+            "border": "--bmb-color-base-on-on-surface-base",
+            "fill": "--bmb-color-base-backgrounds-base-default-alt",
+            "dot": "--bmb-color-base-on-on-surface-base-alt",
+            "label": "--bmb-color-base-on-on-surface-base",
+            "ring": "--bmb-color-base-borders-border-base-focus-alt"
+          },
+          "brand": {
+            "border": "--bmb-color-primary-on-on-surface-primary",
+            "fill": "--bmb-color-primary-backgrounds-primary-default",
+            "dot": "--bmb-color-primary-on-on-primary",
+            "label": "--bmb-color-primary-on-on-surface-primary",
+            "ring": "--bmb-color-base-borders-border-base-focus-alt"
+          },
+          "invert": {
+            "border": "--bmb-color-surface-brand-on-on-surface-subtle-brand",
+            "fill": "--bmb-color-surface-brand-on-on-surface-subtle-brand",
+            "dot": "--bmb-color-surface-brand-backgrounds-background-brand",
+            "label": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+            "ring": "--bmb-color-surface-brand-on-on-surface-neutral-brand"
+          }
+        },
+        "onColorIsNotConstant": "on-* muda por marca e tema: on-primary é #000000 em bne-cia/dark. Nunca cravar a cor."
+      },
+      "globalTheme": {
+        "brands": [
+          "employer",
+          "epays",
+          "bne-cia"
+        ],
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "howToSwitch": "atributos data-brand e data-theme no <html>"
+      },
+      "openDivergences": [
+        "Default de size: a propriedade do .Master Radio diz sm; as 24 variantes públicas instanciam md e a especificação diz md. Implementado md.",
+        "Ponto: medido 4,375 / 5 / 5,625; a especificação arredonda para 4,4 / 5 / 5,6. Implementado o medido.",
+        "Gap: o Figma liga o gap do master à variável spacing-sm, que não existe em dist/brands.css. Implementado o literal 8px, sem token novo.",
+        "Rótulo: o Figma aplica leading-trim CAP_HEIGHT; o CSS não implementa.",
+        "Contraste: os números da especificação e os recalculados a partir de dist/brands.css não coincidem. Ver src/radio.rules.md."
+      ],
+      "generatedFiles": [
+        "dist/radio.css",
+        "dist/radio.preview.css",
+        "dist/radio.tokens.js"
+      ]
+    },
+    "regras": "# Radio\n\nFonte de verdade: o componente **Radio** em **04. CORE-Basics (Audit)**\n`BWdzK06j2tX1Dt62ZSxNR1`, página **✅ 08. Controls** `827:887` — component set `1575:189`\n(`tone` × `state` × `checked`, 24 variantes) e `.Master Radio` `1575:175` (`size`, 3\nvariantes, privado). No Figma existe **só o item**: o grupo é regra de código.\n\nDados lidos **ao vivo** do Figma via MCP em 24/09/2026, com `skipInvisibleInstanceChildren =\nfalse`: descrição do set, das 24 variantes e do master; variáveis ligadas a cada camada,\nincluindo a opacidade; geometria medida nos nós. Junto veio a especificação `radio.rules.md`\nrecebida com a tarefa (conferida pelo design em 23/09/2026), reescrita aqui no formato deste\nrepositório. Nenhum valor foi inventado.\n\n## Radio vs os outros dois\n\n| | Radio | Checkbox | Switch |\n| --- | --- | --- | --- |\n| Para quê | escolha **única** num grupo | opção **independente** | configuração com **efeito imediato** |\n| Quando vale | ao **enviar** o formulário | ao enviar o formulário | **na hora**, sem confirmar |\n| Elemento | `<input type=\"radio\">` em `<fieldset>` | `<input type=\"checkbox\">` | `<input type=\"checkbox\" role=\"switch\">` |\n| Sozinho | **nunca** — mínimo 2 | pode | pode |\n| `indeterminate` | **não** | sim, só no pai de um grupo | não |\n| Hover | borda passa a 2px | borda passa a 2px | **nenhum** |\n| Teclado | **um Tab por grupo**; setas movem a seleção | Espaço; Tab por caixa | Espaço |\n\nA pergunta que decide: **marcar esta opção desmarca as outras?** Se desmarca, é Radio. Se as\nopções convivem, é Checkbox. Se a escolha tem efeito imediato, sem botão de salvar, é Switch.\n\n## Quando usar\n\n- Escolha única entre 2 a ~6 opções visíveis ao mesmo tempo: \"Forma de pagamento\", \"Plano\".\n- Quando comparar as opções lado a lado ajuda a decidir.\n\n## Quando não usar\n\n- Uma opção só (\"Aceito os termos\") → Checkbox. Um Radio sozinho não se desmarca.\n- Opções independentes → Checkbox.\n- Mais de ~6 opções → Dropdown: radio longo empurra a decisão para baixo da dobra.\n- Efeito imediato → Switch.\n- Permitir \"nenhuma escolha\" desmarcando → não existe; inclua uma opção explícita \"Nenhum\".\n\n## Anatomia\n\n`[ círculo ] [ rótulo ]` por item — `<label>` flex horizontal, alinhado ao centro,\n`gap: 8px` —, sempre dentro de um grupo.\n\n```html\n<fieldset>\n    <legend>Forma de pagamento</legend>\n    <label class=\"bmb-radio bmb-radio--neutral bmb-radio--md\">\n        <input type=\"radio\" class=\"bmb-radio__input\" name=\"pagamento\" value=\"pix\" checked>\n        <span class=\"bmb-radio__label\">Pix</span>\n    </label>\n    <label class=\"bmb-radio bmb-radio--neutral bmb-radio--md\">\n        <input type=\"radio\" class=\"bmb-radio__input\" name=\"pagamento\" value=\"boleto\">\n        <span class=\"bmb-radio__label\">Boleto</span>\n    </label>\n</fieldset>\n```\n\n- O `<label>` é o componente e recebe tom e tamanho.\n- O `<input type=\"radio\">` é **nativo**, com `appearance: none`. O mesmo `name` em todos os\n  itens é o que dá o comportamento de grupo — um valor só, um ponto de Tab, setas.\n- O ponto é desenho do componente: o `::before` do input.\n\n## Props\n\n| Prop | Valores | Default | Onde mora |\n| --- | --- | --- | --- |\n| `tone` | `neutral` · `brand` · `invert` | `neutral` | set `Radio`; **igual em todo o grupo** |\n| `size` | `sm` · `md` · `lg` | `md` | `.Master Radio` aninhado; **igual em todo o grupo** |\n| `checked` | `false` · `true` | `false` | set `Radio`; em código, um input marcado por `name` |\n| `state=disabled` | atributo `disabled` no input ou no `<fieldset>` | — | set `Radio` |\n| `state=hover` / `focus` | — (pseudo-classe) | — | set `Radio` |\n| rótulo | conteúdo do `<span class=\"bmb-radio__label\">` | — | `Text` no master |\n| nome do grupo | `name` em todos os inputs + `<legend>` | obrigatório | — (regra de código) |\n\n### `tone` e `size` são do grupo\n\nA especificação recebida descreve `tone` e `size` como props do `RadioGroup`, herdadas pelos\nitens: opções do mesmo grupo não devem variar entre si. **Este pacote é CSS** e não tem\n`RadioGroup`. A regra vira: **todas as classes de tom e de tamanho iguais dentro do mesmo\n`<fieldset>`**. A validação reprova uma demo que misture tons ou tamanhos no mesmo grupo.\n\nSão **3 tons**, não os 13 temas do Button nem os 9 do Hyperlink. O eixo se chama `tone`.\n\n## Cor\n\nA cor vem dos tokens semânticos e muda com `data-brand` e `data-theme`. O mapeamento\ntom → token está em `../scripts/build-radio-css.mjs`.\n\n| Tom | Borda | Preenchimento marcado | Ponto | Rótulo | Anel |\n| --- | --- | --- | --- | --- | --- |\n| `neutral` | `on-surface-base` | `base-default-alt` | `on-surface-base-alt` | `on-surface-base` | `border-base-focus-alt` |\n| `brand` | `on-surface-primary` | `primary-default` | `on-primary` | `on-surface-primary` | `border-base-focus-alt` |\n| `invert` | `on-surface-subtle-brand` | `on-surface-subtle-brand` | `background-brand` | `on-surface-neutral-brand` | `on-surface-neutral-brand` |\n\n**Desmarcado não tem preenchimento:** o círculo mostra a superfície de trás. Conferido nas 12\nvariantes desmarcadas — a camada do círculo não tem fill.\n\n**Zero tokens novos.** Os 10 tokens distintos que as 24 variantes ligam foram conferidos um a\num contra `../dist/brands.css`: todos já existiam, com 6 definições cada. Em Employer claro e\nescuro, o valor resolvido é o mesmo que o Figma reporta.\n\n**A cor não muda por estado.** Conferido nas 24 variantes.\n\n`on-*` não é constante entre marcas e temas: `on-primary` é `#000000` em bne-cia/dark, e\n`on-surface-primary` é `#7bffde` ali. Resolva sempre pelo token; nenhum hex é escrito em\n`dist/radio.css`.\n\n## Estados\n\n| Estado | Como acontece | O que muda |\n| --- | --- | --- |\n| default | input em repouso | — |\n| hover | `:hover` no `<label>` | borda de 1px por dentro → 2px centralizada; nenhuma cor muda |\n| focus | `:focus-visible` no input | anel de 2px com folga de 2px em volta de círculo + rótulo |\n| disabled | atributo `disabled` no input (ou no `<fieldset>`) | opacidade 0,4 no controle inteiro, sem hover e sem foco |\n| checked | `:checked` | preenchimento + ponto |\n\n**Não existe `indeterminate` no Radio** (D4). Um radio marcado não se desmarca com um novo\nclique.\n\n## Geometria\n\nMedida nos nós do `.Master Radio`, não nos valores declarados.\n\n| | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Círculo | 14 | 16 | 18 |\n| Ponto | 4,375 | 5 | 5,625 |\n| Posição do ponto | 4,8125 | 5,5 | 6,1875 |\n\n- Borda: 1px por dentro. No hover, 2px centralizada.\n- Raio do círculo e do ponto: `--bmb-radius-full` — o mesmo `border-radius-full` do Figma.\n- Distância círculo ↔ rótulo: 8px.\n\nA conta é verificada no build: o ponto é centrado (`posição × 2 + ponto = círculo`) e precisa\ncaber dentro da borda. Se a conta deixar de fechar, o gerador quebra com o nome do tamanho.\n\n## Anel de foco\n\n- `outline: 2px solid var(--_bmb-radio-ring)` com `outline-offset: 2px`, no `<label>`, a\n  partir do `:focus-visible` do input, via `:has()`. O anel envolve círculo + rótulo.\n- Token: `border-base-focus-alt` em `neutral` e `brand`; **`on-surface-neutral-brand`** em\n  `invert`.\n- **Não** use `on-surface-subtle-brand` no `invert`, como o Checkbox faz: no Radio ele já é a\n  cor da borda do círculo, e o anel se fundiria com ela. A descrição do set diz isso em\n  palavras.\n- **Não** é `border-{tom}-focus`: reprovam 3:1 (DS-046/047).\n- O foco não muda o tamanho: `outline` não ocupa espaço.\n- Raio: `calc(var(--bmb-radius-md) - 4px)` no `<label>`, para a borda externa do anel bater\n  com o `border-radius-md` do retângulo de foco do Figma.\n\n## Tipografia\n\n| | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Estilo do Figma | `Paragraph/Small/Regular` | `Paragraph/Medium/Regular` | `Paragraph/Large/Regular` |\n| Token | `--bmb-font-size-paragraph-small` | `--bmb-font-size-paragraph-medium` | `--bmb-font-size-paragraph-large` |\n\nFamília `--bmb-font-family-body`, peso `--bmb-font-weight-regular`, entrelinha\n`--bmb-line-height-130`. Nenhum px de fonte é cravado.\n\n## Desvios do Figma (autorizados)\n\n**1. Hover por sombra externa.** Borda de 1px + `box-shadow: 0 0 0 1px` na cor da borda, que\nreproduz os 2px centralizados do Figma sem mudar o círculo.\n\n**2. Anel por `outline` no `<label>`**, não pelo retângulo absoluto do Figma.\n\n**3. Anel nativo do input transparente**, não `outline: none`. Em cores forçadas aparecem dois\nanéis concêntricos, ambos visíveis.\n\n**4. Ponto por `::before`.** Risco: `::before` num `<input>` com `appearance: none` funciona em\nChromium, Firefox e WebKit, mas não é garantido pela especificação do HTML.\n\n**5. Defaults em `:where()`**: `tone=neutral`, `size=md`.\n\n**6. Cores forçadas — acréscimo**: borda e ponto em `CanvasText`, anel em `Highlight`.\n\n**7. Grupo por `<fieldset>` nativo.** O `RadioGroup` da especificação não vira classe: o\ncomportamento de grupo vem do `name`, e o nome do grupo vem do `<legend>`. Nenhum JavaScript\nde roving tabindex.\n\n## Acessibilidade\n\n- `<input type=\"radio\">` nativo dentro de `<label>`, com o **mesmo `name`** em todos os itens,\n  dentro de `<fieldset>` + `<legend>`.\n- **Teclado de grupo:** um único ponto de Tab — o item marcado, ou o primeiro se nenhum\n  estiver. Setas movem foco **e** seleção; Espaço marca o item focado. Tudo nativo: não\n  implemente roving tabindex à mão.\n- **Estado nunca só pela cor:** o marcado se distingue pelo ponto.\n- **Mínimo de 2 no grupo.** Um Radio sozinho não se desmarca e não é escolha.\n- Disabled: atributo `disabled` nativo, no item ou no `<fieldset>` inteiro.\n- Proibido: `aria-pressed`, `indeterminate`.\n- **A borda do controle marcado não pode ser removida.** No `brand` marcado, o preenchimento\n  `primary-default` fica abaixo de 3:1 contra a página no modo escuro.\n\n### Contraste\n\n**Medido no Figma** (especificação recebida, 23/09/2026, 3 marcas × 2 temas): borda ≥ 3:1,\npior 3,22 no `invert`; rótulo ≥ 4,5:1; ponto sobre o preenchimento ≥ 3:1; anel ≥ 3:1;\n`on-surface-primary` ≥ 6,04.\n\n**Recalculado a partir de `dist/brands.css`** (24/09/2026, fórmula da WCAG, contra\n`base-default` e, no `invert`, contra `surface-brand`): borda `neutral` ≥ 15,82; borda e\nrótulo `brand` ≥ 7,34; borda `invert` ≥ 3,48 (epays/light); rótulo `invert` ≥ 14,52; ponto\nsobre o preenchimento ≥ 3,55 (`invert`, epays/light); anel `border-base-focus-alt` ≥ 6,49;\nanel `on-surface-neutral-brand` ≥ 14,52; `brand` marcado 2,45 em epays/dark.\n\nNenhum dos dois conjuntos foi medido no navegador. Eles não coincidem — ver \"Divergências\nabertas\".\n\n## Divergências abertas\n\nRegistradas, não resolvidas por conta própria.\n\n### 1. O default de `size`\n\n| Fonte | Diz |\n| --- | --- |\n| Propriedade `size` do `.Master Radio` 1575:175 | default **`sm`** |\n| As 24 variantes públicas do set 1575:189 | todas instanciam **`md`** |\n| Especificação recebida | **`md`** |\n\n**Implementado:** `md`. **Como fechar:** trocar o default da propriedade do master, ou mudar\n`defaults.size` em `src/radio.tokens.json`.\n\n### 2. O tamanho do ponto\n\n| Fonte | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Nós do `.Master Radio` | 4,375 | 5 | 5,625 |\n| Especificação recebida | 4,4 | 5 | 5,6 |\n\nA especificação arredonda. **Implementado** o medido.\n\n### 3. O gap ligado a uma variável que não existe no repositório\n\n| Fonte | Diz |\n| --- | --- |\n| `.Master Radio`, `itemSpacing` | ligado à variável `spacing-sm` (8) |\n| `dist/brands.css` | não tem nenhum `--bmb-spacing-*` |\n\n**Implementado:** o literal `8px`, como o `gap` do Hyperlink — sem criar token. O Checkbox usa\n8 cru no Figma. **Como fechar:** levar os espaçamentos ao audit, se o time quiser que o gap\nvenha de token.\n\n### 4. O `leading-trim` do rótulo\n\nO texto do master usa `leading-trim: CAP_HEIGHT`. O CSS não implementa (suporte parcial a\n`text-box-trim`).\n\n### 5. Contraste: especificação × `brands.css`\n\nOs números não coincidem (ver \"Contraste\"): o pior `invert` é 3,22 na especificação e 3,48 no\nrecálculo. A superfície de referência da medição do Figma não está registrada. Os dois\nconjuntos concordam que tudo passa, exceto o preenchimento `brand` marcado no escuro.\n\n## Decisões registradas (não são lacunas)\n\n- **D0 — `tone`, não `theme`.** `invert` só sobre o painel da marca.\n- **D1 — disabled sem token** (DS-037). Opacidade 0,4.\n- **D2 — `checked`, não `selected`.**\n- **D3 — `size` no master**, classe irmã em CSS.\n- **D4 — sem `indeterminate`.** Só o Checkbox tem.\n- **D5 — anel `border-base-focus-alt`** em `neutral` e `brand`; `on-surface-neutral-brand` em\n  `invert`.\n- **D6 — o foco não muda o tamanho.**\n- **DS-049 — sem classe para o rótulo.** `Show copy` do master não vira classe.\n- **Sem desmarcar por clique.** É comportamento nativo e é a regra da especificação.\n",
+    "origem": {
+      "contrato": "src/radio.contract.json",
+      "regras": "src/radio.rules.md"
+    }
   }
 };

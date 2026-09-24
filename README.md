@@ -7,6 +7,7 @@ Atualmente contém:
 - Hyperlink
 - Dot
 - Checkbox
+- Radio
 
 ## Componentes
 
@@ -71,6 +72,23 @@ como regressão.
 
 Arquivos em `components.json` sob o id `checkbox`; demo em `demo/checkbox.html` e no
 storybook.
+
+### Radio
+Escolha única: marcar uma opção desmarca as outras do mesmo grupo. Opções independentes são o
+Checkbox; efeito imediato é o Switch.
+
+**Nunca sozinho.** É sempre um grupo de 2 ou mais `<label>` com `<input type="radio">` nativo e
+o mesmo `name`, dentro de `<fieldset>` + `<legend>`. É o `name` que dá o comportamento de
+grupo sem JavaScript — um valor enviado, um ponto de Tab, setas movendo a seleção. Um radio
+marcado não se desmarca: "nenhuma escolha" é uma opção explícita. Não existe `indeterminate`.
+
+Três tons e três tamanhos, como o Checkbox, mas **do grupo**: a especificação os põe num
+`RadioGroup`, e aqui, sem componente de grupo, a regra é "classes de tom e tamanho iguais em
+todo o `<fieldset>`". A validação reprova grupo com menos de 2 itens, fora de `<fieldset>`,
+com `name` diferente ou misturando tom ou tamanho. No `invert` o anel de foco é
+`on-surface-neutral-brand`, não o `subtle` do Checkbox — ali o `subtle` já é a cor da borda.
+
+Arquivos em `components.json` sob o id `radio`; demo em `demo/radio.html` e no storybook.
 
 ## Arquitetura
 

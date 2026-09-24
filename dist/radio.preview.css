@@ -1,0 +1,147 @@
+/* ---------------------------------------------------------------------------
+ * Radio — 3 tons × 3 tamanhos; estados do <input type="radio"> nativo. Sem indeterminate.
+ * Fonte: Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1, página ✅ 08. Controls 827:887: Radio — component set 1575:189 (tone × state × checked, 24 variantes) e .Master Radio 1575:175 (size, 3 variantes). Lido ao vivo via MCP.
+ * COR: só tokens semânticos --bmb-color-*. Precisa de brands.css carregado antes.
+ * GEOMETRIA: literais do Figma (radio.tokens.json) — não são tokens.
+ * GERADO por build-radio-css.mjs — não edite à mão.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+    .bmb-radio {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--_bmb-radio-label);
+        font-family: var(--bmb-font-family-body);
+        font-weight: var(--bmb-font-weight-regular);
+        font-size: var(--_bmb-radio-font);
+        line-height: var(--bmb-line-height-130);
+        border-radius: calc(var(--bmb-radius-md) - 4px);
+        cursor: pointer;
+    }
+
+    /* Defaults: tone=neutral, size=md. Especificidade zero de propósito —
+     * qualquer .bmb-radio--* vence, independente da ordem deste arquivo. */
+    :where(.bmb-radio) {
+        --_bmb-radio-border: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-radio-fill: var(--bmb-color-base-backgrounds-base-default-alt);
+        --_bmb-radio-dot: var(--bmb-color-base-on-on-surface-base-alt);
+        --_bmb-radio-label: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-radio-ring: var(--bmb-color-base-borders-border-base-focus-alt);
+        --_bmb-radio-box: 16px;
+        --_bmb-radio-dot-size: 5px;
+        --_bmb-radio-font: var(--bmb-font-size-paragraph-medium);
+    }
+
+    /* O <input type="radio"> nativo, sem a aparência do sistema: a semântica, o teclado de
+     * grupo e o formulário continuam vindo dele. Borda de 1px por dentro, como no Figma.
+     * Desmarcado não tem preenchimento — o círculo mostra a superfície de trás. */
+    .bmb-radio__input {
+        appearance: none;
+        -webkit-appearance: none;
+        position: relative;
+        flex: 0 0 auto;
+        box-sizing: border-box;
+        margin: 0;
+        inline-size: var(--_bmb-radio-box);
+        block-size: var(--_bmb-radio-box);
+        border: 1px solid var(--_bmb-radio-border);
+        border-radius: var(--bmb-radius-full);
+        background-color: transparent;
+        cursor: inherit;
+    }
+
+    /* Marcado: o círculo ganha preenchimento e a borda FICA — no brand escuro o preenchimento
+     * sozinho não passa 3:1 contra a página. */
+    .bmb-radio__input:checked { background-color: var(--_bmb-radio-fill); }
+
+    /* Ponto: centrado no círculo, do tamanho medido no Figma. Só aparece marcado — o estado
+     * nunca é comunicado só pela cor. */
+    .bmb-radio__input::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        inline-size: var(--_bmb-radio-dot-size);
+        block-size: var(--_bmb-radio-dot-size);
+        border-radius: var(--bmb-radius-full);
+        background-color: var(--_bmb-radio-dot);
+        visibility: hidden;
+    }
+    .bmb-radio__input:checked::before { visibility: visible; }
+
+    /* Hover: a borda passa a 2px centralizada, como no Figma — 1px de borda + 1px de sombra
+     * externa, sem mudar o tamanho do círculo. Nenhuma cor muda. Nunca em disabled. */
+    .bmb-radio:hover .bmb-radio__input:not(:disabled) {
+        box-shadow: 0 0 0 1px var(--_bmb-radio-border);
+    }
+
+    /* Anel de foco: 2px, folga de 2px, em volta de círculo + rótulo. `outline` não ocupa
+     * espaço, então o componente não muda de tamanho. Nunca use outline: none aqui. */
+    .bmb-radio:has(.bmb-radio__input:focus-visible) {
+        outline: 2px solid var(--_bmb-radio-ring);
+        outline-offset: 2px;
+    }
+    /* O anel é do <label>; o do input fica transparente para não duplicar. */
+    .bmb-radio__input:focus-visible {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+    }
+
+    /* Disabled: atributo nativo no input, opacidade 0.4 no controle inteiro, sem token
+     * próprio (DS-037). O nativo já tira do Tab e das setas do grupo. */
+    .bmb-radio:has(.bmb-radio__input:disabled) {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    /* ----- tons ----- */
+    .bmb-radio--neutral {
+        --_bmb-radio-border: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-radio-fill: var(--bmb-color-base-backgrounds-base-default-alt);
+        --_bmb-radio-dot: var(--bmb-color-base-on-on-surface-base-alt);
+        --_bmb-radio-label: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-radio-ring: var(--bmb-color-base-borders-border-base-focus-alt);
+    }
+    .bmb-radio--brand {
+        --_bmb-radio-border: var(--bmb-color-primary-on-on-surface-primary);
+        --_bmb-radio-fill: var(--bmb-color-primary-backgrounds-primary-default);
+        --_bmb-radio-dot: var(--bmb-color-primary-on-on-primary);
+        --_bmb-radio-label: var(--bmb-color-primary-on-on-surface-primary);
+        --_bmb-radio-ring: var(--bmb-color-base-borders-border-base-focus-alt);
+    }
+    .bmb-radio--invert {
+        --_bmb-radio-border: var(--bmb-color-surface-brand-on-on-surface-subtle-brand);
+        --_bmb-radio-fill: var(--bmb-color-surface-brand-on-on-surface-subtle-brand);
+        --_bmb-radio-dot: var(--bmb-color-surface-brand-backgrounds-background-brand);
+        --_bmb-radio-label: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+        --_bmb-radio-ring: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+    }
+
+    /* ----- tamanhos: literais do Figma; fonte via token paragraph-* ----- */
+    .bmb-radio--sm {
+        --_bmb-radio-box: 14px;
+        --_bmb-radio-dot-size: 4.375px;
+        --_bmb-radio-font: var(--bmb-font-size-paragraph-small);
+    }
+    .bmb-radio--md {
+        --_bmb-radio-box: 16px;
+        --_bmb-radio-dot-size: 5px;
+        --_bmb-radio-font: var(--bmb-font-size-paragraph-medium);
+    }
+    .bmb-radio--lg {
+        --_bmb-radio-box: 18px;
+        --_bmb-radio-dot-size: 5.625px;
+        --_bmb-radio-font: var(--bmb-font-size-paragraph-large);
+    }
+
+    /* Alto contraste do Windows: mantém círculo, ponto e anel visíveis com cores do sistema. */
+    @media (forced-colors: active) {
+        .bmb-radio__input { border-color: CanvasText; }
+        .bmb-radio__input::before { forced-color-adjust: none; background-color: CanvasText; }
+        .bmb-radio:has(.bmb-radio__input:focus-visible) {
+            outline: 2px solid Highlight;
+            outline-offset: 2px;
+        }
+    }
+}

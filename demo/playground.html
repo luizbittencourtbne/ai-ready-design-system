@@ -24,6 +24,7 @@
         <link rel="stylesheet" href="../dist/hyperlink.preview.css" />
         <link rel="stylesheet" href="../dist/dot.preview.css" />
         <link rel="stylesheet" href="../dist/checkbox.preview.css" />
+        <link rel="stylesheet" href="../dist/radio.preview.css" />
         <style>
             :root {
                 --doc-bg: #ffffff;
@@ -307,6 +308,7 @@
         <script src="../dist/hyperlink.tokens.js"></script>
         <script src="../dist/dot.tokens.js"></script>
         <script src="../dist/checkbox.tokens.js"></script>
+        <script src="../dist/radio.tokens.js"></script>
         <!-- Snapshot de contrato e regras, gerado por build-docs-data.mjs. Serve de rede para
              quando a página é aberta por file://, onde fetch é bloqueado por CORS. Servida por
              HTTP, a página prefere os arquivos reais. -->
@@ -407,11 +409,13 @@
             const LNK = window.BMB_HYPERLINK_TOKENS;
             const DOT = window.BMB_DOT_TOKENS;
             const CBX = window.BMB_CHECKBOX_TOKENS;
+            const RDO = window.BMB_RADIO_TOKENS;
 
             /* Sem os tokens a página não tem o que mostrar. Falhar com uma frase é melhor do
                que morrer com "cannot read properties of undefined" e uma tela em branco. */
             const FALTANDO = [!BTN && 'dist/button.tokens.js', !LNK && 'dist/hyperlink.tokens.js',
-                !DOT && 'dist/dot.tokens.js', !CBX && 'dist/checkbox.tokens.js'].filter(Boolean);
+                !DOT && 'dist/dot.tokens.js', !CBX && 'dist/checkbox.tokens.js',
+                !RDO && 'dist/radio.tokens.js'].filter(Boolean);
             if (FALTANDO.length) {
                 document.body.innerHTML =
                     '<div style="padding:40px;max-width:60ch;font:15px/1.6 ui-sans-serif,system-ui,sans-serif">' +
@@ -876,6 +880,61 @@
 <!-- Sem rótulo visível: aria-label no input é obrigatório. -->
 <label class="bmb-checkbox bmb-checkbox--neutral bmb-checkbox--md">
     <input type="checkbox" class="bmb-checkbox__input" aria-label="Selecionar linha de Maria Souza">
+</label>`,
+                    },
+                }),
+
+                radio: registroControle({
+                    id: 'radio', T: RDO, tipo: 'radio', grupo: true, swatch: 'fill',
+                    hover: '0 0 0 1px var(--_bmb-radio-border)',
+                    dica: 'Estado real — o grupo tem um só ponto de Tab; use as setas para mover a seleção.',
+                    linhas: (S, ci, cb, cs) => {
+                        const marcado = S.checked === 'true';
+                        const r = [['círculo', marcado ? ci.backgroundColor : 'transparente', marcado ? 'fill' : null],
+                            ['borda', ci.borderColor, 'border']];
+                        if (marcado) r.push(['ponto', cb.backgroundColor, 'dot']);
+                        r.push(['rótulo', cs.color, 'label']);
+                        return r;
+                    },
+                    geo: (z) => `círculo ${z.box}px · ponto ${z.dot}px centrado · gap ${RDO.gap}px · raio --bmb-radius-full`,
+                    extra: {
+                        nome: 'Radio',
+                        descricao: 'Escolha única num grupo de 2 ou mais. Opções independentes são o Checkbox; efeito imediato é o Switch.',
+                        contrato: '../src/radio.contract.json',
+                        regras: '../src/radio.rules.md',
+                        estados: ['Default', 'Hover', 'Focus', 'Disabled'],
+                        checkedVals: RDO.checkedOrder,
+                        controles: ['theme', 'state', 'size', 'checked', 'label'],
+                        inicial: { theme: 'neutral', state: 'Interativo', size: 'md', checked: 'true', label: 'Pix' },
+                        secoesGuidelines: ['Radio vs os outros dois', 'Quando usar', 'Quando não usar', 'Anatomia', 'Props', 'Cor',
+                            'Estados', 'Geometria', 'Desvios do Figma (autorizados)', 'Divergências abertas',
+                            'Decisões registradas (não são lacunas)'],
+                        secoesA11y: ['Acessibilidade', 'Anel de foco'],
+                        aviso: 'O Radio <strong>nunca fica sozinho</strong>: é sempre um grupo de 2 ou mais, com o mesmo <code>name</code>, dentro de <code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code>. Tom e tamanho são do grupo inteiro. Não existe indeterminate.',
+                        notaTamanhos: () => RDO.sizeOrder.map((z) => z + ' círculo ' + RDO.sizes[z].box + 'px · ponto ' + RDO.sizes[z].dot).join(' · '),
+                        comoUsar: `<!-- Sempre um grupo: mesmo name, dentro de <fieldset> + <legend>.
+     Tom e tamanho IGUAIS em todos os itens do grupo. -->
+<fieldset>
+    <legend>Forma de pagamento</legend>
+    <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+        <input type="radio" class="bmb-radio__input" name="pagamento" value="pix" checked>
+        <span class="bmb-radio__label">Pix</span>
+    </label>
+    <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+        <input type="radio" class="bmb-radio__input" name="pagamento" value="boleto">
+        <span class="bmb-radio__label">Boleto</span>
+    </label>
+    <!-- "Nenhuma escolha" é uma opção explícita: radio marcado não se desmarca. -->
+    <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+        <input type="radio" class="bmb-radio__input" name="pagamento" value="nenhum">
+        <span class="bmb-radio__label">Nenhum</span>
+    </label>
+</fieldset>
+
+<!-- Disabled: atributo nativo no item, ou no <fieldset> para o grupo inteiro. -->
+<label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+    <input type="radio" class="bmb-radio__input" name="pagamento" value="cripto" disabled>
+    <span class="bmb-radio__label">Cripto (indisponível)</span>
 </label>`,
                     },
                 }),

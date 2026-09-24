@@ -6,14 +6,14 @@ Revise os arquivos existentes; não assuma uma pasta `components/<nome>/`. Use `
 
 Não é lapso de documentação: os eixos vêm do Figma, e o Figma desenhou cada um de um jeito. Conferir um contra a expectativa do outro produz achado falso.
 
-| | Button | Hyperlink | Dot | Checkbox |
-| --- | --- | --- | --- | --- |
-| Para quê | ação | navegação | status | opção **independente**, vale no envio |
-| Elemento | `<button>` | `<a href>` | `<span>` | `<label>` + `<input type="checkbox">` |
-| Eixo de cor | 13 temas | 9 temas | **5 tons** (`tone`, não `theme`) | **3 tons** (`neutral`, `brand`, `invert`) |
-| Tamanhos | Small → XLarge | XSmall → Large | Small → Large | `sm` → `lg` (no `.Master`) |
-| Estados | 6 | 6 | **nenhum** | 4 (`default`, `hover`, `focus`, `disabled`) × checked `false`/`true`/**`indeterminate`** |
-| Gerador | `scripts/build-css.mjs` | `scripts/build-hyperlink-css.mjs` | `scripts/build-dot-css.mjs` | `scripts/build-checkbox-css.mjs` |
+| | Button | Hyperlink | Dot | Checkbox | Radio |
+| --- | --- | --- | --- | --- | --- |
+| Para quê | ação | navegação | status | opção **independente**, vale no envio | escolha **única** num grupo |
+| Elemento | `<button>` | `<a href>` | `<span>` | `<label>` + `<input type="checkbox">` | `<label>` + `<input type="radio">`, em `<fieldset>`, 2+ com o mesmo `name` |
+| Eixo de cor | 13 temas | 9 temas | **5 tons** (`tone`, não `theme`) | **3 tons** (`neutral`, `brand`, `invert`) | **3 tons**, iguais em todo o grupo |
+| Tamanhos | Small → XLarge | XSmall → Large | Small → Large | `sm` → `lg` (no `.Master`) | `sm` → `lg`, iguais em todo o grupo |
+| Estados | 6 | 6 | **nenhum** | 4 (`default`, `hover`, `focus`, `disabled`) × checked `false`/`true`/**`indeterminate`** | 4 × checked `false`/`true` — **sem** `indeterminate` |
+| Gerador | `scripts/build-css.mjs` | `scripts/build-hyperlink-css.mjs` | `scripts/build-dot-css.mjs` | `scripts/build-checkbox-css.mjs` | `scripts/build-radio-css.mjs` |
 
 **Ausência não é falta.** O Dot não é interativo — sem hover, sem foco, sem disabled, sem tabindex. Isso está na descrição do componente no Figma, no contrato e travado por teste na validação. Reportar "faltam estados" no Dot é erro de revisão. Para ele, a falha seria o contrário: ter ganhado interação que o design não deu.
 

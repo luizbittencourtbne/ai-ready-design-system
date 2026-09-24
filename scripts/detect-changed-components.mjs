@@ -80,6 +80,9 @@ const POR_COMPONENTE = {
     checkbox: [
         ['scripts/build-checkbox-css.mjs', 'gerador do Checkbox: mapeamento tom -> token e geometria'],
     ],
+    radio: [
+        ['scripts/build-radio-css.mjs', 'gerador do Radio: mapeamento tom -> token e geometria'],
+    ],
 };
 
 /* Demo preferida no contexto, quando a declarada no índice não é a melhor para revisão. */

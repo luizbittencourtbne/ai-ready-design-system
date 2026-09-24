@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="pt-BR" data-brand="employer" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Radio</title>
+        <!-- As marcas declaram famílias diferentes em --bmb-font-family-body: Roboto
+             (employer), Nunito (epays) e Montserrat (bne-cia). Sem carregá-las, o rótulo cai no
+             fallback do sistema e a página mostra uma tipografia que não é a do Design System. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/radio.preview.css" />
+        <style>
+            /* apenas a pagina de demo — os estilos do componente vem de radio.preview.css */
+            body {
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                margin: 0;
+                padding: 40px;
+                color: #1b2439;
+                background: var(--bmb-color-base-backgrounds-base-default);
+            }
+            h1 { font-size: 20px; margin: 0 0 4px; }
+            p.sub { margin: 0 0 32px; color: #5b6478; font-size: 14px; max-width: 70ch; }
+            h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #5b6478;
+                margin: 32px 0 12px;
+                font-weight: 600;
+            }
+            .grupos { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+            fieldset {
+                border: 1px solid #e5e8ee;
+                border-radius: 8px;
+                padding: 12px 16px 16px;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            legend { font-size: 13px; color: #5b6478; padding: 0 4px; }
+            /* O tom invert só existe sobre o painel da marca. */
+            fieldset.painel-marca {
+                background: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+                border-color: transparent;
+            }
+            /* float traz a legenda para dentro do painel, em vez de deixá-la sobre a borda. */
+            fieldset.painel-marca legend {
+                float: left;
+                padding: 0;
+                color: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+            }
+            .nota {
+                background: #fffbe6;
+                border: 1px solid #e8d48b;
+                border-radius: 8px;
+                padding: 12px 16px;
+                font-size: 13px;
+                max-width: 70ch;
+                margin: 8px 0 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Radio</h1>
+        <p class="sub">
+            Figma CORE-Basics · ✅ 08. Controls 827:887 · set Radio 1575:189 (3 tons × 4 estados ×
+            2 valores de checked) e .Master Radio 1575:175 (3 tamanhos). Cada grupo tem um só
+            ponto de Tab: entre com Tab e use as setas para mover a seleção. Hover e foco são
+            reais.
+        </p>
+
+        <h2>Tamanhos · neutral — cada tamanho é um grupo</h2>
+        <div class="grupos">
+            <fieldset>
+                <legend>sm · círculo 14 · ponto 4,375</legend>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--sm">
+                    <input type="radio" class="bmb-radio__input" name="tam-sm" value="a" checked />
+                    <span class="bmb-radio__label">Opção A</span>
+                </label>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--sm">
+                    <input type="radio" class="bmb-radio__input" name="tam-sm" value="b" />
+                    <span class="bmb-radio__label">Opção B</span>
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>md · círculo 16 · ponto 5 (default)</legend>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tam-md" value="a" checked />
+                    <span class="bmb-radio__label">Opção A</span>
+                </label>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tam-md" value="b" />
+                    <span class="bmb-radio__label">Opção B</span>
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>lg · círculo 18 · ponto 5,625</legend>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--lg">
+                    <input type="radio" class="bmb-radio__input" name="tam-lg" value="a" checked />
+                    <span class="bmb-radio__label">Opção A</span>
+                </label>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--lg">
+                    <input type="radio" class="bmb-radio__input" name="tam-lg" value="b" />
+                    <span class="bmb-radio__label">Opção B</span>
+                </label>
+            </fieldset>
+        </div>
+
+        <h2>Tons — o tom é do grupo inteiro</h2>
+        <div class="grupos">
+            <fieldset>
+                <legend>neutral</legend>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tom-neutral" value="a" checked />
+                    <span class="bmb-radio__label">Marcado</span>
+                </label>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tom-neutral" value="b" />
+                    <span class="bmb-radio__label">Desmarcado</span>
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>brand</legend>
+                <label class="bmb-radio bmb-radio--brand bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tom-brand" value="a" checked />
+                    <span class="bmb-radio__label">Marcado</span>
+                </label>
+                <label class="bmb-radio bmb-radio--brand bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tom-brand" value="b" />
+                    <span class="bmb-radio__label">Desmarcado</span>
+                </label>
+            </fieldset>
+            <fieldset class="painel-marca">
+                <legend>invert — sobre o painel da marca</legend>
+                <label class="bmb-radio bmb-radio--invert bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tom-invert" value="a" checked />
+                    <span class="bmb-radio__label">Marcado</span>
+                </label>
+                <label class="bmb-radio bmb-radio--invert bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="tom-invert" value="b" />
+                    <span class="bmb-radio__label">Desmarcado</span>
+                </label>
+            </fieldset>
+        </div>
+
+        <h2>Disabled — atributo nativo, opacidade 0,4</h2>
+        <div class="grupos">
+            <fieldset>
+                <legend>Um item indisponível</legend>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="d-item" value="a" checked />
+                    <span class="bmb-radio__label">Disponível</span>
+                </label>
+                <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="d-item" value="b" disabled />
+                    <span class="bmb-radio__label">Esgotado</span>
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>Grupo inteiro indisponível</legend>
+                <label class="bmb-radio bmb-radio--brand bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="d-grupo" value="a" checked disabled />
+                    <span class="bmb-radio__label">Mensal</span>
+                </label>
+                <label class="bmb-radio bmb-radio--brand bmb-radio--md">
+                    <input type="radio" class="bmb-radio__input" name="d-grupo" value="b" disabled />
+                    <span class="bmb-radio__label">Anual</span>
+                </label>
+            </fieldset>
+        </div>
+
+        <h2>Uso correto — "nenhuma escolha" é uma opção explícita</h2>
+        <fieldset>
+            <legend>Receber a newsletter</legend>
+            <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                <input type="radio" class="bmb-radio__input" name="newsletter" value="semanal" />
+                <span class="bmb-radio__label">Semanal</span>
+            </label>
+            <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                <input type="radio" class="bmb-radio__input" name="newsletter" value="mensal" />
+                <span class="bmb-radio__label">Mensal</span>
+            </label>
+            <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
+                <input type="radio" class="bmb-radio__input" name="newsletter" value="nenhum" checked />
+                <span class="bmb-radio__label">Nenhum</span>
+            </label>
+        </fieldset>
+        <p class="nota">
+            Um radio marcado <strong>não se desmarca</strong> com um novo clique. Se o produto
+            precisa permitir nenhuma escolha, ela é uma opção do grupo — aqui, "Nenhum".
+        </p>
+    </body>
+</html>
