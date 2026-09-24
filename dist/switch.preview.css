@@ -1,0 +1,160 @@
+/* ---------------------------------------------------------------------------
+ * Switch — 3 tons × 3 tamanhos; estados do <input type="checkbox" role="switch">.
+ * Sem hover e sem indeterminate.
+ * Fonte: Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1, página ✅ 08. Controls 827:887: Switch — component set 16715:1144 (tone × state × checked, 18 variantes) e .Master Switch 1468:1255 (size, 3 variantes). Lido ao vivo via MCP. O Switch (descontinuado) 1697:1842 NÃO é fonte de nada aqui.
+ * COR: só tokens semânticos --bmb-color-*. Precisa de brands.css carregado antes.
+ * GEOMETRIA: literais do Figma (switch.tokens.json) — não são tokens.
+ * GERADO por build-switch-css.mjs — não edite à mão.
+ * ------------------------------------------------------------------------ */
+
+@layer components {
+    /* O cursor é o único efeito de passar o mouse: o Switch não tem hover (D7). */
+    .bmb-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--_bmb-switch-label);
+        font-family: var(--bmb-font-family-body);
+        font-weight: var(--bmb-font-weight-regular);
+        font-size: var(--_bmb-switch-font);
+        line-height: var(--bmb-line-height-130);
+        border-radius: calc(var(--bmb-radius-md) - 4px);
+        cursor: pointer;
+    }
+
+    /* Defaults: tone=neutral, size=md. Especificidade zero de propósito —
+     * qualquer .bmb-switch--* vence, independente da ordem deste arquivo. */
+    :where(.bmb-switch) {
+        --_bmb-switch-track: var(--bmb-color-base-borders-border-base-subtle-alt);
+        --_bmb-switch-track-on: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-switch-thumb: var(--bmb-color-base-backgrounds-base-default);
+        --_bmb-switch-label: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-switch-ring: var(--bmb-color-base-borders-border-base-focus-alt);
+        --_bmb-switch-w: 34px;
+        --_bmb-switch-h: 20px;
+        --_bmb-switch-thumb-size: 16px;
+        --_bmb-switch-pad: 2px;
+        --_bmb-switch-travel: 14px;
+        --_bmb-switch-font: var(--bmb-font-size-paragraph-medium);
+    }
+
+    /* O trilho é o próprio <input type="checkbox" role="switch">, sem a aparência do sistema.
+     * Sem borda: o trilho em si precisa passar 3:1 contra a página. O tamanho é o mesmo
+     * ligado e desligado — só o pino se move. */
+    .bmb-switch__input {
+        appearance: none;
+        -webkit-appearance: none;
+        position: relative;
+        flex: 0 0 auto;
+        box-sizing: border-box;
+        margin: 0;
+        border: 0;
+        inline-size: var(--_bmb-switch-w);
+        block-size: var(--_bmb-switch-h);
+        border-radius: var(--bmb-radius-full);
+        background-color: var(--_bmb-switch-track);
+        cursor: inherit;
+    }
+    .bmb-switch__input:checked { background-color: var(--_bmb-switch-track-on); }
+
+    /* Pino: a `pad` das bordas do trilho — à esquerda desligado, à direita ligado. A posição
+     * muda por transform, que não mexe no layout nem no tamanho do trilho. O estado nunca é
+     * comunicado só pela cor: a posição do pino também muda. */
+    .bmb-switch__input::before {
+        content: '';
+        position: absolute;
+        inset-block-start: var(--_bmb-switch-pad);
+        inset-inline-start: var(--_bmb-switch-pad);
+        inline-size: var(--_bmb-switch-thumb-size);
+        block-size: var(--_bmb-switch-thumb-size);
+        border-radius: var(--bmb-radius-full);
+        background-color: var(--_bmb-switch-thumb);
+        transition: transform 120ms ease;
+    }
+    .bmb-switch__input:checked::before { transform: translateX(var(--_bmb-switch-travel)); }
+    /* Em RTL o pino ligado fica à esquerda. */
+    .bmb-switch__input:dir(rtl):checked::before { transform: translateX(calc(-1 * var(--_bmb-switch-travel))); }
+
+    /* Movimento reduzido: o pino troca de lado sem deslizar. */
+    @media (prefers-reduced-motion: reduce) {
+        .bmb-switch__input::before { transition: none; }
+    }
+
+    /* Anel de foco: 2px, folga de 2px, em volta de trilho + rótulo. `outline` não ocupa
+     * espaço, então o componente não muda de tamanho. Nunca use outline: none aqui. */
+    .bmb-switch:has(.bmb-switch__input:focus-visible) {
+        outline: 2px solid var(--_bmb-switch-ring);
+        outline-offset: 2px;
+    }
+    /* O anel é do <label>; o do input fica transparente para não duplicar. */
+    .bmb-switch__input:focus-visible {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+    }
+
+    /* Disabled: atributo nativo no input, opacidade 0.4 no controle inteiro, mantendo o
+     * tom e a posição do pino, sem token próprio (DS-037). */
+    .bmb-switch:has(.bmb-switch__input:disabled) {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    /* ----- tons ----- */
+    .bmb-switch--neutral {
+        --_bmb-switch-track: var(--bmb-color-base-borders-border-base-subtle-alt);
+        --_bmb-switch-track-on: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-switch-thumb: var(--bmb-color-base-backgrounds-base-default);
+        --_bmb-switch-label: var(--bmb-color-base-on-on-surface-base);
+        --_bmb-switch-ring: var(--bmb-color-base-borders-border-base-focus-alt);
+    }
+    .bmb-switch--brand {
+        --_bmb-switch-track: var(--bmb-color-base-borders-border-base-subtle-alt);
+        --_bmb-switch-track-on: var(--bmb-color-primary-on-on-surface-primary);
+        --_bmb-switch-thumb: var(--bmb-color-base-backgrounds-base-default);
+        --_bmb-switch-label: var(--bmb-color-primary-on-on-surface-primary);
+        --_bmb-switch-ring: var(--bmb-color-base-borders-border-base-focus-alt);
+    }
+    .bmb-switch--invert {
+        --_bmb-switch-track: var(--bmb-color-surface-brand-on-on-surface-subtle-brand);
+        --_bmb-switch-track-on: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+        --_bmb-switch-thumb: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+        --_bmb-switch-label: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+        --_bmb-switch-ring: var(--bmb-color-surface-brand-on-on-surface-neutral-brand);
+    }
+
+    /* ----- tamanhos: literais do Figma; fonte via token paragraph-* ----- */
+    .bmb-switch--sm {
+        --_bmb-switch-w: 30px;
+        --_bmb-switch-h: 16px;
+        --_bmb-switch-thumb-size: 12px;
+        --_bmb-switch-pad: 2px;
+        --_bmb-switch-travel: 14px;
+        --_bmb-switch-font: var(--bmb-font-size-paragraph-small);
+    }
+    .bmb-switch--md {
+        --_bmb-switch-w: 34px;
+        --_bmb-switch-h: 20px;
+        --_bmb-switch-thumb-size: 16px;
+        --_bmb-switch-pad: 2px;
+        --_bmb-switch-travel: 14px;
+        --_bmb-switch-font: var(--bmb-font-size-paragraph-medium);
+    }
+    .bmb-switch--lg {
+        --_bmb-switch-w: 46px;
+        --_bmb-switch-h: 24px;
+        --_bmb-switch-thumb-size: 20px;
+        --_bmb-switch-pad: 2px;
+        --_bmb-switch-travel: 22px;
+        --_bmb-switch-font: var(--bmb-font-size-paragraph-large);
+    }
+
+    /* Alto contraste do Windows: contorno do trilho, pino em CanvasText e anel em Highlight. */
+    @media (forced-colors: active) {
+        .bmb-switch__input { outline: 1px solid CanvasText; outline-offset: -1px; }
+        .bmb-switch__input::before { forced-color-adjust: none; background-color: CanvasText; }
+        .bmb-switch:has(.bmb-switch__input:focus-visible) {
+            outline: 2px solid Highlight;
+            outline-offset: 2px;
+        }
+    }
+}

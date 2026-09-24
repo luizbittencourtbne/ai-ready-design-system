@@ -870,5 +870,195 @@ window.BMB_DOCS = {
       "contrato": "src/radio.contract.json",
       "regras": "src/radio.rules.md"
     }
+  },
+  "switch": {
+    "contrato": {
+      "component": "Switch",
+      "version": "experimental",
+      "purpose": "liga ou desliga uma configuração com efeito imediato, sem botão de confirmar",
+      "notTheOthers": "Escolha que só vale ao enviar o formulário é o Checkbox. Escolha única entre opções é o Radio. Ver src/switch.rules.md, 'Switch vs os outros dois'.",
+      "source": {
+        "figma": "04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1, página ✅ 08. Controls 827:887 — set Switch 16715:1144 (tone × state × checked, 18 variantes) e .Master Switch 1468:1255 (size). Lido ao vivo via MCP em 2026-09-24.",
+        "spec": "switch.rules.md recebido com a tarefa (conferido pelo design em 2026-09-23) — mapeamento variante↔prop, cores por tom, migração do legado e notas de acessibilidade. Reescrito em src/switch.rules.md.",
+        "deprecated": "Switch (descontinuado) 1697:1842, 24 variantes — NÃO é fonte de código, mockup nem variante. Mapa de migração em deprecatedLegacy e em src/switch.rules.md.",
+        "geometry": "src/switch.tokens.json",
+        "toneMappings": "scripts/build-switch-css.mjs",
+        "brandColors": "audit/core-brands-audit.json",
+        "rules": "src/switch.rules.md"
+      },
+      "element": {
+        "required": "label",
+        "input": "input[type=\"checkbox\"][role=\"switch\"]",
+        "markup": "<label class=\"bmb-switch\"><input type=\"checkbox\" role=\"switch\" class=\"bmb-switch__input\"> <span class=\"bmb-switch__label\">Notificações</span></label>",
+        "forbidden": [
+          "div",
+          "span",
+          "button"
+        ],
+        "forbiddenAttributes": [
+          "aria-pressed",
+          "input sem role=\"switch\""
+        ],
+        "why": "O <input type=\"checkbox\"> nativo dá o Espaço, o foco e o valor; role=\"switch\" faz o leitor de tela anunciar 'interruptor, ligado/desligado' em vez de 'caixa de seleção'. aria-pressed é de botão de alternância, outro papel. <button role=\"switch\"> também é válido pela ARIA, mas este pacote padroniza o input, que não precisa de JavaScript para guardar o estado."
+      },
+      "baseClass": "bmb-switch",
+      "parts": {
+        "input": "bmb-switch__input",
+        "label": "bmb-switch__label"
+      },
+      "variants": {
+        "tone": {
+          "required": false,
+          "default": "neutral",
+          "defaultBehaviour": "sem classe de tom o Switch renderiza como neutral — o default vem do Figma e está em :where(.bmb-switch), com especificidade zero",
+          "classPrefix": "bmb-switch--",
+          "values": [
+            "neutral",
+            "brand",
+            "invert"
+          ],
+          "figmaNames": {
+            "neutral": "neutral",
+            "brand": "brand",
+            "invert": "invert"
+          },
+          "meaning": {
+            "neutral": "padrão, para configurações comuns",
+            "brand": "só quando a configuração remete à marca",
+            "invert": "só sobre o painel da marca (surface-brand); valor transitório, até invert virar modo de superfície"
+          }
+        },
+        "size": {
+          "required": false,
+          "default": "md",
+          "defaultBehaviour": "sem classe de tamanho o Switch renderiza como md — ver a divergência sobre o default em openDivergences",
+          "classPrefix": "bmb-switch--",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "figmaNames": {
+            "sm": "sm",
+            "md": "md",
+            "lg": "lg"
+          },
+          "figmaAxisLocation": "No Figma o eixo size não fica no set Switch: fica na instância aninhada .Master Switch. Em CSS os dois eixos viram classes irmãs."
+        }
+      },
+      "checked": {
+        "values": [
+          "false",
+          "true"
+        ],
+        "figmaProperty": "checked (VARIANT de dois valores no set)",
+        "howToApply": {
+          "false": "input sem o atributo checked — pino à esquerda",
+          "true": "atributo checked no input, ou input.checked = true — pino à direita"
+        },
+        "immediateEffect": "A mudança vale no clique. Se ela depende de rede, mostre o novo estado na hora e reverta com mensagem se falhar. Não deixe o Switch 'no meio'."
+      },
+      "states": {
+        "default": "repouso — o <input> sem pseudo-classe",
+        "focus": {
+          "selector": ".bmb-switch:has(.bmb-switch__input:focus-visible)",
+          "ring": "outline de 2px, outline-offset 2px, no <label> — envolve trilho + rótulo e não muda o tamanho do componente",
+          "token": "--_bmb-switch-ring: border-base-focus-alt em neutral e brand; on-surface-neutral-brand em invert"
+        },
+        "disabled": {
+          "requiredMarkup": "atributo disabled nativo no <input>",
+          "style": "opacidade 0.4 no <label> inteiro, mantendo a cor do tom e a posição do pino; sem foco",
+          "token": "nenhum — DS-037"
+        }
+      },
+      "notSupported": {
+        "hover": "não existe (decisão D7). O Switch não tem borda para o delta de hover dos irmãos, e um hover igual ao repouso seria variante redundante. O único efeito de passar o mouse é o cursor. A validação reprova qualquer :hover que não seja só cursor.",
+        "indeterminate": "não existe no Switch (decisão D4). A validação reprova se aparecer no CSS ou no contrato.",
+        "selected": "não existe. O estado se chama checked (decisão D2).",
+        "stateClasses": "Não há bmb-switch--on, --off, --focus nem --disabled. Estado vem do input nativo.",
+        "labelSwap": "O rótulo descreve a configuração, não o estado: 'Notificações', e não 'Ativado'/'Desativado'. Não troque o texto do rótulo ao alternar.",
+        "showCopy": "O booleano Show copy do master não vira classe (DS-049): o rótulo é conteúdo."
+      },
+      "deprecatedLegacy": {
+        "component": "Switch (descontinuado) 1697:1842",
+        "rule": "Não gerar código, mockup nem variante a partir deste componente.",
+        "migration": {
+          "Enable Off/On": "checked false/true",
+          "Theme Base/Primary/Invert": "tone neutral/brand/invert",
+          "Theme Disabled": "disabled + tone neutral",
+          "Size Small/Medium/Large": "size sm/md/lg"
+        },
+        "whyColorsChanged": "O trilho desligado e o brand do legado usavam tokens que reprovavam 3:1 contra a página (on-base-alt 2,18; border-brand 1,67). As cores mudaram de propósito."
+      },
+      "accessibility": {
+        "role": "<input type=\"checkbox\" role=\"switch\">: o leitor de tela anuncia interruptor e o estado ligado/desligado a partir do checked nativo.",
+        "keyboard": "Espaço alterna. Tab entra e sai.",
+        "label": "O <label> envolve o input e o rótulo: a área clicável inclui o texto. Sem rótulo visível, aria-label no input.",
+        "stateNotColorOnly": "O estado se vê pela posição do pino, não só pela cor do trilho.",
+        "forbidden": "aria-pressed — é botão de alternância, outro papel.",
+        "reducedMotion": "@media (prefers-reduced-motion: reduce) tira a transição do pino.",
+        "focusRing": "outline de 2px com offset de 2px no <label>. Nunca outline: none — a validação reprova.",
+        "forcedColors": "@media (forced-colors: active) desenha o contorno do trilho em CanvasText, o pino em CanvasText e o anel em Highlight.",
+        "notVerified": "Leitor de tela e alto contraste real não foram exercitados. O contraste citado nas regras foi medido no Figma (especificação) e recalculado a partir de dist/brands.css, não no navegador."
+      },
+      "tokens": {
+        "radius": "--bmb-radius-full no trilho e no pino — o border-radius-full do Figma",
+        "typography": "--bmb-font-family-body, --bmb-font-weight-regular, --bmb-font-size-paragraph-{small,medium,large}, --bmb-line-height-130",
+        "noHardcodedColor": "Nenhum hex pode aparecer em dist/switch.css, nem como fallback. A validação reprova.",
+        "perTone": {
+          "neutral": {
+            "track": "--bmb-color-base-borders-border-base-subtle-alt",
+            "track-on": "--bmb-color-base-on-on-surface-base",
+            "thumb": "--bmb-color-base-backgrounds-base-default",
+            "label": "--bmb-color-base-on-on-surface-base",
+            "ring": "--bmb-color-base-borders-border-base-focus-alt"
+          },
+          "brand": {
+            "track": "--bmb-color-base-borders-border-base-subtle-alt",
+            "track-on": "--bmb-color-primary-on-on-surface-primary",
+            "thumb": "--bmb-color-base-backgrounds-base-default",
+            "label": "--bmb-color-primary-on-on-surface-primary",
+            "ring": "--bmb-color-base-borders-border-base-focus-alt"
+          },
+          "invert": {
+            "track": "--bmb-color-surface-brand-on-on-surface-subtle-brand",
+            "track-on": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+            "thumb": "--bmb-color-surface-brand-backgrounds-surface-brand",
+            "label": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+            "ring": "--bmb-color-surface-brand-on-on-surface-neutral-brand"
+          }
+        },
+        "onColorIsNotConstant": "base-default muda por marca e tema: é #000000 em employer/dark. Nunca cravar a cor do pino."
+      },
+      "globalTheme": {
+        "brands": [
+          "employer",
+          "epays",
+          "bne-cia"
+        ],
+        "modes": [
+          "light",
+          "dark"
+        ],
+        "howToSwitch": "atributos data-brand e data-theme no <html>"
+      },
+      "openDivergences": [
+        "Default de size: a propriedade do .Master Switch diz sm; as 18 variantes públicas instanciam md e a especificação diz md. Implementado md.",
+        "Gap: o Figma liga o gap do master à variável spacing-sm, que não existe em dist/brands.css. Implementado o literal 8px, sem token novo.",
+        "Animação: o Figma não define — ligado e desligado são camadas diferentes (thumb e thumb-checked). O deslize de 120ms é decisão de implementação, zerada em prefers-reduced-motion.",
+        "Rótulo: o Figma aplica leading-trim CAP_HEIGHT; o CSS não implementa.",
+        "Contraste: os números da especificação e os recalculados a partir de dist/brands.css não coincidem. Ver src/switch.rules.md."
+      ],
+      "generatedFiles": [
+        "dist/switch.css",
+        "dist/switch.preview.css",
+        "dist/switch.tokens.js"
+      ]
+    },
+    "regras": "# Switch\n\nFonte de verdade: o componente **Switch** em **04. CORE-Basics (Audit)**\n`BWdzK06j2tX1Dt62ZSxNR1`, página **✅ 08. Controls** `827:887` — component set `16715:1144`\n(`tone` × `state` × `checked`, 18 variantes) e `.Master Switch` `1468:1255` (`size`, 3\nvariantes, privado).\n\nDados lidos **ao vivo** do Figma via MCP em 24/09/2026, com `skipInvisibleInstanceChildren =\nfalse`: descrição do set, das 18 variantes e do master; variáveis ligadas a cada camada,\nincluindo a opacidade; geometria medida nos nós, incluindo a posição da camada\n`thumb-checked`. Junto veio a especificação `switch.rules.md` recebida com a tarefa (conferida\npelo design em 23/09/2026), reescrita aqui no formato deste repositório. Nenhum valor foi\ninventado.\n\n**Não confundir com o `Switch (descontinuado)` `1697:1842`**, que fica na mesma página e não é\nfonte de nada aqui — ver a seção própria no fim deste arquivo.\n\n## Switch vs os outros dois\n\n| | Switch | Checkbox | Radio |\n| --- | --- | --- | --- |\n| Para quê | configuração com **efeito imediato** | opção **independente** | escolha **única** num grupo |\n| Quando vale | **na hora**, sem confirmar | ao **enviar** o formulário | ao enviar o formulário |\n| Elemento | `<input type=\"checkbox\" role=\"switch\">` | `<input type=\"checkbox\">` | `<input type=\"radio\">` em `<fieldset>` |\n| O estado se vê por | **posição do pino** | glifo | ponto |\n| Hover | **nenhum** (D7) | borda passa a 2px | borda passa a 2px |\n| `indeterminate` | não | sim, só no pai de um grupo | não |\n| Teclado | Espaço | Espaço; Tab por caixa | setas dentro do grupo |\n\nA pergunta que decide: **a mudança acontece no clique, sem botão de salvar?** Se acontece, é\nSwitch. Se só vale quando a pessoa envia o formulário, é Checkbox — mesmo que o desenho de um\ninterruptor pareça mais bonito ali.\n\n## Quando usar\n\n- Configurações que se aplicam na hora: \"Notificações\", \"Modo escuro\", \"Mostrar saldo\".\n- Ligar ou desligar um recurso numa tela de preferências sem botão de salvar.\n\n## Quando não usar\n\n- Opção de formulário que só vale no envio (\"Aceito os termos\") → Checkbox.\n- Escolha entre opções → Radio.\n- Ação que dispara algo e não fica ligada (\"Enviar agora\") → Button.\n- Terceiro estado, \"no meio\" → não existe. Se a mudança depende de rede, mostre o novo estado\n  na hora e reverta com mensagem se falhar.\n\n## Anatomia\n\n`[ trilho [ pino ] ] [ rótulo ]` — `<label>` flex horizontal, alinhado ao centro, `gap: 8px`.\n\n```html\n<label class=\"bmb-switch bmb-switch--neutral bmb-switch--md\">\n    <input type=\"checkbox\" role=\"switch\" class=\"bmb-switch__input\" name=\"notificacoes\" checked>\n    <span class=\"bmb-switch__label\">Notificações</span>\n</label>\n```\n\n- O `<label>` é o componente e recebe tom e tamanho.\n- O **trilho é o próprio input**, com `appearance: none`; o **pino é o `::before`** dele.\n- O rótulo descreve **a configuração, não o estado**: \"Notificações\", e não\n  \"Ativado\"/\"Desativado\". Não troque o texto ao alternar.\n\n## Props\n\n| Prop | Valores | Default | Onde mora no Figma |\n| --- | --- | --- | --- |\n| `tone` | `neutral` · `brand` · `invert` | `neutral` | set `Switch` |\n| `size` | `sm` · `md` · `lg` | `md` | `.Master Switch` aninhado |\n| `checked` | `false` · `true` | `false` | set `Switch` |\n| `state=disabled` | atributo `disabled` no input | — | set `Switch` |\n| `state=focus` | — (pseudo-classe) | — | set `Switch` |\n| rótulo | conteúdo do `<span class=\"bmb-switch__label\">` | — | `Copy` no master |\n\nO set tem **três estados**, não quatro: `default`, `focus`, `disabled`. **Não existe hover**\n(D7). São 3 tons, não os 13 temas do Button nem os 9 do Hyperlink.\n\n## Cor\n\nA cor vem dos tokens semânticos e muda com `data-brand` e `data-theme`. O mapeamento\ntom → token está em `../scripts/build-switch-css.mjs`.\n\n| Tom | Trilho desligado | Trilho ligado | Pino | Rótulo | Anel |\n| --- | --- | --- | --- | --- | --- |\n| `neutral` | `border-base-subtle-alt` | `on-surface-base` | `base-default` | `on-surface-base` | `border-base-focus-alt` |\n| `brand` | `border-base-subtle-alt` | `on-surface-primary` | `base-default` | `on-surface-primary` | `border-base-focus-alt` |\n| `invert` | `on-surface-subtle-brand` | `on-surface-neutral-brand` | `surface-brand` | `on-surface-neutral-brand` | `on-surface-neutral-brand` |\n\n**Zero tokens novos.** Os 8 tokens distintos que as 18 variantes ligam foram conferidos um a\num contra `../dist/brands.css`: todos já existiam, com 6 definições cada. Em Employer claro e\nescuro, o valor resolvido é o mesmo que o Figma reporta.\n\n**Por que esses tokens.** O Switch não tem borda, então o próprio trilho precisa passar 3:1\ncontra a página. Os tokens do legado reprovavam: `on-base-alt` (trilho desligado) dava 2,18,\n`primary-default` (brand ligado) 1,45 no Dark e `border-brand` (invert desligado) 1,67. **Não\ntroque o trilho por um token de fundo \"mais suave\" sem medir.**\n\n`base-default` não é constante: é `#000000` em employer/dark, `#0e141c` em epays/dark e\n`#0e1c13` em bne-cia/dark. Resolva sempre pelo token; nenhum hex é escrito em\n`dist/switch.css`.\n\n## Estados\n\n| Estado | Como acontece | O que muda |\n| --- | --- | --- |\n| default | input em repouso | — |\n| focus | `:focus-visible` no input | anel de 2px com folga de 2px em volta de trilho + rótulo |\n| disabled | atributo `disabled` no input | opacidade 0,4 no controle inteiro, mantendo tom e posição do pino; sem foco |\n| checked | `:checked` | trilho troca de cor e o pino vai para a direita |\n| hover | — | **nada.** Só o cursor, que já vem do `<label>` |\n\n**Não existe hover** (D7): o Switch não tem borda para o delta de hover dos irmãos, e um hover\nigual ao repouso seria variante redundante. O CSS gerado não tem nenhuma regra de `:hover`, e\na validação reprova qualquer `:hover` que não seja só `cursor`.\n\n**Não existe `indeterminate`** (D4).\n\n## Geometria\n\nMedida nos nós do `.Master Switch`, não nos valores declarados.\n\n| | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Trilho (L × A) | 30 × 16 | 34 × 20 | 46 × 24 |\n| Pino | 12 | 16 | 20 |\n| Folga do pino | 2 | 2 | 2 |\n| Pino desligado (`thumb`) em x | 2 | 2 | 2 |\n| Pino ligado (`thumb-checked`) em x | 16 | 16 | 24 |\n| Deslize em CSS | 14 | 14 | 22 |\n\n- O pino fica a 2px das bordas do trilho: à esquerda desligado, à direita ligado.\n- Raio do trilho e do pino: `--bmb-radius-full`.\n- Distância trilho ↔ rótulo: 8px.\n- **O trilho não muda de tamanho** entre desligado e ligado. Em CSS, o pino anda por\n  `transform: translateX(...)`, que não mexe no layout.\n\nA conta é verificada no build: `pino + 2 × folga = altura do trilho` e\n`largura − pino − folga = posição do thumb-checked`. Se alguém mexer em `switch.tokens.json` e\na conta deixar de fechar, o gerador quebra com o nome do tamanho.\n\n## Anel de foco\n\n- `outline: 2px solid var(--_bmb-switch-ring)` com `outline-offset: 2px`, no `<label>`, a\n  partir do `:focus-visible` do input, via `:has()`. O anel envolve trilho + rótulo.\n- Token: `border-base-focus-alt` em `neutral` e `brand`; `on-surface-neutral-brand` em\n  `invert`.\n- **Não** é `border-{tom}-focus`: reprovam 3:1 (DS-046/047).\n- O foco não muda o tamanho: `outline` não ocupa espaço.\n- Raio: `calc(var(--bmb-radius-md) - 4px)` no `<label>`, para a borda externa do anel bater\n  com o `border-radius-md` do retângulo de foco do Figma.\n\n## Tipografia\n\n| | `sm` | `md` | `lg` |\n| --- | --- | --- | --- |\n| Estilo do Figma | `Paragraph/Small/Regular` | `Paragraph/Medium/Regular` | `Paragraph/Large/Regular` |\n| Token | `--bmb-font-size-paragraph-small` | `--bmb-font-size-paragraph-medium` | `--bmb-font-size-paragraph-large` |\n\nFamília `--bmb-font-family-body`, peso `--bmb-font-weight-regular`, entrelinha\n`--bmb-line-height-130`. Nenhum px de fonte é cravado.\n\n## Desvios do Figma (autorizados)\n\n**1. Uma camada de pino, não duas.** No Figma, desligado e ligado usam camadas próprias\n(`thumb` e `thumb-checked`), e por isso o pino fica certo em qualquer tamanho. Em CSS há um\npino só, o `::before`, que anda `translateX(largura − pino − 2 × folga)`. A posição final é a\nmesma da camada `thumb-checked` — o build confere.\n\n**2. Deslize de 120ms — acréscimo.** O Figma não define animação. A duração é a mesma das\ntransições do Hyperlink, e **`prefers-reduced-motion: reduce` a zera**: o pino troca de lado\nsem deslizar.\n\n**3. RTL — acréscimo.** O pino usa `inset-inline-start` e, em `:dir(rtl)`, desliza para a\nesquerda. O Figma não desenha RTL.\n\n**4. Anel por `outline` no `<label>`**, não pelo retângulo absoluto do Figma; **anel nativo do\ninput transparente**, não `outline: none`.\n\n**5. Defaults em `:where()`**: `tone=neutral`, `size=md`.\n\n**6. Cores forçadas — acréscimo.** O sistema substitui o fundo, e um trilho sem borda sumiria.\nUm `outline` de 1px para dentro desenha o contorno sem mudar o tamanho; o pino fica em\n`CanvasText` e o anel em `Highlight`. É a posição do pino que diz se está ligado.\n\nRisco comum aos três controles: `::before` num `<input>` com `appearance: none` funciona em\nChromium, Firefox e WebKit, mas não é garantido pela especificação do HTML.\n\n## Acessibilidade\n\n- `<input type=\"checkbox\" role=\"switch\">` nativo dentro de `<label>`. O leitor de tela anuncia\n  interruptor e o estado a partir do `checked` nativo. Sem rótulo visível, `aria-label` no\n  input é obrigatório.\n- **`role=\"switch\"` é obrigatório** — sem ele é um Checkbox com outra roupa.\n- **Proibido `aria-pressed`**: é botão de alternância, outro papel.\n- Espaço alterna. Tab entra e sai.\n- **Estado nunca só pela cor:** a posição do pino também muda.\n- O rótulo descreve a configuração, não o estado.\n- Disabled: atributo `disabled` nativo, mantendo a posição do pino.\n- Movimento reduzido respeitado.\n\n### Contraste\n\n**Medido no Figma** (especificação recebida, 23/09/2026, 3 marcas × 2 temas): trilho ≥ 3:1\ncontra a página ou o painel, pior 3,22; pino ≥ 3:1 contra o trilho; rótulo ≥ 4,5:1; anel\n≥ 3:1.\n\n**Recalculado a partir de `dist/brands.css`** (24/09/2026, fórmula da WCAG, contra\n`base-default` e, no `invert`, contra `surface-brand`): trilho desligado `neutral`/`brand`\n≥ 6,49; trilho ligado `neutral` ≥ 15,82 e `brand` ≥ 7,34; trilho `invert` desligado ≥ 3,48\n(epays/light) e ligado ≥ 14,52; pino contra o trilho ≥ 3,48 (`invert` desligado, epays/light);\nrótulo `brand` ≥ 7,34; anel `border-base-focus-alt` ≥ 6,49 e `on-surface-neutral-brand`\n≥ 14,52.\n\nNenhum dos dois conjuntos foi medido no navegador. Eles não coincidem — ver \"Divergências\nabertas\".\n\n## Divergências abertas\n\nRegistradas, não resolvidas por conta própria.\n\n### 1. O default de `size`\n\n| Fonte | Diz |\n| --- | --- |\n| Propriedade `size` do `.Master Switch` 1468:1255 | default **`sm`** |\n| As 18 variantes públicas do set 16715:1144 | todas instanciam **`md`** |\n| Especificação recebida | **`md`** |\n\n**Implementado:** `md`. **Como fechar:** trocar o default da propriedade do master, ou mudar\n`defaults.size` em `src/switch.tokens.json`.\n\n### 2. O gap ligado a uma variável que não existe no repositório\n\n| Fonte | Diz |\n| --- | --- |\n| `.Master Switch`, `itemSpacing` | ligado à variável `spacing-sm` (8) |\n| `dist/brands.css` | não tem nenhum `--bmb-spacing-*` |\n\n**Implementado:** o literal `8px`, sem criar token.\n\n### 3. A animação\n\nO Figma não define animação — ligado e desligado são camadas diferentes. O deslize de 120ms é\ndecisão de implementação (desvio 2). **Como fechar:** o design define duração e curva, ou\nconfirma que não deve haver deslize.\n\n### 4. O `leading-trim` do rótulo\n\nO texto do master usa `leading-trim: CAP_HEIGHT`. O CSS não implementa.\n\n### 5. Contraste: especificação × `brands.css`\n\nO pior trilho é 3,22 na especificação e 3,48 no recálculo. A superfície de referência da\nmedição do Figma não está registrada. Os dois conjuntos concordam que tudo passa.\n\n## Decisões registradas (não são lacunas)\n\n- **D0 — `tone`, não `theme`.** `invert` só sobre o painel da marca.\n- **D1 — disabled sem token** (DS-037). Opacidade 0,4.\n- **D2 — `checked`, não `selected`.**\n- **D3 — `size` no master**, classe irmã em CSS.\n- **D4 — sem `indeterminate`.**\n- **D5 — anel `border-base-focus-alt`** em `neutral` e `brand`.\n- **D6 — o foco não muda o tamanho.**\n- **D7 — sem hover.** O único efeito de passar o mouse é o cursor.\n- **DS-049 — sem classe para o rótulo.** `Show copy` do master não vira classe.\n\n## Switch (descontinuado)\n\n`Switch (descontinuado)` `1697:1842`, 24 variantes (`Enable` × `Size` × `Theme`), na mesma\npágina. Descontinuado em 23/09/2026.\n\n> **Não gerar código, mockup nem variante a partir deste componente.**\n\nEle não é implementado neste pacote, não tem classe e não é fonte de nenhum valor aqui. As\ncores mudaram **de propósito**: o trilho desligado e o `brand` do legado usavam tokens que\nreprovavam 3:1. O Switch novo também não tem hover.\n\n### Mapa de migração\n\n| Legado | Switch novo |\n| --- | --- |\n| `Enable=Off` / `Enable=On` | `checked` `false` / `true` |\n| `Theme=Base` / `Primary` / `Invert` | `tone` `neutral` / `brand` / `invert` |\n| `Theme=Disabled` | atributo `disabled` + `tone` `neutral` |\n| `Size=Small` / `Medium` / `Large` | `size` `sm` / `md` / `lg` (no `.Master Switch`) |\n\nO mesmo mapa está na descrição do componente descontinuado no Figma e em\n`deprecatedLegacy`, no contrato.\n",
+    "origem": {
+      "contrato": "src/switch.contract.json",
+      "regras": "src/switch.rules.md"
+    }
   }
 };

@@ -591,6 +591,66 @@ if (rdItem) {
     }
 }
 
+/* ---- Switch ------------------------------------------------------------------------
+ * Configuração com efeito imediato. É o checkbox nativo com role="switch", e as checagens
+ * próprias são quase todas NEGATIVAS, como as do Dot: sem hover (D7), sem indeterminate (D4),
+ * sem aria-pressed, e o trilho não muda de tamanho entre desligado e ligado. */
+const swItem = (manifest.components ?? []).find((item) => item.id === 'switch');
+let sw = null;
+if (swItem) {
+    sw = validarControle(swItem, {
+        global: 'BMB_SWITCH_TOKENS',
+        inputType: 'checkbox',
+        inputContrato: 'input[type="checkbox"][role="switch"]',
+        papeis: ['track', 'track-on', 'thumb', 'label', 'ring'],
+        porInput(inp) {
+            check(/role="switch"/.test(inp),
+                `Switch: ${inp.slice(0, 70)}… precisa de role="switch" — sem ele é um Checkbox.`);
+        },
+    });
+    const regras = regrasDe(sw.css);
+
+    // D7: nenhum hover visual. Uma regra de :hover só pode declarar cursor.
+    for (const r of regras.filter((x) => x.sel.includes(':hover'))) {
+        const props = [...r.corpo.matchAll(/([\w-]+)\s*:/g)].map((m) => m[1]);
+        check(props.every((pr) => pr === 'cursor'),
+            `Switch: "${r.sel}" muda ${props.filter((pr) => pr !== 'cursor').join(', ')} no hover — o Switch não tem hover (D7).`);
+    }
+    check(!(sw.contrato.states ?? {}).hover && !sw.fonte.stateOrder.includes('hover'),
+        'Switch: o contrato e os tokens não podem declarar hover (D7).');
+
+    const { notSupported, ...semAusencias } = sw.contrato;
+    check(!/indeterminate/i.test(JSON.stringify(semAusencias)) && !/indeterminate/i.test(sw.limpo) &&
+        !(sw.fonte.checkedOrder ?? []).includes('indeterminate'),
+        'Switch: não existe indeterminate no Switch (D4) — o CSS, o contrato e os tokens não podem ter.');
+    check(!/aria-pressed/.test(sw.demo), 'Switch: aria-pressed é botão de alternância, outro papel.');
+
+    // O trilho não muda de tamanho: o estado ligado só troca a cor e move o pino.
+    for (const r of regras.filter((x) => /__input(:[\w-]+(\([^)]*\))?)*:checked\s*$/.test(x.sel))) {
+        const muda = r.corpo.match(/(^|[\s;])((inline|block|min-inline|min-block)-size|width|height|padding[\w-]*|border[\w-]*|margin[\w-]*)\s*:/);
+        check(!muda, `Switch: "${r.sel}" muda ${muda?.[2]} — o trilho não pode mudar de tamanho entre desligado e ligado.`);
+    }
+    check(regras.some((r) => r.sel.includes(':checked::before') && /transform:\s*translateX/.test(r.corpo)),
+        'Switch: o pino ligado precisa andar por transform: translateX, sem mexer no trilho.');
+    check(/@media \(prefers-reduced-motion: reduce\)/.test(sw.limpo),
+        'Switch: falta @media (prefers-reduced-motion: reduce) para o deslize do pino.');
+
+    for (const nome of sw.fonte.sizeOrder) {
+        const z = sw.fonte.sizes[nome];
+        check(z.thumb + z.pad * 2 === z.track.h,
+            `Switch: geometria de ${nome} não fecha — pino ${z.thumb} + 2 × ${z.pad} != ${z.track.h}.`);
+        const curso = z.track.w - z.thumb - z.pad * 2;
+        check(z.thumbCheckedX - z.pad === curso,
+            `Switch: o pino ligado de ${nome} não bate com o thumb-checked do Figma (x=${z.thumbCheckedX}).`);
+        const bloco = blocoDe(sw.css, `.bmb-switch--${nome} {`);
+        check(bloco.includes(`--_bmb-switch-w: ${z.track.w}px;`) && bloco.includes(`--_bmb-switch-h: ${z.track.h}px;`) &&
+            bloco.includes(`--_bmb-switch-travel: ${curso}px;`),
+            `Switch: tamanho ${nome} sem trilho ${z.track.w}×${z.track.h} ou deslize de ${curso}px.`);
+    }
+    check(sw.contrato.deprecatedLegacy?.rule?.includes('Não gerar código'),
+        'Switch: o contrato precisa registrar que o Switch (descontinuado) não gera código.');
+}
+
 /* Devolve o texto visível do elemento que CONTÉM a posição `i`. Não é um parser de HTML: é uma
  * varredura de profundidade, suficiente para o HTML bem formado das demos deste repositório.
  * Existe porque a regra mais importante do Dot — nunca ser a única fonte da informação — é
@@ -696,7 +756,7 @@ if (dContract) {
     partes.push(`Dot ${dContract.variants.tone.values.length} tons/` +
         `${dContract.variants.size.values.length} tamanhos/0 estados`);
 }
-const controles = [cb, rd].filter(Boolean);
+const controles = [cb, rd, sw].filter(Boolean);
 for (const k of controles) {
     partes.push(`${k.contrato.component} ${k.contrato.variants.tone.values.length} tons/` +
         `${k.contrato.variants.size.values.length} tamanhos/${Object.keys(k.contrato.states).length} estados`);

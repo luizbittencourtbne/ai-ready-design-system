@@ -6,18 +6,18 @@ Revise os arquivos existentes; não assuma uma pasta `components/<nome>/`. Use `
 
 Não é lapso de documentação: os eixos vêm do Figma, e o Figma desenhou cada um de um jeito. Conferir um contra a expectativa do outro produz achado falso.
 
-| | Button | Hyperlink | Dot | Checkbox | Radio |
-| --- | --- | --- | --- | --- | --- |
-| Para quê | ação | navegação | status | opção **independente**, vale no envio | escolha **única** num grupo |
-| Elemento | `<button>` | `<a href>` | `<span>` | `<label>` + `<input type="checkbox">` | `<label>` + `<input type="radio">`, em `<fieldset>`, 2+ com o mesmo `name` |
-| Eixo de cor | 13 temas | 9 temas | **5 tons** (`tone`, não `theme`) | **3 tons** (`neutral`, `brand`, `invert`) | **3 tons**, iguais em todo o grupo |
-| Tamanhos | Small → XLarge | XSmall → Large | Small → Large | `sm` → `lg` (no `.Master`) | `sm` → `lg`, iguais em todo o grupo |
-| Estados | 6 | 6 | **nenhum** | 4 (`default`, `hover`, `focus`, `disabled`) × checked `false`/`true`/**`indeterminate`** | 4 × checked `false`/`true` — **sem** `indeterminate` |
-| Gerador | `scripts/build-css.mjs` | `scripts/build-hyperlink-css.mjs` | `scripts/build-dot-css.mjs` | `scripts/build-checkbox-css.mjs` | `scripts/build-radio-css.mjs` |
+| | Button | Hyperlink | Dot | Checkbox | Radio | Switch |
+| --- | --- | --- | --- | --- | --- | --- |
+| Para quê | ação | navegação | status | opção **independente**, vale no envio | escolha **única** num grupo | configuração com **efeito imediato** |
+| Elemento | `<button>` | `<a href>` | `<span>` | `<label>` + `<input type="checkbox">` | `<label>` + `<input type="radio">`, em `<fieldset>`, 2+ com o mesmo `name` | `<label>` + `<input type="checkbox" role="switch">` |
+| Eixo de cor | 13 temas | 9 temas | **5 tons** (`tone`, não `theme`) | **3 tons** (`neutral`, `brand`, `invert`) | **3 tons**, iguais em todo o grupo | **3 tons** |
+| Tamanhos | Small → XLarge | XSmall → Large | Small → Large | `sm` → `lg` (no `.Master`) | `sm` → `lg`, iguais em todo o grupo | `sm` → `lg` |
+| Estados | 6 | 6 | **nenhum** | 4 (`default`, `hover`, `focus`, `disabled`) × checked `false`/`true`/**`indeterminate`** | 4 × checked `false`/`true` — **sem** `indeterminate` | **3** (`default`, `focus`, `disabled`) × checked `false`/`true` — **sem hover**, sem `indeterminate` |
+| Gerador | `scripts/build-css.mjs` | `scripts/build-hyperlink-css.mjs` | `scripts/build-dot-css.mjs` | `scripts/build-checkbox-css.mjs` | `scripts/build-radio-css.mjs` | `scripts/build-switch-css.mjs` |
 
 **Ausência não é falta.** O Dot não é interativo — sem hover, sem foco, sem disabled, sem tabindex. Isso está na descrição do componente no Figma, no contrato e travado por teste na validação. Reportar "faltam estados" no Dot é erro de revisão. Para ele, a falha seria o contrário: ter ganhado interação que o design não deu.
 
-Nos controles, os estados não são classes: vêm do `<input>` nativo (`:checked`, `:indeterminate`, `:disabled`, `:focus-visible`), e o disabled não tem token próprio (DS-037, opacidade 0,4). Reportar "falta classe de estado" ou "falta token de disabled" é erro de revisão.
+Nos controles, os estados não são classes: vêm do `<input>` nativo (`:checked`, `:indeterminate`, `:disabled`, `:focus-visible`), e o disabled não tem token próprio (DS-037, opacidade 0,4). Reportar "falta classe de estado" ou "falta token de disabled" é erro de revisão. O mesmo vale para "o Switch não tem hover" (D7) e "o Radio e o Switch não têm indeterminate" (D4): é a especificação, e a falha seria o contrário. O `Switch (descontinuado)` do Figma não é fonte de nada — não peça que ele seja implementado.
 
 Antes de tratar qualquer ausência como problema, confira no contrato se ela é a especificação.
 

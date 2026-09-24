@@ -64,6 +64,19 @@
       "css": "dist/radio.css",
       "browserCss": "dist/radio.preview.css",
       "demo": "demo/radio.html"
+    },
+    {
+      "id": "switch",
+      "name": "Switch",
+      "status": "experimental",
+      "purpose": "configuração com efeito imediato, sem confirmar (valor que vale no envio é o Checkbox, escolha única é o Radio)",
+      "element": "label > input[type=checkbox][role=switch]",
+      "contract": "src/switch.contract.json",
+      "rules": "src/switch.rules.md",
+      "tokens": "src/switch.tokens.json",
+      "css": "dist/switch.css",
+      "browserCss": "dist/switch.preview.css",
+      "demo": "demo/switch.html"
     }
   ]
 }

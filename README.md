@@ -8,6 +8,7 @@ Atualmente contém:
 - Dot
 - Checkbox
 - Radio
+- Switch
 
 ## Componentes
 
@@ -89,6 +90,24 @@ com `name` diferente ou misturando tom ou tamanho. No `invert` o anel de foco é
 `on-surface-neutral-brand`, não o `subtle` do Checkbox — ali o `subtle` já é a cor da borda.
 
 Arquivos em `components.json` sob o id `radio`; demo em `demo/radio.html` e no storybook.
+
+### Switch
+Configuração com efeito imediato: liga ou desliga na hora, sem botão de salvar. Valor que só
+vale no envio é o Checkbox; escolha única é o Radio.
+
+O elemento é `<input type="checkbox" role="switch">` nativo dentro de `<label>` — o
+`role="switch"` é obrigatório, e `aria-pressed` é proibido. O trilho é o próprio input e o
+pino é o `::before`, que anda por `transform` sem mudar o tamanho do trilho; o deslize some em
+`prefers-reduced-motion`. O rótulo nomeia a configuração, não o estado.
+
+**Não tem hover** (D7): passar o mouse só muda o cursor, e a validação reprova qualquer
+`:hover` que não seja só `cursor`. Também não tem `indeterminate`. Os tokens do trilho foram
+escolhidos para passar 3:1 sem borda; não os troque por um fundo "mais suave" sem medir.
+
+O `Switch (descontinuado)` que fica na mesma página do Figma **não gera código, mockup nem
+variante**. O mapa de migração do legado está em `src/switch.rules.md`.
+
+Arquivos em `components.json` sob o id `switch`; demo em `demo/switch.html` e no storybook.
 
 ## Arquitetura
 

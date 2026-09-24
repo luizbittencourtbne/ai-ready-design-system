@@ -83,6 +83,9 @@ const POR_COMPONENTE = {
     radio: [
         ['scripts/build-radio-css.mjs', 'gerador do Radio: mapeamento tom -> token e geometria'],
     ],
+    switch: [
+        ['scripts/build-switch-css.mjs', 'gerador do Switch: mapeamento tom -> token e geometria'],
+    ],
 };
 
 /* Demo preferida no contexto, quando a declarada no índice não é a melhor para revisão. */

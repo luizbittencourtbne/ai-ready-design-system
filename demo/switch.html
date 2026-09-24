@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-BR" data-brand="employer" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Switch</title>
+        <!-- As marcas declaram famílias diferentes em --bmb-font-family-body: Roboto
+             (employer), Nunito (epays) e Montserrat (bne-cia). Sem carregá-las, o rótulo cai no
+             fallback do sistema e a página mostra uma tipografia que não é a do Design System. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/switch.preview.css" />
+        <style>
+            /* apenas a pagina de demo — os estilos do componente vem de switch.preview.css */
+            body {
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                margin: 0;
+                padding: 40px;
+                color: #1b2439;
+                background: var(--bmb-color-base-backgrounds-base-default);
+            }
+            h1 { font-size: 20px; margin: 0 0 4px; }
+            p.sub { margin: 0 0 32px; color: #5b6478; font-size: 14px; max-width: 70ch; }
+            h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #5b6478;
+                margin: 32px 0 12px;
+                font-weight: 600;
+            }
+            .row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+            .cell { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+            .cap { font-size: 11px; color: #8890a0; }
+            /* O tom invert só existe sobre o painel da marca. */
+            .painel-marca {
+                background: var(--bmb-color-surface-brand-backgrounds-surface-brand);
+                padding: 20px;
+                border-radius: 8px;
+            }
+            .preferencias { display: flex; flex-direction: column; gap: 14px; max-width: 360px; }
+            .status { font-size: 13px; color: #5b6478; min-height: 1.4em; }
+            .nota {
+                background: #fffbe6;
+                border: 1px solid #e8d48b;
+                border-radius: 8px;
+                padding: 12px 16px;
+                font-size: 13px;
+                max-width: 70ch;
+                margin: 8px 0 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Switch</h1>
+        <p class="sub">
+            Figma CORE-Basics · ✅ 08. Controls 827:887 · set Switch 16715:1144 (3 tons × 3
+            estados × 2 valores de checked) e .Master Switch 1468:1255 (3 tamanhos). Não há hover:
+            passar o mouse só muda o cursor. Foco é real — navegue com Tab e alterne com Espaço.
+        </p>
+
+        <h2>Tamanhos · neutral</h2>
+        <div class="row">
+            <div class="cell">
+                <label class="bmb-switch bmb-switch--neutral bmb-switch--sm">
+                    <input type="checkbox" role="switch" class="bmb-switch__input" name="tam-sm" checked />
+                    <span class="bmb-switch__label">Notificações</span>
+                </label>
+                <span class="cap">sm · trilho 30×16 · pino 12</span>
+            </div>
+            <div class="cell">
+                <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                    <input type="checkbox" role="switch" class="bmb-switch__input" name="tam-md" checked />
+                    <span class="bmb-switch__label">Notificações</span>
+                </label>
+                <span class="cap">md · trilho 34×20 · pino 16 (default)</span>
+            </div>
+            <div class="cell">
+                <label class="bmb-switch bmb-switch--neutral bmb-switch--lg">
+                    <input type="checkbox" role="switch" class="bmb-switch__input" name="tam-lg" checked />
+                    <span class="bmb-switch__label">Notificações</span>
+                </label>
+                <span class="cap">lg · trilho 46×24 · pino 20</span>
+            </div>
+        </div>
+
+        <h2>Tons × checked</h2>
+        <div class="row">
+            <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="n-f" />
+                <span class="bmb-switch__label">neutral</span>
+            </label>
+            <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="n-t" checked />
+                <span class="bmb-switch__label">neutral ligado</span>
+            </label>
+            <label class="bmb-switch bmb-switch--brand bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="b-f" />
+                <span class="bmb-switch__label">brand</span>
+            </label>
+            <label class="bmb-switch bmb-switch--brand bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="b-t" checked />
+                <span class="bmb-switch__label">brand ligado</span>
+            </label>
+        </div>
+        <div class="row painel-marca" style="margin-top: 16px">
+            <label class="bmb-switch bmb-switch--invert bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="i-f" />
+                <span class="bmb-switch__label">invert</span>
+            </label>
+            <label class="bmb-switch bmb-switch--invert bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="i-t" checked />
+                <span class="bmb-switch__label">invert ligado</span>
+            </label>
+        </div>
+
+        <h2>Disabled — atributo nativo, opacidade 0,4, pino no lugar</h2>
+        <div class="row">
+            <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="d-f" disabled />
+                <span class="bmb-switch__label">Indisponível</span>
+            </label>
+            <label class="bmb-switch bmb-switch--brand bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="d-t" checked disabled />
+                <span class="bmb-switch__label">Indisponível, ligado</span>
+            </label>
+        </div>
+
+        <h2>Uso correto — efeito imediato, rótulo que nomeia a configuração</h2>
+        <div class="preferencias">
+            <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="notificacoes" checked data-imediato />
+                <span class="bmb-switch__label">Notificações por e-mail</span>
+            </label>
+            <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="saldo" data-imediato />
+                <span class="bmb-switch__label">Mostrar saldo na tela inicial</span>
+            </label>
+            <p class="status" role="status" id="status"></p>
+        </div>
+        <p class="nota">
+            O rótulo descreve <strong>a configuração</strong>, não o estado: "Notificações por
+            e-mail", nunca "Ativado". Ele não muda ao alternar — quem muda é o pino, e o leitor
+            de tela anuncia o estado a partir do <code>checked</code>. A mudança vale no clique,
+            sem botão de salvar; se ela depender de rede, mostre o novo estado na hora e reverta
+            com mensagem se falhar.
+        </p>
+
+        <h2>Uso correto — sem rótulo visível</h2>
+        <div class="row">
+            <label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+                <input type="checkbox" role="switch" class="bmb-switch__input" name="linha-1" aria-label="Ativar a regra de desconto" />
+            </label>
+            <span class="cap">Sem texto ao lado (célula de tabela): aria-label no input é obrigatório.</span>
+        </div>
+
+        <script>
+            /* Efeito imediato: a mudança é aplicada (aqui, só anunciada) no clique. */
+            const status = document.getElementById('status');
+            for (const i of document.querySelectorAll('input[data-imediato]')) {
+                i.addEventListener('change', () => {
+                    const nome = i.closest('label').textContent.trim();
+                    status.textContent = `${nome}: ${i.checked ? 'ligado' : 'desligado'} — salvo.`;
+                });
+            }
+        </script>
+    </body>
+</html>

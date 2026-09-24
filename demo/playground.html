@@ -25,6 +25,7 @@
         <link rel="stylesheet" href="../dist/dot.preview.css" />
         <link rel="stylesheet" href="../dist/checkbox.preview.css" />
         <link rel="stylesheet" href="../dist/radio.preview.css" />
+        <link rel="stylesheet" href="../dist/switch.preview.css" />
         <style>
             :root {
                 --doc-bg: #ffffff;
@@ -309,6 +310,7 @@
         <script src="../dist/dot.tokens.js"></script>
         <script src="../dist/checkbox.tokens.js"></script>
         <script src="../dist/radio.tokens.js"></script>
+        <script src="../dist/switch.tokens.js"></script>
         <!-- Snapshot de contrato e regras, gerado por build-docs-data.mjs. Serve de rede para
              quando a página é aberta por file://, onde fetch é bloqueado por CORS. Servida por
              HTTP, a página prefere os arquivos reais. -->
@@ -410,12 +412,14 @@
             const DOT = window.BMB_DOT_TOKENS;
             const CBX = window.BMB_CHECKBOX_TOKENS;
             const RDO = window.BMB_RADIO_TOKENS;
+            const SWT = window.BMB_SWITCH_TOKENS;
 
             /* Sem os tokens a página não tem o que mostrar. Falhar com uma frase é melhor do
                que morrer com "cannot read properties of undefined" e uma tela em branco. */
             const FALTANDO = [!BTN && 'dist/button.tokens.js', !LNK && 'dist/hyperlink.tokens.js',
                 !DOT && 'dist/dot.tokens.js', !CBX && 'dist/checkbox.tokens.js',
-                !RDO && 'dist/radio.tokens.js'].filter(Boolean);
+                !RDO && 'dist/radio.tokens.js',
+                !SWT && 'dist/switch.tokens.js'].filter(Boolean);
             if (FALTANDO.length) {
                 document.body.innerHTML =
                     '<div style="padding:40px;max-width:60ch;font:15px/1.6 ui-sans-serif,system-ui,sans-serif">' +
@@ -935,6 +939,51 @@
 <label class="bmb-radio bmb-radio--neutral bmb-radio--md">
     <input type="radio" class="bmb-radio__input" name="pagamento" value="cripto" disabled>
     <span class="bmb-radio__label">Cripto (indisponível)</span>
+</label>`,
+                    },
+                }),
+
+                /* O Switch não tem hover (D7): `hover` fica de fora da configuração, e por
+                   isso não há estado Hover para forçar. */
+                switch: registroControle({
+                    id: 'switch', T: SWT, tipo: 'checkbox', role: 'switch', swatch: 'track-on',
+                    dica: 'Estado real — clique ou dê Tab e Espaço. Passar o mouse não muda nada além do cursor: o Switch não tem hover.',
+                    linhas: (S, ci, cb, cs) => {
+                        const ligado = S.checked === 'true';
+                        return [['trilho', ci.backgroundColor, ligado ? 'track-on' : 'track'],
+                            ['pino', cb.backgroundColor, 'thumb'], ['rótulo', cs.color, 'label']];
+                    },
+                    geo: (z) => `trilho ${z.track.w}×${z.track.h} · pino ${z.thumb} a ${z.pad}px das bordas · deslize ${z.track.w - z.thumb - 2 * z.pad}px · gap ${SWT.gap}px`,
+                    extra: {
+                        nome: 'Switch',
+                        descricao: 'Configuração com efeito imediato, sem botão de salvar. Valor que vale no envio é o Checkbox; escolha única é o Radio.',
+                        contrato: '../src/switch.contract.json',
+                        regras: '../src/switch.rules.md',
+                        estados: ['Default', 'Focus', 'Disabled'],
+                        checkedVals: SWT.checkedOrder,
+                        controles: ['theme', 'state', 'size', 'checked', 'label'],
+                        inicial: { theme: 'neutral', state: 'Interativo', size: 'md', checked: 'true', label: 'Notificações' },
+                        secoesGuidelines: ['Switch vs os outros dois', 'Quando usar', 'Quando não usar', 'Anatomia', 'Props', 'Cor',
+                            'Estados', 'Geometria', 'Desvios do Figma (autorizados)', 'Divergências abertas',
+                            'Decisões registradas (não são lacunas)', 'Switch (descontinuado)'],
+                        secoesA11y: ['Acessibilidade', 'Anel de foco'],
+                        aviso: 'O Switch <strong>não tem hover</strong>: passar o mouse só muda o cursor. O rótulo nomeia a configuração, não o estado — "Notificações", nunca "Ativado". E o <code>Switch (descontinuado)</code> do Figma não gera código.',
+                        notaTamanhos: () => SWT.sizeOrder.map((z) => z + ' trilho ' + SWT.sizes[z].track.w + '×' + SWT.sizes[z].track.h).join(' · '),
+                        comoUsar: `<!-- role="switch" é obrigatório. O rótulo nomeia a configuração, não o estado. -->
+<label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+    <input type="checkbox" role="switch" class="bmb-switch__input" name="notificacoes" checked>
+    <span class="bmb-switch__label">Notificações</span>
+</label>
+
+<!-- Disabled: atributo nativo. O pino fica onde estava. -->
+<label class="bmb-switch bmb-switch--brand bmb-switch--md">
+    <input type="checkbox" role="switch" class="bmb-switch__input" checked disabled>
+    <span class="bmb-switch__label">Modo escuro</span>
+</label>
+
+<!-- Sem rótulo visível: aria-label no input é obrigatório. -->
+<label class="bmb-switch bmb-switch--neutral bmb-switch--md">
+    <input type="checkbox" role="switch" class="bmb-switch__input" aria-label="Ativar a regra de desconto">
 </label>`,
                     },
                 }),
