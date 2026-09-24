@@ -1,0 +1,177 @@
+{
+  "component": "Checkbox",
+  "version": "experimental",
+  "purpose": "opção independente: cada caixa liga ou desliga uma opção sem afetar as outras, e o valor só vale quando o formulário é enviado",
+  "notTheOthers": "Escolha única entre opções é o Radio. Configuração com efeito imediato, sem confirmar, é o Switch. Ver src/checkbox.rules.md, 'Checkbox vs os outros dois'.",
+  "source": {
+    "figma": "04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1, página ✅ 08. Controls 827:887 — set Checkbox 1451:1360 (tone × state × checked, 36 variantes) e .Master Checkbox 1451:1285 (size). Lido ao vivo via MCP em 2026-09-24.",
+    "spec": "checkbox.rules.md recebido com a tarefa (conferido pelo design em 2026-09-23) — mapeamento variante↔prop, cores por tom e notas de acessibilidade. Reescrito em src/checkbox.rules.md.",
+    "geometry": "src/checkbox.tokens.json",
+    "toneMappings": "scripts/build-checkbox-css.mjs",
+    "brandColors": "audit/core-brands-audit.json",
+    "rules": "src/checkbox.rules.md"
+  },
+  "element": {
+    "required": "label",
+    "input": "input[type=\"checkbox\"]",
+    "markup": "<label class=\"bmb-checkbox\"><input type=\"checkbox\" class=\"bmb-checkbox__input\"> <span class=\"bmb-checkbox__label\">Rótulo</span></label>",
+    "forbidden": [
+      "div",
+      "span",
+      "button"
+    ],
+    "forbiddenAttributes": [
+      "role=\"switch\"",
+      "aria-pressed",
+      "role=\"checkbox\" num elemento que não é input"
+    ],
+    "why": "A semântica, o teclado (Espaço alterna) e o envio no formulário vêm do <input type=\"checkbox\"> nativo. O <label> que o envolve faz o rótulo inteiro ser área clicável. Trocar o input por <div> ou <span> perde as três coisas; role=\"switch\" transformaria a caixa em interruptor, que é outro componente."
+  },
+  "baseClass": "bmb-checkbox",
+  "parts": {
+    "input": "bmb-checkbox__input",
+    "label": "bmb-checkbox__label"
+  },
+  "variants": {
+    "tone": {
+      "required": false,
+      "default": "neutral",
+      "defaultBehaviour": "sem classe de tom o Checkbox renderiza como neutral — o default vem do Figma e está em :where(.bmb-checkbox), com especificidade zero",
+      "classPrefix": "bmb-checkbox--",
+      "values": [
+        "neutral",
+        "brand",
+        "invert"
+      ],
+      "figmaNames": {
+        "neutral": "neutral",
+        "brand": "brand",
+        "invert": "invert"
+      },
+      "meaning": {
+        "neutral": "padrão, para formulários e listas comuns",
+        "brand": "só quando a escolha precisa remeter à marca",
+        "invert": "só sobre o painel da marca (surface-brand); valor transitório, até invert virar modo de superfície"
+      }
+    },
+    "size": {
+      "required": false,
+      "default": "md",
+      "defaultBehaviour": "sem classe de tamanho o Checkbox renderiza como md — ver a divergência sobre o default em openDivergences",
+      "classPrefix": "bmb-checkbox--",
+      "values": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "figmaNames": {
+        "sm": "sm",
+        "md": "md",
+        "lg": "lg"
+      },
+      "figmaAxisLocation": "No Figma o eixo size não fica no set Checkbox: fica na instância aninhada .Master Checkbox. Em CSS os dois eixos viram classes irmãs."
+    }
+  },
+  "checked": {
+    "values": [
+      "false",
+      "true",
+      "indeterminate"
+    ],
+    "figmaProperty": "checked (VARIANT de três valores no set)",
+    "howToApply": {
+      "false": "input sem o atributo checked",
+      "true": "atributo checked no input, ou input.checked = true",
+      "indeterminate": "input.indeterminate = true por script — não existe atributo HTML. A pseudo-classe é :indeterminate."
+    },
+    "indeterminateRule": "Só para o controle pai de um grupo parcialmente marcado, como o 'selecionar todos' de Table e List. Nunca como terceiro estado de negócio ('talvez', 'parcial'). Clicar num pai indeterminado marca todos os filhos."
+  },
+  "states": {
+    "default": "repouso — o <input> sem pseudo-classe",
+    "hover": ":hover no <label> — a borda passa de 1px por dentro para 2px centralizada (sombra externa de 1px). Nenhuma cor muda. Não é classe nem prop.",
+    "focus": {
+      "selector": ".bmb-checkbox:has(.bmb-checkbox__input:focus-visible)",
+      "ring": "outline de 2px, outline-offset 2px, no <label> — envolve caixa + rótulo e não muda o tamanho do componente",
+      "token": "--_bmb-checkbox-ring: border-base-focus-alt em neutral e brand; on-surface-subtle-brand em invert"
+    },
+    "disabled": {
+      "requiredMarkup": "atributo disabled nativo no <input>",
+      "style": "opacidade 0.4 no <label> inteiro, mantendo a cor do tom; sem hover e sem foco",
+      "token": "nenhum — DS-037"
+    }
+  },
+  "notSupported": {
+    "selected": "não existe. A seleção se chama checked (decisão D2).",
+    "active": "não existe no Figma.",
+    "stateClasses": "Não há bmb-checkbox--hover, --focus, --disabled nem --checked. Estado vem do input nativo.",
+    "showCopy": "O booleano Show copy do master não vira classe (DS-049): o rótulo é conteúdo, e a presença do texto é o mecanismo. Sem rótulo visível, aria-label no input é obrigatório.",
+    "diagonalGlyph": "O traço diagonal oculto (Icon 1840:3860, 1840:3388, 1840:3426) é uma camada escondida do master. Não é implementado."
+  },
+  "accessibility": {
+    "keyboard": "Espaço alterna. Tab entra e sai de cada caixa individualmente — não é grupo com setas.",
+    "label": "O <label> envolve o input e o rótulo: a área clicável inclui o texto. Sem rótulo visível, aria-label no input.",
+    "group": "Grupo de checkboxes com título: <fieldset> + <legend>.",
+    "stateNotColorOnly": "Marcado e indeterminado se distinguem pelo glifo, não só pela cor da caixa. No invert a caixa marcada tem o mesmo fundo da desmarcada — só o glifo muda.",
+    "indeterminate": "Com o input nativo, o leitor de tela anuncia 'misto' a partir de input.indeterminate. aria-checked=\"mixed\" só se aplica a quem usar role=\"checkbox\", o que este pacote não faz.",
+    "focusRing": "outline de 2px com offset de 2px no <label>. Nunca outline: none — a validação reprova.",
+    "forcedColors": "@media (forced-colors: active) mantém borda e glifo em CanvasText e o anel em Highlight.",
+    "keepCheckedBorder": "No brand marcado, o preenchimento primary-default fica abaixo de 3:1 contra a página no modo escuro. Quem delimita o controle é a borda on-surface-primary. A borda do controle marcado NÃO pode ser removida.",
+    "notVerified": "Nada disto foi exercitado em navegador, teclado ou leitor de tela. O contraste citado nas regras foi medido no Figma (especificação) e recalculado a partir de dist/brands.css, não no navegador."
+  },
+  "tokens": {
+    "radius": "--bmb-radius-sm na caixa (4px no Desktop, 2px abaixo de 1024px) — o border-radius-sm do Figma",
+    "typography": "--bmb-font-family-body, --bmb-font-weight-regular, --bmb-font-size-paragraph-{small,medium,large}, --bmb-line-height-130",
+    "noHardcodedColor": "Nenhum hex pode aparecer em dist/checkbox.css, nem como fallback. A validação reprova.",
+    "perTone": {
+      "neutral": {
+        "bg": "--bmb-color-base-backgrounds-base-default",
+        "bgChecked": "--bmb-color-base-backgrounds-base-default-alt",
+        "glyph": "--bmb-color-base-on-on-surface-base-alt",
+        "border": "--bmb-color-base-on-on-surface-base",
+        "label": "--bmb-color-base-on-on-surface-base",
+        "ring": "--bmb-color-base-borders-border-base-focus-alt"
+      },
+      "brand": {
+        "bg": "--bmb-color-primary-on-on-primary",
+        "bgChecked": "--bmb-color-primary-backgrounds-primary-default",
+        "glyph": "--bmb-color-primary-on-on-primary",
+        "border": "--bmb-color-primary-on-on-surface-primary",
+        "label": "--bmb-color-primary-on-on-surface-primary",
+        "ring": "--bmb-color-base-borders-border-base-focus-alt"
+      },
+      "invert": {
+        "bg": "--bmb-color-surface-brand-backgrounds-surface-brand",
+        "bgChecked": "--bmb-color-surface-brand-backgrounds-surface-brand",
+        "glyph": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+        "border": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+        "label": "--bmb-color-surface-brand-on-on-surface-neutral-brand",
+        "ring": "--bmb-color-surface-brand-on-on-surface-subtle-brand"
+      }
+    },
+    "onColorIsNotConstant": "on-* e base-default mudam por marca e tema: on-primary é #000000 em bne-cia/dark, base-default é #000000 em employer/dark. Nunca cravar a cor."
+  },
+  "globalTheme": {
+    "brands": [
+      "employer",
+      "epays",
+      "bne-cia"
+    ],
+    "modes": [
+      "light",
+      "dark"
+    ],
+    "howToSwitch": "atributos data-brand e data-theme no <html>"
+  },
+  "openDivergences": [
+    "DS-053: no brand desmarcado, o fundo da caixa é on-primary, um token de texto usado como fundo. Implementado como o Figma mostra.",
+    "Default de size: a propriedade do .Master Checkbox diz sm; as 36 variantes públicas instanciam md e a especificação diz md. Implementado md.",
+    "Glifo check do sm: 5,09 × 3,5 em (4, 5) numa caixa de 14 — fora do centro e proporcionalmente menor que no md e no lg. Implementado como medido.",
+    "Rótulo: o Figma aplica leading-trim CAP_HEIGHT; o CSS não implementa (suporte parcial a text-box-trim).",
+    "Contraste: os números da especificação (Figma) e os recalculados a partir de dist/brands.css não coincidem. Ver src/checkbox.rules.md."
+  ],
+  "generatedFiles": [
+    "dist/checkbox.css",
+    "dist/checkbox.preview.css",
+    "dist/checkbox.tokens.js"
+  ]
+}

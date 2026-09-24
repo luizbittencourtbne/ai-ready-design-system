@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-BR" data-brand="employer" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Hyperlink</title>
+        <!-- As marcas declaram famílias diferentes em --bmb-font-family-body: Roboto
+             (employer), Nunito (epays) e Montserrat (bne-cia). Sem carregá-las, o texto cai no
+             fallback do sistema e a página mostra uma tipografia que não é a do Design System. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/hyperlink.preview.css" />
+        <style>
+            /* apenas a pagina de demo — os estilos do componente vem de hyperlink.preview.css */
+            body {
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                margin: 0;
+                padding: 40px;
+                color: #1b2439;
+                background: #fff;
+            }
+            h1 { font-size: 20px; margin: 0 0 4px; }
+            p.sub { margin: 0 0 32px; color: #5b6478; font-size: 14px; max-width: 70ch; }
+            h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #5b6478;
+                margin: 32px 0 12px;
+                font-weight: 600;
+            }
+            .row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+            .cell { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+            .cap { font-size: 11px; color: #8890a0; }
+            .prosa { max-width: 60ch; line-height: 1.6; }
+            .escuro {
+                background: #171717;
+                padding: 20px;
+                border-radius: 8px;
+                margin-top: 8px;
+            }
+            .nota {
+                background: #fffbe6;
+                border: 1px solid #e8d48b;
+                border-radius: 8px;
+                padding: 12px 16px;
+                font-size: 13px;
+                max-width: 70ch;
+                margin: 8px 0 0;
+            }
+        </style>
+    </head>
+    <body>
+        <svg style="display: none" aria-hidden="true">
+            <symbol id="ico-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+            </symbol>
+            <symbol id="ico-externo" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 16L16 8M9 8h7v7" />
+            </symbol>
+            <symbol id="ico-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5" />
+            </symbol>
+        </svg>
+
+        <h1>Hyperlink</h1>
+        <p class="sub">
+            Figma CORE-Basics · Hiperlink 240:1702 · set 99:8725 (9 temas × 6 estados) e
+            .Master Hiperlink 99:8672 (4 tamanhos × 2 conteúdos). Só combinações que existem no
+            componente. Hover, active e foco são reais — passe o mouse e navegue com Tab.
+        </p>
+
+        <h2>Tamanhos · Label &amp; Icon</h2>
+        <div class="row">
+            <div class="cell">
+                <a href="#destino-xs" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--xs">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                    <span class="bmb-hyperlink__label">Hiperlink</span>
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-seta" /></svg></span>
+                </a>
+                <span class="cap">XSmall · ícone 8,981</span>
+            </div>
+            <div class="cell">
+                <a href="#destino-sm" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--sm">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                    <span class="bmb-hyperlink__label">Hiperlink</span>
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-seta" /></svg></span>
+                </a>
+                <span class="cap">Small · ícone 12</span>
+            </div>
+            <div class="cell">
+                <a href="#destino-md" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                    <span class="bmb-hyperlink__label">Hiperlink</span>
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-seta" /></svg></span>
+                </a>
+                <span class="cap">Medium · ícone 16</span>
+            </div>
+            <div class="cell">
+                <a href="#destino-lg" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--lg">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                    <span class="bmb-hyperlink__label">Hiperlink</span>
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-seta" /></svg></span>
+                </a>
+                <span class="cap">Large · ícone 18,917</span>
+            </div>
+        </div>
+
+        <h2>Ícone à esquerda, à direita, ou nenhum</h2>
+        <p class="sub">
+            O Figma desenha os dois ícones na variante Label &amp; Icon. Não há propriedade de
+            posição: usar um, outro ou os dois é decisão de quem consome.
+        </p>
+        <div class="row">
+            <div class="cell">
+                <a href="#so-esquerda" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                    <span class="bmb-hyperlink__label">Ver documento</span>
+                </a>
+                <span class="cap">só à esquerda</span>
+            </div>
+            <div class="cell">
+                <a href="#so-direita" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__label">Continuar</span>
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-seta" /></svg></span>
+                </a>
+                <span class="cap">só à direita</span>
+            </div>
+            <div class="cell">
+                <a href="#sem-icone" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__label">Somente texto</span>
+                </a>
+                <span class="cap">sem ícone</span>
+            </div>
+        </div>
+
+        <h2>Icon Only</h2>
+        <p class="sub">
+            Exige nome acessível no <code>&lt;a&gt;</code>, porque não há texto visível. A caixa
+            é do tamanho do próprio ícone — o alvo de toque de 24×24 vem da Hit Area invisível,
+            não do tamanho do desenho. Tente acertar o XSmall com o dedo: a área é maior do que
+            parece.
+        </p>
+        <div class="row">
+            <div class="cell">
+                <a href="#icone-xs" class="bmb-hyperlink bmb-hyperlink--icon-only bmb-hyperlink--primary bmb-hyperlink--xs" aria-label="Abrir documento">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                </a>
+                <span class="cap">XSmall · caixa 8,915</span>
+            </div>
+            <div class="cell">
+                <a href="#icone-sm" class="bmb-hyperlink bmb-hyperlink--icon-only bmb-hyperlink--primary bmb-hyperlink--sm" aria-label="Abrir documento">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                </a>
+                <span class="cap">Small · caixa 12</span>
+            </div>
+            <div class="cell">
+                <a href="#icone-md" class="bmb-hyperlink bmb-hyperlink--icon-only bmb-hyperlink--primary bmb-hyperlink--md" aria-label="Abrir documento">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                </a>
+                <span class="cap">Medium · caixa 16</span>
+            </div>
+            <div class="cell">
+                <a href="#icone-lg" class="bmb-hyperlink bmb-hyperlink--icon-only bmb-hyperlink--primary bmb-hyperlink--lg" aria-label="Abrir documento">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                </a>
+                <span class="cap">Large · caixa 18,917</span>
+            </div>
+        </div>
+
+        <h2>Os 9 temas</h2>
+        <div class="row">
+            <div class="cell"><a href="#t-base" class="bmb-hyperlink bmb-hyperlink--base bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">base</span></div>
+            <div class="cell"><a href="#t-primary" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">primary</span></div>
+            <div class="cell"><a href="#t-secondary" class="bmb-hyperlink bmb-hyperlink--secondary bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">secondary</span></div>
+            <div class="cell"><a href="#t-tertiary" class="bmb-hyperlink bmb-hyperlink--tertiary bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">tertiary</span></div>
+            <div class="cell"><a href="#t-quaternary" class="bmb-hyperlink bmb-hyperlink--quaternary bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">quaternary</span></div>
+            <div class="cell"><a href="#t-success" class="bmb-hyperlink bmb-hyperlink--success bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">success</span></div>
+            <div class="cell"><a href="#t-warning" class="bmb-hyperlink bmb-hyperlink--warning bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">warning</span></div>
+            <div class="cell"><a href="#t-error" class="bmb-hyperlink bmb-hyperlink--error bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a><span class="cap">error</span></div>
+        </div>
+        <div class="escuro">
+            <a href="#t-invert" class="bmb-hyperlink bmb-hyperlink--invert bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a>
+            <span class="cap" style="color: #9aa0aa">invert · sobre fundo escuro</span>
+        </div>
+
+        <h2>Selected</h2>
+        <div class="row">
+            <div class="cell">
+                <a href="#sel-base" class="bmb-hyperlink bmb-hyperlink--selected bmb-hyperlink--base bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a>
+                <span class="cap">base · token próprio de selected</span>
+            </div>
+            <div class="cell">
+                <a href="#sel-primary" class="bmb-hyperlink bmb-hyperlink--selected bmb-hyperlink--primary bmb-hyperlink--md"><span class="bmb-hyperlink__label">Hiperlink</span></a>
+                <span class="cap">primary · mesma cor, só sublinhado</span>
+            </div>
+        </div>
+
+        <h2>Dentro de texto</h2>
+        <p class="prosa">
+            O componente usa <code>inline-flex</code>, então funciona dentro de um parágrafo e
+            também isolado. Um exemplo de
+            <a href="#no-texto" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md"><span class="bmb-hyperlink__label">link no meio da frase</span></a>
+            para ver como ele se comporta junto do texto corrido.
+        </p>
+        <p class="nota">
+            <strong>Regra de uso obrigatória.</strong> O Default não é sublinhado, por decisão do
+            time. O custo foi medido: entre a cor do link e a cor do texto ao redor o contraste é
+            <strong>1,16:1</strong>, e a WCAG 1.4.1 exige 3:1 quando a cor é a única pista.
+            Antes de usar o componente em texto corrido, meça esse contraste — é
+            <em>cor-contra-cor</em>, não texto-contra-fundo. Abaixo de 3:1, sublinhe o link nesse
+            contexto ou escolha outro Theme — é para isso que existe a classe
+            <code>bmb-hyperlink--force-underline</code>, abaixo.
+            Ver <code>src/hyperlink.rules.md</code>.
+        </p>
+
+        <h2>Force Underline</h2>
+        <p class="sub">
+            Contraparte em código da propriedade booleana <code>Force Underline</code> do
+            component set. No Figma ela não desenha nada — é só sinalização. Tentaram desenhar
+            com um retângulo atrás do texto e não funcionou: o retângulo fica fora da instância
+            aninhada e não enxerga se os ícones estão ligados, então a margem desalinha. O
+            sublinhado nativo do CSS acompanha a largura real do texto, com ou sem ícone.
+        </p>
+        <div class="row">
+            <div class="cell">
+                <a href="#fu-sem" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__label">Sem a classe</span>
+                </a>
+                <span class="cap">Default — sem sublinhado</span>
+            </div>
+            <div class="cell">
+                <a href="#fu-com" class="bmb-hyperlink bmb-hyperlink--force-underline bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__label">Com a classe</span>
+                </a>
+                <span class="cap">force-underline</span>
+            </div>
+            <div class="cell">
+                <a href="#fu-icones" class="bmb-hyperlink bmb-hyperlink--force-underline bmb-hyperlink--primary bmb-hyperlink--md">
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-doc" /></svg></span>
+                    <span class="bmb-hyperlink__label">Com ícone dos dois lados</span>
+                    <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-seta" /></svg></span>
+                </a>
+                <span class="cap">o sublinhado pega só o texto</span>
+            </div>
+        </div>
+        <p class="prosa" style="margin-top: 16px">
+            Em texto corrido, que é onde a regra de 3:1 morde: um
+            <a href="#fu-prosa" class="bmb-hyperlink bmb-hyperlink--force-underline bmb-hyperlink--primary bmb-hyperlink--md"><span class="bmb-hyperlink__label">link sublinhado</span></a>
+            se distingue do texto ao redor sem depender da cor.
+        </p>
+
+        <h2>Disabled</h2>
+        <p class="nota">
+            <strong>Repare que não há <code>href</code>.</strong> É isso que torna o link não
+            clicável e não focável — <code>&lt;a&gt;</code> não tem <code>disabled</code> nativo.
+            O <code>aria-disabled</code> reforça o estado para o leitor de tela, e o CSS aplica
+            opacidade 0,4 e <code>cursor: not-allowed</code>. Especificação registrada no Figma
+            em 18/09/2026. Navegue com Tab: o link abaixo é pulado.
+        </p>
+        <div class="row" style="margin-top: 12px">
+            <a class="bmb-hyperlink bmb-hyperlink--disabled-appearance bmb-hyperlink--primary bmb-hyperlink--md" aria-disabled="true"><span class="bmb-hyperlink__label">Hiperlink</span></a>
+            <a href="#comparacao" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md"><span class="bmb-hyperlink__label">Link normal, para comparar</span></a>
+        </div>
+        <p class="sub" style="margin-top: 12px">
+            Ainda assim, na maioria dos casos o certo é <strong>não renderizar o link</strong>.
+            Se o destino não existe, texto simples comunica melhor.
+        </p>
+
+        <h2>Link externo</h2>
+        <p class="nota">
+            Não é variante: é o slot <strong>Right Icon</strong> com o ícone
+            <code>arrow-up-right-01-round</code> (Arrows, em 03. CORE-Media). Abaixo uma
+            aproximação do ícone, já que o pacote não embute a biblioteca de mídia. Se abrir em
+            nova aba, <code>rel="noopener noreferrer"</code> é obrigatório e o aviso precisa
+            estar no texto — o ícone é decorativo e não anuncia nada.
+        </p>
+        <div class="row" style="margin-top: 12px">
+            <a href="https://example.com" target="_blank" rel="noopener noreferrer" class="bmb-hyperlink bmb-hyperlink--primary bmb-hyperlink--md">
+                <span class="bmb-hyperlink__label">Ver no site (abre em nova aba)</span>
+                <span class="bmb-hyperlink__icon" aria-hidden="true"><svg><use href="#ico-externo" /></svg></span>
+            </a>
+        </div>
+
+        <h2>O que não está aqui, e por quê</h2>
+        <p class="sub">
+            Não há exemplo de <strong>visited</strong>: o DS decidiu em 18/09/2026 não
+            diferenciar link visitado, por privacidade — navegadores restringem
+            <code>:visited</code> desde que a pseudo-classe virou vetor de detecção de
+            histórico. Não é lacuna, é decisão.
+        </p>
+        <p class="sub">
+            Não há variante <strong>inline</strong> vs <strong>standalone</strong>: o
+            <code>inline-flex</code> resolve os dois, de propósito, como o link nativo do HTML.
+            Ver "Decisões registradas" em <code>src/hyperlink.rules.md</code>.
+        </p>
+    </body>
+</html>

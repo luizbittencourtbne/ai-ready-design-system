@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-BR" data-brand="employer" data-theme="light">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Dot</title>
+        <!-- As marcas declaram famílias diferentes em --bmb-font-family-body: Roboto
+             (employer), Nunito (epays) e Montserrat (bne-cia). Sem carregá-las, o texto cai no
+             fallback do sistema e a página mostra uma tipografia que não é a do Design System. -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&family=Nunito:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="../dist/brands.css" />
+        <link rel="stylesheet" href="../dist/dot.preview.css" />
+        <style>
+            /* apenas a pagina de demo — os estilos do componente vem de dot.preview.css */
+            body {
+                font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+                margin: 0;
+                padding: 40px;
+                color: #1b2439;
+                background: #fff;
+            }
+            h1 { font-size: 20px; margin: 0 0 4px; }
+            p.sub { margin: 0 0 32px; color: #5b6478; font-size: 14px; max-width: 70ch; }
+            h2 {
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #5b6478;
+                margin: 32px 0 12px;
+                font-weight: 600;
+            }
+            .row { display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+            .cell { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+            /* O par Dot + texto. É a unidade real de uso: o Dot sozinho não existe. */
+            .par { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+            .cap { font-size: 11px; color: #8890a0; }
+            .escuro {
+                background: #171717;
+                color: #fafafa;
+                padding: 20px;
+                border-radius: 8px;
+                margin-top: 8px;
+            }
+            .escuro .cap { color: #9aa1ad; }
+            .nota {
+                background: #fffbe6;
+                border: 1px solid #e8d48b;
+                border-radius: 8px;
+                padding: 12px 16px;
+                font-size: 13px;
+                max-width: 70ch;
+                margin: 8px 0 0;
+            }
+            table { border-collapse: collapse; font-size: 14px; }
+            th, td { text-align: left; padding: 8px 16px 8px 0; border-bottom: 1px solid #e8eaee; }
+            th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #8890a0; font-weight: 600; }
+        </style>
+    </head>
+    <body>
+        <!-- Glifo do Figma: uma barra horizontal arredondada, igual nos cinco tons. O `fill` é
+             currentColor de propósito — é assim que o token on-{tom} chega ao desenho. -->
+        <svg style="display: none" aria-hidden="true">
+            <symbol id="ico-dot" viewBox="0 0 10 10">
+                <path
+                    d="M8.63672 4.43164C8.95036 4.43183 9.2041 4.68632 9.2041 5C9.20409 5.31368 8.95035 5.56817 8.63672 5.56836H1.36328C1.04965 5.56817 0.795908 5.31367 0.795898 5C0.795898 4.68632 1.04964 4.43183 1.36328 4.43164H8.63672Z"
+                    fill="currentColor"
+                />
+            </symbol>
+        </svg>
+
+        <h1>Dot</h1>
+        <p class="sub">
+            Figma CORE-Basics · Dot 992:1153 · set 16645:256367 (5 tons) e .Master Dot
+            16645:256354 (3 tamanhos). Não há estados: o componente não é interativo. Passar o
+            mouse ou apertar Tab não faz nada aqui — e é assim mesmo.
+        </p>
+
+        <p class="nota">
+            <strong>Em todos os exemplos desta página o Dot vem acompanhado de texto.</strong>
+            Não é estilo de demo: o Dot informa por cor, e por cor apenas. Sozinho, ele não
+            comunica nada a quem não distingue as cores. Ver <code>src/dot.rules.md</code>.
+        </p>
+
+        <h2>Tons</h2>
+        <div class="row">
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--base bmb-dot--md" aria-hidden="true"></span>Sem categoria</span>
+                <span class="cap">base · base-default-alt</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--primary bmb-dot--md" aria-hidden="true"></span>Plano Pro</span>
+                <span class="cap">primary · primary-default</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--success bmb-dot--md" aria-hidden="true"></span>Ativo</span>
+                <span class="cap">success · success-default</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--warning bmb-dot--md" aria-hidden="true"></span>Pendente</span>
+                <span class="cap">warning · warning-default</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--error bmb-dot--md" aria-hidden="true"></span>Bloqueado</span>
+                <span class="cap">error · error-default</span>
+            </div>
+        </div>
+
+        <p class="nota">
+            <strong>Primary não é Success.</strong> O tom Primary remete à marca — um plano, uma
+            novidade, uma feature. Ele não quer dizer que algo deu certo. Cadastro aprovado é
+            <code>success</code>, mesmo quando o azul da marca cai melhor na tela.
+        </p>
+
+        <h2>Tamanhos</h2>
+        <div class="row">
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--success bmb-dot--sm" aria-hidden="true"></span>Online</span>
+                <span class="cap">sm · 8px (1 + 6 + 1)</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--success bmb-dot--md" aria-hidden="true"></span>Online</span>
+                <span class="cap">md · 16px (3 + 10 + 3) · default</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--success bmb-dot--lg" aria-hidden="true"></span>Online</span>
+                <span class="cap">lg · 24px (4 + 16 + 4)</span>
+            </div>
+        </div>
+
+        <h2>Defaults</h2>
+        <p class="sub">
+            O Figma define default para os dois eixos: <code>tone=Base</code> e
+            <code>Size=Medium</code>. Um <code>.bmb-dot</code> sem nenhuma classe de tom ou
+            tamanho renderiza exatamente isso — e é idêntico ao par explícito ao lado.
+        </p>
+        <div class="row">
+            <div class="cell">
+                <span class="par"><span class="bmb-dot" aria-hidden="true"></span>Sem classe nenhuma</span>
+                <span class="cap">class="bmb-dot"</span>
+            </div>
+            <div class="cell">
+                <span class="par"><span class="bmb-dot bmb-dot--base bmb-dot--md" aria-hidden="true"></span>Classes explícitas</span>
+                <span class="cap">class="bmb-dot bmb-dot--base bmb-dot--md"</span>
+            </div>
+        </div>
+
+        <h2>Com glifo</h2>
+        <p class="sub">
+            <code>Show icon</code> tem default <code>false</code>. Em CSS não há classe para
+            ligar: o glifo é a presença do filho <code>.bmb-dot__icon</code>. O desenho é o
+            mesmo nos cinco tons — ele não diferencia status, só a cor diferencia. Por isso ele
+            não dispensa o texto.
+        </p>
+        <div class="row">
+            <div class="cell">
+                <span class="par">
+                    <span class="bmb-dot bmb-dot--success bmb-dot--sm" aria-hidden="true">
+                        <span class="bmb-dot__icon"><svg><use href="#ico-dot" /></svg></span>
+                    </span>
+                    Aprovado
+                </span>
+                <span class="cap">sm · glifo 6px</span>
+            </div>
+            <div class="cell">
+                <span class="par">
+                    <span class="bmb-dot bmb-dot--warning bmb-dot--md" aria-hidden="true">
+                        <span class="bmb-dot__icon"><svg><use href="#ico-dot" /></svg></span>
+                    </span>
+                    Aguardando revisão
+                </span>
+                <span class="cap">md · glifo 10px</span>
+            </div>
+            <div class="cell">
+                <span class="par">
+                    <span class="bmb-dot bmb-dot--error bmb-dot--lg" aria-hidden="true">
+                        <span class="bmb-dot__icon"><svg><use href="#ico-dot" /></svg></span>
+                    </span>
+                    Falhou
+                </span>
+                <span class="cap">lg · glifo 16px</span>
+            </div>
+        </div>
+
+        <h2>Sem texto ao lado: o Dot precisa de rótulo próprio</h2>
+        <p class="sub">
+            Numa tabela em que a coluna já se chama “Status”, repetir a palavra em cada linha
+            polui. Aí o Dot deixa de ser decoração e passa a carregar a informação — então
+            precisa de <code>role="img"</code> e <code>aria-label</code>. Sem isso, a coluna
+            inteira fica vazia para quem usa leitor de tela.
+        </p>
+        <table>
+            <thead>
+                <tr><th>Integração</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Folha de pagamento</td>
+                    <td><span class="bmb-dot bmb-dot--success bmb-dot--md" role="img" aria-label="Ativo"></span></td>
+                </tr>
+                <tr>
+                    <td>Ponto eletrônico</td>
+                    <td><span class="bmb-dot bmb-dot--warning bmb-dot--md" role="img" aria-label="Pendente"></span></td>
+                </tr>
+                <tr>
+                    <td>Banco de horas</td>
+                    <td><span class="bmb-dot bmb-dot--error bmb-dot--md" role="img" aria-label="Offline"></span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>A cor do glifo muda por marca</h2>
+        <p class="sub">
+            <code>on-success</code> resolve para <code>#fafafa</code> em employer e ePays, e para
+            <code>#000000</code> em BNE CIA — porque o verde de sucesso daquela marca é muito
+            mais claro. Troque a marca no <code>&lt;html&gt;</code> e compare o glifo.
+        </p>
+        <div class="row">
+            <div class="cell" data-brand="employer">
+                <span class="par">
+                    <span class="bmb-dot bmb-dot--success bmb-dot--lg" aria-hidden="true">
+                        <span class="bmb-dot__icon"><svg><use href="#ico-dot" /></svg></span>
+                    </span>
+                    Ativo
+                </span>
+                <span class="cap">employer · glifo claro</span>
+            </div>
+            <div class="cell" data-brand="epays">
+                <span class="par">
+                    <span class="bmb-dot bmb-dot--success bmb-dot--lg" aria-hidden="true">
+                        <span class="bmb-dot__icon"><svg><use href="#ico-dot" /></svg></span>
+                    </span>
+                    Ativo
+                </span>
+                <span class="cap">epays · glifo claro</span>
+            </div>
+            <div class="cell" data-brand="bne-cia">
+                <span class="par">
+                    <span class="bmb-dot bmb-dot--success bmb-dot--lg" aria-hidden="true">
+                        <span class="bmb-dot__icon"><svg><use href="#ico-dot" /></svg></span>
+                    </span>
+                    Ativo
+                </span>
+                <span class="cap">bne-cia · glifo preto</span>
+            </div>
+        </div>
+
+        <h2>Modo escuro</h2>
+        <div class="escuro" data-theme="dark">
+            <div class="row">
+                <div class="cell">
+                    <span class="par"><span class="bmb-dot bmb-dot--base bmb-dot--md" aria-hidden="true"></span>Sem categoria</span>
+                    <span class="cap">base</span>
+                </div>
+                <div class="cell">
+                    <span class="par"><span class="bmb-dot bmb-dot--primary bmb-dot--md" aria-hidden="true"></span>Plano Pro</span>
+                    <span class="cap">primary</span>
+                </div>
+                <div class="cell">
+                    <span class="par"><span class="bmb-dot bmb-dot--success bmb-dot--md" aria-hidden="true"></span>Ativo</span>
+                    <span class="cap">success</span>
+                </div>
+                <div class="cell">
+                    <span class="par"><span class="bmb-dot bmb-dot--warning bmb-dot--md" aria-hidden="true"></span>Pendente</span>
+                    <span class="cap">warning</span>
+                </div>
+                <div class="cell">
+                    <span class="par"><span class="bmb-dot bmb-dot--error bmb-dot--md" aria-hidden="true"></span>Bloqueado</span>
+                    <span class="cap">error</span>
+                </div>
+            </div>
+        </div>
+
+        <h2>O que o Dot não faz</h2>
+        <p class="sub">
+            Não tem hover, foco, active, selected nem disabled. Não recebe
+            <code>tabindex</code>, não vira <code>&lt;button&gt;</code> e não recebe
+            <code>onclick</code>. A validação reprova o CSS se qualquer pseudo-classe de
+            interação aparecer nele, e reprova esta demo se um Dot for aplicado a um elemento
+            interativo. Se precisa ser clicado, o componente é o Button; se leva a outro
+            destino, é o Hyperlink.
+        </p>
+    </body>
+</html>

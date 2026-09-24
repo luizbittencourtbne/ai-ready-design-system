@@ -1,21 +1,119 @@
-# Instruções para assistentes — BambooDS
+# AGENTS.md
 
-Este pacote contém um experimento do componente Button. Leia `README.md` e `components.json` antes de trabalhar. O contrato real está em `src/button.contract.json`, as decisões e pendências em `src/button.rules.md` e os dados de geometria em `src/button.tokens.json`. Não substitua essa estrutura por um `component.json` genérico.
+## Sobre este repositório
 
-## Fontes e fluxo
+Este repositório contém componentes do BambooDS estruturados para consumo por humanos, código e agentes de IA.
 
-- Cores: `audit/audit-brands-raw.json` e `audit/audit-semantic-raw.json` alimentam `audit/core-brands-audit.json` e `dist/brands.css`.
-- Geometria: `src/button.tokens.json` alimenta o CSS do botão via `scripts/build-css.mjs`.
-- O contrato descreve a API, mas o mapeamento de temas continua em `scripts/build-css.mjs`.
-- `dist/` é gerado. Não edite esses arquivos manualmente.
-- Não declare que houve uma conferência ao vivo no Figma: os dados aqui são snapshots de audits.
+Antes de trabalhar em qualquer componente:
+1. leia este arquivo;
+2. leia `components.json`;
+3. localize o componente pelo `id`;
+4. leia os arquivos declarados no índice;
+5. preserve as decisões existentes;
+6. não invente estados, tokens ou APIs.
 
-## Convenções
+---
 
-- Confira padrões existentes antes de sugerir componente, variante ou token novo.
-- Preserve as marcas `employer`, `epays`, `bne-cia` e os modos `light` e `dark`.
-- Prefira HTML semântico, `disabled` nativo e nome acessível para botão só com ícone.
-- Diferencie erro comprovado, risco e divergência já documentada. Não corrija escolhas de design em aberto por conta própria.
-- Ao alterar código em uma tarefa autorizada, rode `npm run check` e registre o resultado.
+## Regras globais do Design System
 
-Para revisão somente leitura, siga `agents/ds-lead.md` e `agents/component-reviewer.md`; não modifique arquivos.
+- Reutilize tokens existentes antes de criar novos.
+- Não use valores hardcoded quando existir token equivalente.
+- Contracts descrevem a API suportada.
+- Rules documentam decisões, restrições e exceções.
+- Tokens estruturam decisões visuais.
+- `dist/` contém artefatos gerados e não deve ser tratado como fonte primária.
+- Não altere componentes não relacionados sem necessidade.
+- Diferencie:
+  - erro comprovado;
+  - risco;
+  - decisão ainda não definida.
+
+---
+
+## Descoberta de componentes
+
+A fonte de descoberta é:
+
+`components.json`
+
+Nunca assuma caminhos de arquivo a partir do nome do componente.
+
+Para trabalhar com um componente:
+
+1. localize seu `id` em `components.json`;
+2. leia os caminhos declarados;
+3. carregue contract;
+4. carregue rules;
+5. carregue tokens;
+6. carregue implementation/demo quando necessário.
+
+Exemplo:
+
+Button
+→ `components.json`
+→ contract
+→ rules
+→ tokens
+→ implementation
+→ demo
+
+---
+
+## Fluxo de build
+
+A fonte de verdade é `src/` e os arquivos de auditoria declarados.
+
+Fluxo geral:
+
+source/audit
+→ tokens
+→ scripts de build
+→ `dist/`
+
+Não edite arquivos em `dist/` manualmente.
+
+Depois de qualquer alteração relevante:
+
+`npm run check`
+
+deve continuar passando.
+
+---
+
+## Fluxo de auditoria
+
+Arquivos em `audit/` representam dados extraídos ou verificados a partir das fontes de design.
+
+Quando houver diferença entre:
+- Figma;
+- audit;
+- tokens;
+- implementação;
+
+não escolha silenciosamente uma das versões.
+
+Registre a divergência e indique qual fonte sustenta cada valor.
+
+---
+
+## Como trabalhar com componentes
+
+Ao adicionar ou alterar um componente:
+
+1. localizar ou criar entrada em `components.json`;
+2. criar/atualizar contract;
+3. criar/atualizar rules;
+4. criar/atualizar tokens;
+5. implementar;
+6. atualizar demo;
+7. atualizar build apenas se necessário;
+8. atualizar validação;
+9. rodar `npm run check`;
+10. confirmar que `detect-changed-components.mjs` identifica o componente.
+
+Nunca:
+- invente variantes;
+- invente estados;
+- copie regras específicas de outro componente sem verificar;
+- altere `dist/` como fonte;
+- esconda uma divergência conhecida.

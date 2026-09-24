@@ -11,6 +11,72 @@
       "css": "dist/button.css",
       "browserCss": "dist/button.preview.css",
       "demo": "demo/playground.html"
+    },
+    {
+      "id": "hyperlink",
+      "name": "Hyperlink",
+      "status": "experimental",
+      "purpose": "navegação: leva a pessoa para outro destino (ação é o Button)",
+      "element": "a",
+      "contract": "src/hyperlink.contract.json",
+      "rules": "src/hyperlink.rules.md",
+      "tokens": "src/hyperlink.tokens.json",
+      "css": "dist/hyperlink.css",
+      "browserCss": "dist/hyperlink.preview.css",
+      "demo": "demo/hyperlink.html"
+    },
+    {
+      "id": "dot",
+      "name": "Dot",
+      "status": "experimental",
+      "purpose": "indicador de status: informa por cor, nunca sozinho (ação é o Button, navegação é o Hyperlink)",
+      "element": "span",
+      "interactive": false,
+      "contract": "src/dot.contract.json",
+      "rules": "src/dot.rules.md",
+      "tokens": "src/dot.tokens.json",
+      "css": "dist/dot.css",
+      "browserCss": "dist/dot.preview.css",
+      "demo": "demo/dot.html"
+    },
+    {
+      "id": "checkbox",
+      "name": "Checkbox",
+      "status": "experimental",
+      "purpose": "opção independente: o valor vale no envio (escolha única é o Radio, efeito imediato é o Switch)",
+      "element": "label > input[type=checkbox]",
+      "contract": "src/checkbox.contract.json",
+      "rules": "src/checkbox.rules.md",
+      "tokens": "src/checkbox.tokens.json",
+      "css": "dist/checkbox.css",
+      "browserCss": "dist/checkbox.preview.css",
+      "demo": "demo/checkbox.html"
+    },
+    {
+      "id": "radio",
+      "name": "Radio",
+      "status": "experimental",
+      "purpose": "escolha única dentro de um grupo de 2+ (opções independentes são o Checkbox, efeito imediato é o Switch)",
+      "element": "fieldset > label > input[type=radio]",
+      "contract": "src/radio.contract.json",
+      "rules": "src/radio.rules.md",
+      "tokens": "src/radio.tokens.json",
+      "css": "dist/radio.css",
+      "browserCss": "dist/radio.preview.css",
+      "demo": "demo/radio.html"
+    },
+    {
+      "id": "switch",
+      "name": "Switch",
+      "status": "experimental",
+      "purpose": "configuração com efeito imediato, sem confirmar (valor que vale no envio é o Checkbox, escolha única é o Radio)",
+      "element": "label > input[type=checkbox][role=switch]",
+      "contract": "src/switch.contract.json",
+      "rules": "src/switch.rules.md",
+      "tokens": "src/switch.tokens.json",
+      "css": "dist/switch.css",
+      "browserCss": "dist/switch.preview.css",
+      "demo": "demo/switch.html"
     }
   ]
 }

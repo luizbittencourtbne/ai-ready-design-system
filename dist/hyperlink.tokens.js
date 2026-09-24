@@ -1,0 +1,105 @@
+window.BMB_HYPERLINK_TOKENS = {
+  "_source": "Figma 04. CORE-Basics (Audit) BWdzK06j2tX1Dt62ZSxNR1: Hiperlink 240:1702 — component set 99:8725 (Theme × State, 9×6) e .Master Hiperlink 99:8672 (Size × Content, 4×2). Lido ao vivo via MCP.",
+  "_generated": "2026-09-20",
+  "_revisao": "2026-09-20, segunda leitura. O componente foi ajustado no Figma em 2026-09-18: ganhou anel de foco por tema, Hit Area de 24px (WCAG 2.5.8), perdeu a altura fixa do master, e o ícone do Large passou de 22 para 18,917, batendo com o Icon Only. As caixas de Icon Only deixaram de ter folga: agora são do tamanho do próprio ícone.",
+  "_leiaAntes": "Só entram aqui valores que scripts/build-hyperlink-css.mjs realmente consome. Campo que não vira CSS não mora neste arquivo.",
+  "themeOrder": [
+    "Base",
+    "Primary",
+    "Secondary",
+    "Tertiary",
+    "Quaternary",
+    "Success",
+    "Warning",
+    "Error",
+    "Invert"
+  ],
+  "stateOrder": [
+    "Default",
+    "Hover",
+    "Active",
+    "Selected",
+    "Focus",
+    "Disabled"
+  ],
+  "sizeOrder": [
+    "XSmall",
+    "Small",
+    "Medium",
+    "Large"
+  ],
+  "contentOrder": [
+    "Label & Icon",
+    "Icon Only"
+  ],
+  "gap": 4,
+  "disabledOpacity": 0.4,
+  "hitArea": 24,
+  "focus": {
+    "borderWidth": 2,
+    "padY": 2,
+    "padX": 4,
+    "radius": 4
+  },
+  "sizes": {
+    "XSmall": {
+      "icon": 8.981
+    },
+    "Small": {
+      "icon": 12
+    },
+    "Medium": {
+      "icon": 16
+    },
+    "Large": {
+      "icon": 18.917
+    }
+  },
+  "themeTokens": {
+    "base": {
+      "fg": "base-on-on-base",
+      "fg-hover": "base-backgrounds-base-hover-alt",
+      "fg-active": "base-backgrounds-base-active-alt",
+      "fg-selected": "base-backgrounds-base-selected-alt",
+      "fg-focus": "base-borders-border-base-focus-alt"
+    },
+    "primary": {
+      "fg": "primary-on-on-surface-primary"
+    },
+    "secondary": {
+      "fg": "secondary-on-on-surface-secondary"
+    },
+    "tertiary": {
+      "fg": "tertiary-on-on-surface-tertiary"
+    },
+    "quaternary": {
+      "fg": "quaternary-on-on-surface-quaternary"
+    },
+    "success": {
+      "fg": "success-on-on-surface-success"
+    },
+    "warning": {
+      "fg": "warning-on-on-surface-warning"
+    },
+    "error": {
+      "fg": "error-on-on-surface-error"
+    },
+    "invert": {
+      "fg": "surface-brand-on-on-surface-neutral-brand"
+    }
+  },
+  "brands": [
+    {
+      "id": "employer",
+      "label": "Employer"
+    },
+    {
+      "id": "epays",
+      "label": "ePays"
+    },
+    {
+      "id": "bne-cia",
+      "label": "BNE CIA"
+    }
+  ]
+};

@@ -6,6 +6,8 @@
 
 > Leia `CLAUDE.md`, `AGENTS.md`, `README.md`, `components.json`, `agents/ds-lead.md` e `agents/component-reviewer.md`. Revise o componente Button a partir dos arquivos reais do pacote. Faça somente uma revisão, sem editar arquivos. Se puder executar comandos, rode `npm run validate`; se não puder, registre essa limitação. Entregue Escopo e verificações, Problemas, Recomendações e Status, com evidências em caminhos de arquivo. Diferencie pendências de design já documentadas de problemas novos.
 
-4. Compare a resposta com `review-exemplo.md`. Os números e o resultado de build daquele exemplo se referem a este pacote e podem mudar após edições futuras.
+Troque `Button` por `Hyperlink`, `Dot`, `Checkbox`, `Radio` ou `Switch` para revisar os outros componentes do índice. Eles não têm o mesmo formato — o Dot, por exemplo, não é interativo e não tem estados —, e `agents/component-reviewer.md` traz a tabela com os eixos de cada um.
+
+4. Compare a resposta com `review-exemplo.md`. Aquele exemplo é um retrato de quando o pacote só tinha o Button: os números e o resultado de build mudaram desde então, e ele continua ali como modelo de formato, não como resultado atual.
 
 `agents/*.md` são instruções para o assistente seguir, não processos autônomos instalados. O primeiro teste comprova se a revisão segue as fontes do projeto. Para pedir uma mudança depois, descreva qual problema quer corrigir e peça uma proposta antes da edição.
