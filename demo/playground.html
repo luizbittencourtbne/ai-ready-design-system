@@ -162,12 +162,19 @@
             .palco[data-canvas='dark'] .rot { color: #9aa0aa; }
             .linha-estado { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px 16px; width: 100%; }
             .linha-estado .rot { justify-self: end; }
-            /* O tom invert dos controles só existe sobre o painel da marca. */
-            .superficie-marca {
-                display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px 20px;
-                padding: 12px 16px; border-radius: 8px;
+            /* O tom invert dos controles só existe sobre o painel da marca. Em vez de um cartão
+               a mais em volta do componente — que o fazia parecer maior que os outros tons —,
+               o próprio palco vira o painel. Vem depois de data-canvas para vencer o modo escuro. */
+            .palco[data-superficie='marca'] { background: var(--bmb-color-surface-brand-backgrounds-surface-brand); }
+            .palco[data-superficie='marca'] .rot,
+            .palco[data-superficie='marca'] .grupo-controle legend { color: var(--bmb-color-surface-brand-on-on-surface-subtle-brand); }
+            /* Na grade de tons os três dividem o palco: só a amostra invert ganha o painel, com
+               margem negativa do tamanho do padding para não empurrar as vizinhas. */
+            .amostra.na-marca {
+                padding: 8px 12px; margin: -8px -12px; border-radius: 8px;
                 background: var(--bmb-color-surface-brand-backgrounds-surface-brand);
             }
+            .amostra.na-marca .rot { color: var(--bmb-color-surface-brand-on-on-surface-subtle-brand); }
             /* Grupo do Radio: um <fieldset> de verdade, com <legend>, sem a moldura do navegador. */
             .grupo-controle { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
             .grupo-controle legend { float: left; margin-right: 12px; font: 11px ui-monospace, monospace; color: var(--doc-dim); }
@@ -479,11 +486,11 @@
                         } else {
                             corpo = item.call(this, S, null, S.checked, rotulo(S));
                         }
-                        if (S.theme !== 'invert') return corpo;
-                        const painel = el('span', 'superficie-marca');
-                        painel.appendChild(corpo);
-                        return painel;
+                        return corpo;
                     },
+                    /* invert só existe sobre o painel da marca: quem pinta o fundo é o palco
+                       (ou a amostra, na grade de tons), não um invólucro em volta do componente. */
+                    superficie(S) { return S.theme === 'invert' ? 'marca' : ''; },
                     alvo(n) { return n.matches?.('label.' + base) ? n : n.querySelector('label.' + base); },
                     /* Hover e Focus são pseudo-estados: forçados aqui por style inline que aponta
                        para as MESMAS custom properties privadas que o CSS gerado expõe. Não
@@ -1305,6 +1312,13 @@
                 }
 
                 for (const p of host.querySelectorAll('.palco')) p.dataset.canvas = GLOBAL.mode;
+                /* O painel da marca pinta o palco inteiro quando o tom exige (invert). A grade de
+                   tons fica de fora: nela os tons dividem o palco, e só a amostra invert é pintada. */
+                const sup = C.superficie ? C.superficie(S) : '';
+                for (const id of ['palco', 'ex-tamanhos', 'ex-estados']) {
+                    const p = $(id);
+                    if (p) p.dataset.superficie = sup;
+                }
 
                 // playground
                 const palco = $('palco');
@@ -1323,8 +1337,8 @@
                 const ht = $('g-theme');
                 if (ht) for (const b of ht.querySelectorAll('button')) b.querySelector('i').style.background = C.corSwatch(b.dataset.val);
 
-                /* Os controles devolvem um invólucro (painel da marca, grupo do Radio); os
-                   tokens e a tipografia são lidos do componente de dentro. */
+                /* O Radio devolve o grupo (<fieldset>); os tokens e a tipografia são lidos do
+                   componente de dentro. */
                 const alvo = C.alvo ? C.alvo(no) : no;
                 const cs = getComputedStyle(alvo);
                 const info = C.tokens(S, cs, alvo);
@@ -1348,7 +1362,11 @@
                 // exemplos estáticos
                 const et = $('ex-temas');
                 et.innerHTML = '';
-                for (const t of C.temas) et.appendChild(amostra(C.no({ ...S, theme: t, state: 'Interativo' }), t));
+                for (const t of C.temas) {
+                    const a = amostra(C.no({ ...S, theme: t, state: 'Interativo' }), t);
+                    if (C.superficie && C.superficie({ theme: t })) a.classList.add('na-marca');
+                    et.appendChild(a);
+                }
 
                 const ez = $('ex-tamanhos');
                 ez.innerHTML = '';

@@ -532,6 +532,11 @@ if (cbItem) {
         const z = cb.fonte.sizes[nome];
         check(z.dash.x * 2 + z.dash.w === z.box && z.dash.y * 2 === z.box,
             `Checkbox: o traço do indeterminate de ${nome} não está centrado na caixa de ${z.box}.`);
+        /* O check é centrado na horizontal em todos os tamanhos. No sm isso é desvio
+         * autorizado (centerX), porque o x do Figma o deixava 0,45px à esquerda. */
+        const x = z.check.centerX ? (z.box - z.check.w) / 2 : z.check.x;
+        check(Math.abs(x * 2 + z.check.w - z.box) < 0.01,
+            `Checkbox: o check de ${nome} não está centrado na horizontal da caixa de ${z.box} (x=${x}).`);
         check(blocoDe(cb.css, `.bmb-checkbox--${nome} {`).includes(`--_bmb-checkbox-box: ${z.box}px;`),
             `Checkbox: tamanho ${nome} sem caixa de ${z.box}px.`);
     }

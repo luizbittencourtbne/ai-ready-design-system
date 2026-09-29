@@ -165,7 +165,7 @@
   "openDivergences": [
     "DS-053: no brand desmarcado, o fundo da caixa é on-primary, um token de texto usado como fundo. Implementado como o Figma mostra.",
     "Default de size: a propriedade do .Master Checkbox diz sm; as 36 variantes públicas instanciam md e a especificação diz md. Implementado md.",
-    "Glifo check do sm: 5,09 × 3,5 em (4, 5) numa caixa de 14 — fora do centro e proporcionalmente menor que no md e no lg. Implementado como medido.",
+    "Glifo check do sm: 5,09 × 3,5 em (4, 5) numa caixa de 14 — fora do centro e proporcionalmente menor que no md e no lg. Centrado na horizontal (x = 4,4545) por decisão do time, como desvio autorizado; a proporção continua em aberto.",
     "Rótulo: o Figma aplica leading-trim CAP_HEIGHT; o CSS não implementa (suporte parcial a text-box-trim).",
     "Contraste: os números da especificação (Figma) e os recalculados a partir de dist/brands.css não coincidem. Ver src/checkbox.rules.md."
   ],
